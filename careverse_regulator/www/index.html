@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ title }}</title>
+    <meta name="description" content="Compliance 360 regulator portal for licensing, oversight, and healthcare compliance operations." />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+    <style>
+      :root {
+        --primary: #11b5a1;
+        --primary-dark: #0d8b7b;
+        --navy: #0a2a66;
+        --ink-main: #132238;
+        --ink-body: #30445f;
+        --ink-muted: #6d7f96;
+        --ink-light: #9caabf;
+        --glass-bg: linear-gradient(145deg, rgba(255,255,255,0.76), rgba(255,255,255,0.42));
+        --glass-border: 1px solid rgba(255,255,255,0.55);
+        --glass-shadow: 0 12px 36px rgba(10, 27, 54, 0.10);
+        --glass-shadow-lg: 0 24px 70px rgba(10, 27, 54, 0.14);
+        --radius: 18px;
+        --radius-lg: 24px;
+        --font: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+      html, body {
+        font-family: var(--font);
+        color: var(--ink-main);
+        background:
+          radial-gradient(44% 34% at 8% 18%, rgba(17, 181, 161, 0.19) 0%, rgba(17, 181, 161, 0) 72%),
+          radial-gradient(30% 24% at 92% 8%, rgba(10, 42, 102, 0.12) 0%, rgba(10, 42, 102, 0) 72%),
+          linear-gradient(168deg, #f4f7fb 0%, #f7fbfb 46%, #f4f7fa 100%);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        scroll-behavior: smooth;
+      }
+
+      #page-content { padding: 0 !important; max-width: none !important; }
+
+      .page { position: relative; overflow: hidden; }
+      .page > * { position: relative; z-index: 1; }
+
+      .page::before,
+      .page::after {
+        content: "";
+        position: fixed;
+        pointer-events: none;
+        border-radius: 999px;
+        filter: blur(40px);
+        z-index: 0;
+      }
+
+      .page::before {
+        width: 360px;
+        height: 360px;
+        top: -110px;
+        right: -70px;
+        background: radial-gradient(circle, rgba(17, 181, 161, 0.18), transparent);
+      }
+
+      .page::after {
+        width: 320px;
+        height: 320px;
+        bottom: -100px;
+        left: -60px;
+        background: radial-gradient(circle, rgba(10, 42, 102, 0.12), transparent);
+      }
+
+      .orb-mid {
+        position: fixed;
+        left: -40px;
+        top: 42%;
+        width: 190px;
+        height: 190px;
+        border-radius: 999px;
+        background: radial-gradient(circle, rgba(11, 138, 123, 0.09), transparent);
+        filter: blur(48px);
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .wrap {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 0 28px;
+      }
+
+      .glass {
+        background: var(--glass-bg);
+        border: var(--glass-border);
+        box-shadow: var(--glass-shadow);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-radius: var(--radius);
+      }
+
+      .navbar {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        padding: 16px 28px;
+        background: linear-gradient(145deg, rgba(255,255,255,0.74), rgba(255,255,255,0.46));
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border-bottom: 1px solid rgba(219, 228, 239, 0.42);
+      }
+
+      .navbar-content {
+        max-width: 1120px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .brand-mark {
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, rgba(17, 181, 161, 0.18), rgba(10, 42, 102, 0.18));
+        color: var(--navy);
+        font-weight: 800;
+      }
+
+      .brand-copy {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .brand-copy strong {
+        font-size: 15px;
+        color: var(--ink-main);
+      }
+
+      .brand-copy span {
+        font-size: 12px;
+        color: var(--ink-muted);
+      }
+
+      .navbar-actions,
+      .hero-actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .btn {
+        padding: 12px 18px;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+      }
+
+      .btn:hover { transform: translateY(-1px); }
+
+      .btn-outline {
+        background: rgba(255,255,255,0.78);
+        color: var(--ink-body);
+        border: 1px solid rgba(206, 218, 232, 0.9);
+      }
+
+      .btn-primary {
+        color: #fff;
+        background: linear-gradient(135deg, var(--navy), var(--primary));
+        box-shadow: 0 8px 22px rgba(10, 42, 102, 0.22);
+      }
+
+      .hero {
+        padding: 108px 0 54px;
+      }
+
+      .hero-inner {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: 20px;
+        align-items: stretch;
+      }
+
+      .hero-copy {
+        padding: 44px;
+      }
+
+      .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 18px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--ink-muted);
+        background: rgba(255,255,255,0.82);
+        box-shadow: 0 6px 18px rgba(10, 27, 54, 0.07);
+        margin-bottom: 26px;
+        text-transform: uppercase;
+        letter-spacing: 0.35px;
+      }
+
+      .hero-badge svg {
+        width: 14px;
+        height: 14px;
+        color: var(--primary-dark);
+      }
+
+      .hero-title {
+        font-size: clamp(2.8rem, 5vw, 4rem);
+        font-weight: 800;
+        line-height: 1.02;
+        letter-spacing: -0.045em;
+        margin-bottom: 18px;
+      }
+
+      .hero-title .accent {
+        background: linear-gradient(135deg, var(--navy), var(--primary));
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .hero-desc {
+        font-size: 17px;
+        line-height: 1.7;
+        color: var(--ink-muted);
+        max-width: 58ch;
+        margin-bottom: 30px;
+      }
+
+      .hero-proof {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+      }
+
+      .proof-stat {
+        padding: 16px 14px;
+        border-radius: 16px;
+        background: rgba(255,255,255,0.58);
+        border: 1px solid rgba(255,255,255,0.55);
+      }
+
+      .proof-stat strong {
+        display: block;
+        font-size: 24px;
+        font-weight: 800;
+        color: var(--navy);
+        margin-bottom: 4px;
+      }
+
+      .proof-stat span {
+        font-size: 12px;
+        color: var(--ink-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+
+      .hero-rail {
+        padding: 26px;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+
+      .hero-rail-head h3 {
+        font-size: 18px;
+        font-weight: 800;
+        margin-bottom: 8px;
+      }
+
+      .hero-rail-head p {
+        font-size: 14px;
+        line-height: 1.65;
+        color: var(--ink-muted);
+      }
+
+      .mini-card {
+        padding: 18px;
+        border-radius: 18px;
+        background: rgba(255,255,255,0.64);
+        border: 1px solid rgba(255,255,255,0.55);
+      }
+
+      .mini-card .mc-label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.35px;
+        color: var(--ink-light);
+        margin-bottom: 10px;
+      }
+
+      .mini-card .mc-value {
+        font-size: 28px;
+        font-weight: 800;
+        line-height: 1;
+        color: var(--ink-main);
+        margin-bottom: 6px;
+      }
+
+      .mini-card .mc-sub {
+        font-size: 13px;
+        color: var(--ink-muted);
+      }
+
+      .section {
+        padding: 86px 0;
+      }
+
+      .section-head {
+        margin-bottom: 34px;
+      }
+
+      .section-head h2 {
+        font-size: 32px;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        margin-bottom: 10px;
+      }
+
+      .section-head p {
+        font-size: 15px;
+        line-height: 1.65;
+        color: var(--ink-muted);
+        max-width: 520px;
+      }
+
+      .cap-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+
+      .cap-card,
+      .feature-card,
+      .quote-card,
+      .cta-box {
+        padding: 28px;
+      }
+
+      .cap-card h3,
+      .feature-card h3 {
+        font-size: 18px;
+        margin-bottom: 10px;
+      }
+
+      .cap-card p,
+      .feature-card p {
+        font-size: 14px;
+        line-height: 1.65;
+        color: var(--ink-muted);
+      }
+
+      .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+      }
+
+      .feature-card {
+        min-height: 220px;
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+      }
+
+      .feature-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--glass-shadow-lg);
+      }
+
+      .feature-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(17, 181, 161, 0.10);
+        color: var(--primary-dark);
+        margin-bottom: 16px;
+        font-weight: 800;
+      }
+
+      .testimonial-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 16px;
+      }
+
+      .quote-card blockquote {
+        font-size: 18px;
+        line-height: 1.7;
+        color: var(--ink-body);
+        font-style: italic;
+        margin-bottom: 18px;
+      }
+
+      .quote-card strong {
+        display: block;
+        font-size: 14px;
+        color: var(--navy);
+      }
+
+      .quote-card span {
+        font-size: 12px;
+        color: var(--ink-muted);
+      }
+
+      .cta-box {
+        text-align: center;
+        max-width: 780px;
+        margin: 0 auto;
+        border-radius: 24px;
+        box-shadow: var(--glass-shadow-lg);
+      }
+
+      .cta-box h2 {
+        font-size: 32px;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        margin-bottom: 12px;
+      }
+
+      .cta-box p {
+        font-size: 15px;
+        line-height: 1.65;
+        color: var(--ink-muted);
+        max-width: 520px;
+        margin: 0 auto 24px;
+      }
+
+      .footer {
+        padding: 44px 0 30px;
+        border-top: 1px solid rgba(219, 228, 239, 0.42);
+      }
+
+      .footer-grid {
+        display: grid;
+        grid-template-columns: 1.6fr 1fr 1fr 1fr;
+        gap: 24px;
+        margin-bottom: 24px;
+      }
+
+      .footer-brand p {
+        font-size: 13px;
+        color: var(--ink-muted);
+        line-height: 1.7;
+        max-width: 280px;
+        margin-top: 10px;
+      }
+
+      .footer-col h4 {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        color: var(--ink-body);
+        margin-bottom: 12px;
+      }
+
+      .footer-col a {
+        display: block;
+        text-decoration: none;
+        color: var(--ink-muted);
+        font-size: 13px;
+        margin-bottom: 10px;
+      }
+
+      .footer-bottom {
+        padding-top: 18px;
+        border-top: 1px solid rgba(219, 228, 239, 0.32);
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .footer-bottom span {
+        font-size: 12px;
+        color: var(--ink-light);
+      }
+
+      @media (max-width: 1024px) {
+        .hero-inner,
+        .testimonial-grid,
+        .feature-grid,
+        .cap-grid,
+        .footer-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .hero-proof {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      @media (max-width: 768px) {
+        .hero {
+          padding: 74px 0 34px;
+        }
+
+        .hero-copy,
+        .hero-rail,
+        .cap-card,
+        .feature-card,
+        .quote-card,
+        .cta-box {
+          padding: 22px;
+        }
+
+        .navbar-content {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .navbar-actions,
+        .hero-actions {
+          width: 100%;
+          flex-direction: column;
+        }
+
+        .btn {
+          width: 100%;
+        }
+
+        .hero-proof {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+</head>
+<body>
+    <div class="page">
+      <div class="orb-mid"></div>
+
+      <nav class="navbar">
+        <div class="navbar-content">
+          <div class="brand">
+            <div class="brand-mark">C</div>
+            <div class="brand-copy">
+              <strong>{{ app_name }}</strong>
+              <span>Regulator operations portal</span>
+            </div>
+          </div>
+          <div class="navbar-actions">
+            <a href="{{ cta_secondary_link }}" class="btn btn-outline">{{ cta_secondary_text }}</a>
+            <a href="{{ cta_link }}" class="btn btn-primary">{{ cta_text }}</a>
+          </div>
+        </div>
+      </nav>
+
+      <section class="hero">
+        <div class="wrap">
+          <div class="hero-inner">
+            <div class="glass hero-copy">
+              <div class="hero-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+                National compliance command center
+              </div>
+              <h1 class="hero-title">Healthcare oversight with <span class="accent">clear decisions</span> and one operating view.</h1>
+              <p class="hero-desc">{{ subtitle }}</p>
+              <div class="hero-actions">
+                <a href="{{ cta_link }}" class="btn btn-primary">{{ cta_text }}</a>
+                <a href="/login?redirect-to=/app" class="btn btn-outline">Administrator Login</a>
+              </div>
+              <div class="hero-proof">
+                {% for metric in metrics %}
+                <div class="proof-stat">
+                  <strong>{{ metric.value }}</strong>
+                  <span>{{ metric.label }}</span>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <div class="glass hero-rail">
+              <div class="hero-rail-head">
+                <h3>Built for regulators who need flow, not fragmentation</h3>
+                <p>Compliance 360 aligns review queues, enforcement signals, and operational follow-up across facilities, professionals, and partner agencies.</p>
+              </div>
+              {% for item in showcase_stats %}
+              <div class="mini-card">
+                <div class="mc-label">{{ item.label }}</div>
+                <div class="mc-value">{{ item.value }}</div>
+                <div class="mc-sub">{{ item.sub }}</div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="wrap">
+          <div class="section-head">
+            <h2>What Compliance 360 does</h2>
+            <p>The platform gives supervisory teams a top-down operating model: intake, review, risk signal, action, and accountability in one place.</p>
+          </div>
+          <div class="cap-grid">
+            {% for capability in capabilities %}
+            <div class="glass cap-card">
+              <h3>{{ capability.title }}</h3>
+              <p>{{ capability.description }}</p>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </section>
+
+      <section class="section" style="padding-top: 0;">
+        <div class="wrap">
+          <div class="section-head">
+            <h2>Core platform modules</h2>
+            <p>Designed to support licensing, inspections, and compliance intelligence without forcing teams into disconnected tools.</p>
+          </div>
+          <div class="feature-grid">
+            {% for feature in features %}
+            <div class="glass feature-card">
+              <div class="feature-icon">{{ loop.index }}</div>
+              <h3>{{ feature.title }}</h3>
+              <p>{{ feature.description }}</p>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </section>
+
+      <section class="section" style="padding-top: 0;">
+        <div class="wrap">
+          <div class="section-head">
+            <h2>How regulators describe the shift</h2>
+            <p>The value is not cosmetic. The portal improves speed, consistency, and supervisory confidence across the review cycle.</p>
+          </div>
+          <div class="testimonial-grid">
+            {% for item in testimonials %}
+            <div class="glass quote-card">
+              <blockquote>"{{ item.quote }}"</blockquote>
+              <strong>{{ item.author }}</strong>
+              <span>Compliance 360 regulator program</span>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </section>
+
+      <section class="section" style="padding-top: 0;">
+        <div class="wrap">
+          <div class="glass cta-box">
+            <h2>Open the regulator workspace</h2>
+            <p>Continue into Compliance 360 to review licensing pipelines, monitor expiring approvals, and coordinate oversight actions.</p>
+            <div class="hero-actions" style="justify-content: center; margin-bottom: 0;">
+              <a href="{{ cta_link }}" class="btn btn-primary">{{ cta_text }}</a>
+              <a href="{{ cta_secondary_link }}" class="btn btn-outline">{{ cta_secondary_text }}</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <div class="wrap">
+          <div class="footer-grid">
+            <div class="footer-brand">
+              <div class="brand">
+                <div class="brand-mark">C</div>
+                <div class="brand-copy">
+                  <strong>{{ app_name }}</strong>
+                  <span>Healthcare compliance operations</span>
+                </div>
+              </div>
+              <p>National-grade oversight for licensing, compliance monitoring, inspections, and accountable decision-making.</p>
+            </div>
+            {% for heading, items in footer_links.items() %}
+            <div class="footer-col">
+              <h4>{{ heading }}</h4>
+              {% for item in items %}
+              <a href="{{ cta_link if item == 'Compliance 360' else (cta_secondary_link if item == 'Switch to Desk' else '#') }}">{{ item }}</a>
+              {% endfor %}
+            </div>
+            {% endfor %}
+          </div>
+          <div class="footer-bottom">
+            <span>&copy; {{ frappe.utils.now_datetime().year }} Compliance 360. All rights reserved.</span>
+            <span>{{ contact_email }} | {{ contact_phone }}</span>
+          </div>
+        </div>
+      </footer>
+    </div>
+</body>
+</html>

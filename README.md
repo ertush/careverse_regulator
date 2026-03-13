@@ -2,6 +2,12 @@
 
 Agencies and Regulators Portal
 
+### Frontend Design Language
+
+Use this as the canonical UI/UX context for all frontend module work:
+
+- [Frontend Design Language](docs/FRONTEND_DESIGN_LANGUAGE.md)
+
 ### Installation
 
 You can install this app using the [bench](https://github.com/frappe/bench) CLI:

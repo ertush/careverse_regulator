@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ title }}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+    <style>
+      :root {
+        --primary: #11b5a1;
+        --primary-dark: #0d8b7b;
+        --navy: #0a2a66;
+        --ink-main: #132238;
+        --ink-body: #31455f;
+        --ink-muted: #71819a;
+        --line: rgba(255,255,255,0.52);
+        --glass-bg: linear-gradient(145deg, rgba(255,255,255,0.78), rgba(255,255,255,0.46));
+        --glass-shadow: 0 16px 46px rgba(10, 27, 54, 0.12);
+        --font: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+      html, body {
+        font-family: var(--font);
+        min-height: 100vh;
+        color: var(--ink-main);
+        background:
+          radial-gradient(44% 34% at 8% 18%, rgba(17, 181, 161, 0.19) 0%, rgba(17, 181, 161, 0) 72%),
+          radial-gradient(30% 24% at 92% 8%, rgba(10, 42, 102, 0.12) 0%, rgba(10, 42, 102, 0) 72%),
+          linear-gradient(168deg, #f4f7fb 0%, #f7fbfb 46%, #f4f7fa 100%);
+      }
+
+      body { overflow-x: hidden; }
+
+      .shell {
+        min-height: 100vh;
+        display: flex;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .shell::before,
+      .shell::after {
+        content: "";
+        position: fixed;
+        pointer-events: none;
+        border-radius: 999px;
+        filter: blur(34px);
+        z-index: 0;
+      }
+
+      .shell::before {
+        width: 360px;
+        height: 360px;
+        top: -130px;
+        right: -88px;
+        background: radial-gradient(circle, rgba(17, 181, 161, 0.24), rgba(17, 181, 161, 0));
+      }
+
+      .shell::after {
+        width: 300px;
+        height: 300px;
+        bottom: -114px;
+        left: -78px;
+        background: radial-gradient(circle, rgba(10, 42, 102, 0.18), rgba(10, 42, 102, 0));
+      }
+
+      .shell > * { position: relative; z-index: 1; }
+
+      .left {
+        flex: 0 0 46%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 4rem 4.2rem;
+        border-right: 1px solid rgba(255,255,255,0.32);
+        background: linear-gradient(175deg, rgba(248, 250, 253, 0.90), rgba(245, 247, 250, 0.70));
+      }
+
+      .right {
+        flex: 0 0 54%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2.8rem 1.5rem;
+      }
+
+      .glass {
+        background: var(--glass-bg);
+        border: 1px solid var(--line);
+        box-shadow: var(--glass-shadow);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 26px;
+      }
+
+      .brand-mark {
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, rgba(17, 181, 161, 0.18), rgba(10, 42, 102, 0.18));
+        color: var(--navy);
+        font-weight: 800;
+      }
+
+      .brand-copy strong {
+        display: block;
+        font-size: 16px;
+      }
+
+      .brand-copy span {
+        display: block;
+        font-size: 12px;
+        color: var(--ink-muted);
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.35px;
+        text-transform: uppercase;
+        color: var(--ink-muted);
+        background: rgba(255,255,255,0.78);
+        margin-bottom: 20px;
+      }
+
+      .left h1 {
+        font-size: clamp(2.1rem, 3.2vw, 3rem);
+        line-height: 1.03;
+        letter-spacing: -0.04em;
+        margin-bottom: 16px;
+      }
+
+      .left p {
+        font-size: 15px;
+        line-height: 1.7;
+        color: var(--ink-muted);
+        max-width: 470px;
+      }
+
+      .perk-list {
+        margin-top: 34px;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+
+      .perk {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+      }
+
+      .perk-dot {
+        width: 36px;
+        height: 36px;
+        border-radius: 12px;
+        flex-shrink: 0;
+        background: rgba(17, 181, 161, 0.10);
+        color: var(--primary-dark);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+      }
+
+      .perk span {
+        font-size: 14px;
+        color: var(--ink-body);
+        line-height: 1.6;
+      }
+
+      .side-foot {
+        display: flex;
+        gap: 28px;
+        flex-wrap: wrap;
+      }
+
+      .side-foot strong {
+        display: block;
+        font-size: 20px;
+        color: var(--navy);
+      }
+
+      .side-foot span {
+        display: block;
+        font-size: 11px;
+        color: var(--ink-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.35px;
+        margin-top: 4px;
+      }
+
+      .card {
+        width: 100%;
+        max-width: 470px;
+        border-radius: 22px;
+        padding: 2.3rem;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 20%;
+        right: 20%;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, rgba(17, 181, 161, 0.34), transparent);
+      }
+
+      .card-head {
+        margin-bottom: 1.8rem;
+      }
+
+      .card-head h2 {
+        font-size: 1.55rem;
+        font-weight: 800;
+        margin-bottom: 8px;
+      }
+
+      .card-head p {
+        color: var(--ink-muted);
+        font-size: 13px;
+        line-height: 1.55;
+      }
+
+      .error {
+        display: none;
+        margin-bottom: 14px;
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: 1px solid rgba(220, 38, 38, 0.15);
+        background: rgba(254, 242, 242, 0.86);
+        color: #b42318;
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      .field {
+        margin-bottom: 16px;
+        position: relative;
+      }
+
+      .field label {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--ink-body);
+      }
+
+      .field input {
+        width: 100%;
+        height: 48px;
+        padding: 0 14px;
+        border-radius: 12px;
+        border: 1.5px solid rgba(214, 223, 235, 0.95);
+        background: rgba(255,255,255,0.80);
+        font: inherit;
+        font-size: 14px;
+        color: var(--ink-main);
+        transition: border-color 0.16s ease, box-shadow 0.16s ease;
+      }
+
+      .field input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(17, 181, 161, 0.14);
+        background: #fff;
+      }
+
+      .submit {
+        width: 100%;
+        height: 48px;
+        border: 0;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--navy), var(--primary));
+        color: #fff;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 8px 24px rgba(10, 42, 102, 0.22);
+      }
+
+      .submit:disabled {
+        opacity: 0.7;
+        cursor: wait;
+      }
+
+      .meta-row {
+        margin-top: 14px;
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        font-size: 13px;
+      }
+
+      .meta-row a {
+        color: var(--primary-dark);
+        text-decoration: none;
+        font-weight: 700;
+      }
+
+      @media (max-width: 980px) {
+        .shell {
+          flex-direction: column;
+        }
+
+        .left {
+          display: none;
+        }
+
+        .right {
+          width: 100%;
+          min-height: 100vh;
+        }
+
+        .card {
+          max-width: 100%;
+        }
+      }
+    </style>
+</head>
+<body>
+    <div class="shell">
+      <section class="left">
+        <div>
+          <div class="brand">
+            <div class="brand-mark">C</div>
+            <div class="brand-copy">
+              <strong>{{ app_name }}</strong>
+              <span>Regulator operations portal</span>
+            </div>
+          </div>
+          <div class="pill">Secure access</div>
+          <h1>{{ headline }}</h1>
+          <p>{{ subheadline }}</p>
+
+          <div class="perk-list">
+            {% for perk in perks %}
+            <div class="perk">
+              <div class="perk-dot">{{ loop.index }}</div>
+              <span>{{ perk }}</span>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="side-foot">
+          <div><strong>Unified</strong><span>Licensing reviews</span></div>
+          <div><strong>Trusted</strong><span>Audit trail</span></div>
+          <div><strong>Direct</strong><span>Desk access</span></div>
+        </div>
+      </section>
+
+      <section class="right">
+        <div class="glass card">
+          <div class="card-head">
+            <h2>Welcome Back</h2>
+            <p>Enter your credentials to continue into Compliance 360.</p>
+          </div>
+
+          <div id="error" class="error"></div>
+
+          <form id="login-form" method="post" action="/api/method/login">
+            <input type="hidden" name="redirect_to" value="{{ redirect_to }}" />
+            <div class="field">
+              <label for="usr">{{ login_name_placeholder }}</label>
+              <input id="usr" name="usr" type="text" autocomplete="username" required />
+            </div>
+            <div class="field">
+              <label for="pwd">Password</label>
+              <input id="pwd" name="pwd" type="password" autocomplete="current-password" required />
+            </div>
+            <button id="submit-btn" class="submit" type="submit">Sign In</button>
+          </form>
+
+          <div class="meta-row">
+            <a href="/app">Switch to Desk</a>
+            <span>Support: <a href="mailto:{{ support_email }}">{{ support_email }}</a></span>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      (function () {
+        const form = document.getElementById("login-form");
+        const submitBtn = document.getElementById("submit-btn");
+        const errorBox = document.getElementById("error");
+        const redirectTo = {{ redirect_to | tojson }};
+        const csrfToken = {{ frappe.session.csrf_token | tojson }};
+
+        function setError(message) {
+          errorBox.textContent = message || "Sign in failed. Please try again.";
+          errorBox.style.display = "block";
+        }
+
+        form.addEventListener("submit", async function (event) {
+          event.preventDefault();
+          errorBox.style.display = "none";
+          submitBtn.disabled = true;
+          submitBtn.textContent = "Signing in...";
+
+          const usr = form.usr.value;
+          const pwd = form.pwd.value;
+
+          try {
+            const body = new URLSearchParams({ usr, pwd }).toString();
+            const response = await fetch("/api/method/login", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+                "X-Frappe-CSRF-Token": csrfToken,
+              },
+              credentials: "include",
+              body,
+            });
+
+            const payload = await response.json().catch(() => ({}));
+
+            if (!response.ok || payload.exc) {
+              setError(payload.message || "Invalid email or password.");
+              return;
+            }
+
+            window.location.href = redirectTo || "/compliance-360";
+          } catch (error) {
+            setError("Unable to sign in right now. Please retry.");
+          } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Sign In";
+          }
+        });
+      })();
+    </script>
+</body>
+</html>

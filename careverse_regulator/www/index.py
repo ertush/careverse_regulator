@@ -1,7 +1,8 @@
-"""Public landing page for Compliance 360."""
+"""Custom landing page for Compliance 360."""
 
 import frappe
 from frappe import _
+from frappe.core.doctype.navbar_settings.navbar_settings import get_app_logo
 
 no_cache = True
 
@@ -14,83 +15,47 @@ def get_context(context):
     context.no_cache = 1
     context.no_header = True
     context.no_breadcrumbs = True
-    context.title = _("Compliance 360 - Regulators Portal")
+    context.title = _("Healthcare Regulator Platform - Compliance 360")
 
     context.app_name = "Compliance 360"
-    context.tagline = "Your National Hub for Healthcare Compliance"
-    context.subtitle = (
-        "Digitally manage licensing, accreditation, inspections, compliance monitoring, and "
-        "enforcement for healthcare professionals and facilities across Kenya."
-    )
-    context.cta_text = "Open Compliance 360"
+    context.logo = get_app_logo() or "/assets/careverse_regulator/compliance-360/favicon.svg?v=20260313a"
+
+    context.cta_text = "Get Started"
     context.cta_link = "/login?redirect-to=/compliance-360"
-    context.cta_secondary_text = "Switch to Desk"
-    context.cta_secondary_link = "/app"
-
-    context.metrics = [
-        {"value": "17+", "label": "Regulatory Bodies"},
-        {"value": "50,000+", "label": "Licensed Professionals"},
-        {"value": "5,000+", "label": "Facilities Regulated"},
-        {"value": "100%", "label": "Digital and Secure"},
-    ]
-
-    context.showcase_stats = [
-        {"label": "Active Renewals", "value": "2,430", "sub": "Currently under review"},
-        {"label": "Inspection Alerts", "value": "164", "sub": "Flagged for action"},
-        {"label": "Decision Time", "value": "5.2d", "sub": "Average turnaround"},
-    ]
+    context.cta_secondary_text = "Sign In"
+    context.cta_secondary_link = "/login?redirect-to=/compliance-360"
 
     context.features = [
         {
+            "icon": "📋",
             "title": "License Management",
-            "description": "Streamlined application processing with automated workflows and certificate generation.",
+            "description": "Automated tracking, renewal reminders, and compliance checks for professional and facility licenses.",
         },
         {
-            "title": "Compliance Monitoring",
-            "description": "Real-time tracking with alerts for CPD credits, expiries, and inspections.",
+            "icon": "✓",
+            "title": "Compliance Tracking",
+            "description": "Real-time monitoring of compliance requirements with alerts and follow-up actions.",
         },
         {
-            "title": "Analytics & Insights",
-            "description": "Powerful reporting with trends, filters, and export-ready regulatory summaries.",
+            "icon": "📊",
+            "title": "Regulatory Reporting",
+            "description": "Operational and regulatory reporting for inspections, renewals, and enforcement status.",
+        },
+        {
+            "icon": "🏥",
+            "title": "Facility Oversight",
+            "description": "Company-scoped oversight of licensed health facilities and inspection outcomes.",
+        },
+        {
+            "icon": "👥",
+            "title": "Health Worker Lifecycle",
+            "description": "Track progression from indexing and internship licenses through full registration and renewal.",
+        },
+        {
+            "icon": "🔒",
+            "title": "Secure & Auditable",
+            "description": "Role-based access with immutable activity history and accountability by regulator company.",
         },
     ]
-
-    context.capabilities = [
-        {
-            "title": "Risk-Led Oversight",
-            "description": "Prioritize inspections, renewals, and escalations using a single supervisory queue.",
-        },
-        {
-            "title": "Shared Regulatory Workspace",
-            "description": "Coordinate national and county reviews inside one secure operating environment.",
-        },
-        {
-            "title": "Decision Intelligence",
-            "description": "Use metrics, trends, and alerts to improve approval quality and response speed.",
-        },
-        {
-            "title": "Trusted Audit Trail",
-            "description": "Every action is recorded for accountability, transparency, and follow-through.",
-        },
-    ]
-
-    context.testimonials = [
-        {
-            "quote": "Compliance 360 has shortened facility review cycles by over 40% across our pilot counties.",
-            "author": "Director, County Health Regulation Board",
-        },
-        {
-            "quote": "Our inspectors now coordinate licensing and enforcement from one trusted digital workspace.",
-            "author": "Chief Compliance Officer, National Health Authority",
-        },
-    ]
-
-    context.contact_email = "support@careverse.africa"
-    context.contact_phone = "+254 700 000 360"
-    context.footer_links = {
-        "Platform": ["Licensing", "Inspections", "Enforcement"],
-        "Resources": ["Operational Support", "Implementation Guide", "Service Desk"],
-        "Access": ["Switch to Desk", "Sign In", "Compliance 360"],
-    }
 
     return context

@@ -195,6 +195,7 @@ export default function App() {
     <AppLayout
       currentRoute={route}
       pageTitle={currentMeta.title}
+      pageSubtitle={currentMeta.subtitle}
       onNavigate={navigate}
       onOpenNotifications={() => navigate('notifications-center')}
       onLogout={handleLogout}

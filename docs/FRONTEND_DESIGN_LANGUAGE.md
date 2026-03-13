@@ -88,6 +88,8 @@ Reference:
   - `frontend/src/ThemeRoot.tsx`
 - CSS variable layer in:
   - `frontend/src/index.css`
+- Regulator color identity is locked to this app's token system.
+- Do not import or retain external palette styles from `careverse_hq` or other apps.
 
 Do not hardcode colors inside new components unless unavoidable.
 Use theme tokens and existing CSS variables.
@@ -113,6 +115,24 @@ Primary semantic variables:
 Rule:
 - New custom CSS should read from semantic variables.
 - New component-level CSS should not redefine global palette.
+
+## 4.4 Regulator palette contract (mandatory)
+Canonical operational palette:
+- Primary teal: `#0f766e`
+- Secondary green: `#16a34a`
+- Warning amber: `#d97706`
+- Error red: `#dc2626`
+- Light layout base: `#f4f7fb` and `#edf3f7/#e7eef5` surface gradients
+- Dark layout base: `#08111f` with dark surfaces from theme tokens
+
+Application rules:
+- Primary actions, active nav states, focus accents, and key status emphasis use the green family.
+- Do not swap the portal to blue/purple brand schemes unless explicitly approved in this document.
+- New modules must inherit `colorPrimary` from `ThemeRoot` and semantic variables from `index.css`.
+- Landing, login, unauthorized, and dashboard views must all use the same regulator palette system.
+
+Change-control for palette edits:
+- Any color-token change requires an explicit update to this section, with rationale and light/dark screenshots.
 
 ---
 
@@ -365,4 +385,3 @@ Any major deviation from this design language should include:
 - Before/after screenshots in light and dark mode
 - Accessibility and contrast impact
 - Explicit approval before merge
-

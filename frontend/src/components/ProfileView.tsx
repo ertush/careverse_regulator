@@ -17,11 +17,11 @@ export default function ProfileView({ userName, userEmail, userRole, onOpenDesk,
     <div className="profile-view-wrap">
       <ProCard className="glass-pro-card profile-identity-card" bordered={false}>
         <Space direction="vertical" size={14} style={{ width: '100%' }}>
-          <Tag icon={<UserOutlined />} className="profile-pill" color="blue">
+          <Tag icon={<UserOutlined />} className="profile-pill">
             Signed in operator
           </Tag>
           <Title level={3} style={{ margin: 0 }}>{userName}</Title>
-          <Paragraph className="profile-copy">Use this account profile to verify your current role and session context.</Paragraph>
+          <Paragraph className="profile-copy">Verify identity, role, and active session context for this regulator workspace.</Paragraph>
           <div className="profile-meta-grid">
             <div>
               <Text type="secondary">Email</Text>

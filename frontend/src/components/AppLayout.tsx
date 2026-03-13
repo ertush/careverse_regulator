@@ -40,6 +40,7 @@ interface AppLayoutProps {
   children: React.ReactNode
   currentRoute: string
   pageTitle: string
+  pageSubtitle?: string
   onNavigate: (route: string) => void
   onOpenNotifications: () => void
   onLogout: () => void
@@ -70,6 +71,7 @@ export default function AppLayout({
   children,
   currentRoute,
   pageTitle,
+  pageSubtitle,
   onNavigate,
   onOpenNotifications,
   onLogout,
@@ -90,7 +92,7 @@ export default function AppLayout({
   }, [isTablet])
 
   const selectedMenuKey = useMemo(() => selectedMenuKeyForRoute(currentRoute), [currentRoute])
-  const pageContext = selectedMenuKey === 'dashboard' ? 'Regulatory command center' : 'Operational workspace'
+  const pageContext = selectedMenuKey === 'dashboard' ? 'Workspace overview' : 'Operational workspace'
   const displayUsername = user?.name || user?.email || 'User'
   const displayCompany = user?.companyDisplayName || user?.company || 'Company not configured'
   const brandTitle = user?.companyDisplayName || user?.company || 'Compliance360'
@@ -189,6 +191,7 @@ export default function AppLayout({
     height: isMobile ? '36px' : '40px',
     fontSize: isMobile ? '15px' : '16px',
   }
+  const notificationCount = 0
 
   const renderLogo = () => (
     <div
@@ -335,12 +338,23 @@ export default function AppLayout({
               <div className="reg-header-context">
                 <Text className="reg-header-eyebrow">{pageContext}</Text>
                 <Text className="reg-header-title">{pageTitle}</Text>
+                {pageSubtitle && <Text className="reg-header-subtitle">{pageSubtitle}</Text>}
               </div>
             </div>
 
             <div className="reg-header-right">
               <Tooltip title="Notifications">
-                <Badge count={0} showZero size="small">
+                {notificationCount > 0 ? (
+                  <Badge count={notificationCount} size="small">
+                    <Button
+                      type="text"
+                      icon={<BellOutlined />}
+                      className="reg-header-icon-btn"
+                      style={headerActionButtonStyle}
+                      onClick={onOpenNotifications}
+                    />
+                  </Badge>
+                ) : (
                   <Button
                     type="text"
                     icon={<BellOutlined />}
@@ -348,7 +362,7 @@ export default function AppLayout({
                     style={headerActionButtonStyle}
                     onClick={onOpenNotifications}
                   />
-                </Badge>
+                )}
               </Tooltip>
 
               <Tooltip title={isDarkMode ? 'Light Mode' : 'Dark Mode'}>

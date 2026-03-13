@@ -73,10 +73,10 @@ export default function DashboardView({ emptyState, onNavigate, company }: Dashb
       <ProCard className="glass-pro-card dashboard-command-card" bordered={false}>
         <div className="dashboard-command-head">
           <div className="dashboard-command-copy">
-            <span className="dashboard-command-chip">Active tenant</span>
+            <span className="dashboard-command-chip">Active company</span>
             <Title level={3} className="dashboard-command-title">{tenantLabel}</Title>
             <Paragraph className="dashboard-command-subtitle">
-              Licensing, inspection, and enforcement decisions in one operator view.
+              Licensing, inspection, and enforcement queues in one operational view.
             </Paragraph>
           </div>
           <div className="dashboard-command-actions">
@@ -102,7 +102,7 @@ export default function DashboardView({ emptyState, onNavigate, company }: Dashb
           <button type="button" className="dashboard-command-stat" onClick={() => onNavigate('users-roles')}>
             <span>Active cases</span>
             <strong>{activeBoard?.activeCases || '--'}</strong>
-            <em>Enforcement and disciplinary</em>
+            <em>Enforcement and discipline</em>
           </button>
           <button type="button" className="dashboard-command-stat" onClick={() => onNavigate('dashboard')}>
             <span>SLA compliance</span>
@@ -138,7 +138,7 @@ export default function DashboardView({ emptyState, onNavigate, company }: Dashb
       ) : (
         <>
           <ProCard ghost gutter={[12, 12]} wrap className="dashboard-primary-grid">
-            <ProCard colSpan={{ xs: 24, xl: 14 }} className="glass-pro-card dashboard-panel" title="Priority queue">
+            <ProCard colSpan={{ xs: 24, xl: 14 }} className="glass-pro-card dashboard-panel" title="Priority queues">
               <div className="dashboard-list">
                 {visibleQueues.length > 0 ? (
                   visibleQueues.map((queue) => (
@@ -166,7 +166,7 @@ export default function DashboardView({ emptyState, onNavigate, company }: Dashb
               </div>
             </ProCard>
 
-            <ProCard colSpan={{ xs: 24, xl: 10 }} className="glass-pro-card dashboard-panel" title="County risk watch">
+            <ProCard colSpan={{ xs: 24, xl: 10 }} className="glass-pro-card dashboard-panel" title="Risk watch">
               <div className="dashboard-list">
                 {visibleCountyRisk.length > 0 ? (
                   visibleCountyRisk.map((item) => (

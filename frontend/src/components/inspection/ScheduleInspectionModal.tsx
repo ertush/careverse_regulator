@@ -1,4 +1,5 @@
 import { Modal, Select, DatePicker, Input, Button } from 'antd'
+import { useResponsive } from '@/hooks/useResponsive'
 import dayjs from 'dayjs'
 
 interface ScheduleInspectionModalProps {
@@ -11,7 +12,7 @@ interface ScheduleInspectionModalProps {
     date: string
     note: string
   }
-  setFormData: (data: any) => void
+  setFormData: (data: ScheduleInspectionModalProps['formData']) => void
   facilities: string[]
   inspectors: string[]
 }
@@ -25,14 +26,16 @@ export default function ScheduleInspectionModal({
   facilities,
   inspectors,
 }: ScheduleInspectionModalProps) {
+  const { isMobile } = useResponsive()
+
   return (
     <Modal
       title={
         <div>
-          <div style={{ fontSize: '18px', fontWeight: 600, color: '#101828', marginBottom: '4px' }}>
+          <div style={{ fontSize: isMobile ? '16px' : '18px', fontWeight: 600, color: '#101828', marginBottom: '4px' }}>
             Facility Inspection
           </div>
-          <div style={{ fontSize: '14px', color: '#475467', fontWeight: 400 }}>
+          <div style={{ fontSize: isMobile ? '13px' : '14px', color: '#475467', fontWeight: 400 }}>
             Fill in the details below to generate report
           </div>
         </div>
@@ -40,7 +43,9 @@ export default function ScheduleInspectionModal({
       open={open}
       onCancel={onClose}
       footer={null}
-      width={640}
+      width={isMobile ? '100%' : 640}
+      style={isMobile ? { top: 0, paddingBottom: 0, maxWidth: '100vw' } : {}}
+      bodyStyle={isMobile ? { maxHeight: 'calc(100vh - 100px)', overflowY: 'auto' } : {}}
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '24px' }}>
         <div>
@@ -139,12 +144,13 @@ export default function ScheduleInspectionModal({
           />
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '16px' }}>
+        <div style={{ display: 'flex', flexDirection: isMobile ? 'column-reverse' : 'row', justifyContent: 'space-between', gap: isMobile ? '8px' : '0', marginTop: '16px' }}>
           <Button
-            size="large"
+            size={isMobile ? 'middle' : 'large'}
             onClick={onClose}
+            block={isMobile}
             style={{
-              width: '48%',
+              width: isMobile ? '100%' : '48%',
               borderColor: '#11b5a1',
               color: '#11b5a1',
             }}
@@ -153,11 +159,12 @@ export default function ScheduleInspectionModal({
           </Button>
           <Button
             type="primary"
-            size="large"
+            size={isMobile ? 'middle' : 'large'}
             onClick={onSubmit}
             disabled={!formData.facility || !formData.inspector || !formData.date}
+            block={isMobile}
             style={{
-              width: '48%',
+              width: isMobile ? '100%' : '48%',
               backgroundColor: '#11b5a1',
               borderColor: '#11b5a1',
             }}

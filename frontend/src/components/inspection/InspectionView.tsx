@@ -5,11 +5,14 @@ import { useInspectionStore } from '@/stores/inspectionStore'
 import type { Inspection } from '@/stores/inspectionStore'
 import { useFindingsStore } from '@/stores/findingsStore'
 import type { Finding } from '@/stores/findingsStore'
+import { useResponsive } from '@/hooks/useResponsive'
 import InspectionTable from './InspectionTable'
+import InspectionCard from './InspectionCard'
 import InspectionFilters from './InspectionFilters'
 import ScheduleInspectionModal from './ScheduleInspectionModal'
 import InspectionDetailModal from './InspectionDetailModal'
 import FindingsTable from './FindingsTable'
+import FindingCard from './FindingCard'
 import FindingsFilters from './FindingsFilters'
 import FindingsDetailModal from './FindingsDetailModal'
 import dayjs from 'dayjs'
@@ -22,6 +25,7 @@ interface InspectionViewProps {
 export default function InspectionView({ onNavigate, company }: InspectionViewProps) {
   const { inspections, activeTab, setActiveTab, applyMockForCompany } = useInspectionStore()
   const { findings, applyMockForCompany: applyFindingsMock } = useFindingsStore()
+  const { isMobile, isTablet } = useResponsive()
 
   // Inspection tab state
   const [searchText, setSearchText] = useState('')
@@ -116,29 +120,30 @@ export default function InspectionView({ onNavigate, company }: InspectionViewPr
   }
 
   return (
-    <div className="inspection-shell" style={{ padding: '24px' }}>
-      <ProCard ghost style={{ marginBottom: '24px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+    <div className="inspection-shell" style={{ padding: isMobile ? '16px' : '24px' }}>
+      <ProCard ghost style={{ marginBottom: isMobile ? '16px' : '24px' }}>
+        <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', alignItems: isMobile ? 'stretch' : 'flex-start', gap: isMobile ? '16px' : '0' }}>
           <div style={{ flex: 1 }}>
-            <h2 style={{ margin: 0, fontSize: '24px', fontWeight: 'bold', color: '#000' }}>
+            <h2 style={{ margin: 0, fontSize: isMobile ? '20px' : '24px', fontWeight: 'bold', color: '#000' }}>
               Inspection Management
             </h2>
-            <p style={{ margin: '4px 0 0 0', fontSize: '16px', fontWeight: 600, color: '#8c8c8c' }}>
+            <p style={{ margin: '4px 0 0 0', fontSize: isMobile ? '14px' : '16px', fontWeight: 600, color: '#8c8c8c' }}>
               Schedule & View Facility Inspections
             </p>
 
-            <div style={{ display: 'flex', gap: '16px', marginTop: '29px' }}>
+            <div style={{ display: 'flex', gap: isMobile ? '12px' : '16px', marginTop: isMobile ? '16px' : '29px', overflowX: 'auto' }}>
               <div
                 style={{
                   borderBottom: activeTab === 'scheduled' ? '2px solid #11b5a1' : 'none',
                   paddingBottom: '11px',
                   cursor: 'pointer',
+                  whiteSpace: 'nowrap',
                 }}
                 onClick={() => setActiveTab('scheduled')}
               >
                 <span
                   style={{
-                    fontSize: '14px',
+                    fontSize: isMobile ? '13px' : '14px',
                     fontWeight: 600,
                     color: activeTab === 'scheduled' ? '#11b5a1' : '#667085',
                   }}
@@ -151,12 +156,13 @@ export default function InspectionView({ onNavigate, company }: InspectionViewPr
                   borderBottom: activeTab === 'findings' ? '2px solid #11b5a1' : 'none',
                   paddingBottom: '11px',
                   cursor: 'pointer',
+                  whiteSpace: 'nowrap',
                 }}
                 onClick={() => setActiveTab('findings')}
               >
                 <span
                   style={{
-                    fontSize: '14px',
+                    fontSize: isMobile ? '13px' : '14px',
                     fontWeight: 600,
                     color: activeTab === 'findings' ? '#11b5a1' : '#667085',
                   }}
@@ -169,14 +175,15 @@ export default function InspectionView({ onNavigate, company }: InspectionViewPr
 
           <Button
             type="primary"
-            size="large"
+            size={isMobile ? 'middle' : 'large'}
             onClick={() => setIsModalVisible(true)}
+            block={isMobile}
             style={{
               backgroundColor: '#11b5a1',
               borderColor: '#11b5a1',
               borderRadius: '10px',
-              height: '44px',
-              fontSize: '16px',
+              height: isMobile ? '40px' : '44px',
+              fontSize: isMobile ? '14px' : '16px',
               fontWeight: 600,
             }}
           >
@@ -208,14 +215,18 @@ export default function InspectionView({ onNavigate, company }: InspectionViewPr
               <div
                 style={{
                   display: 'flex',
+                  flexDirection: isMobile ? 'column' : 'row',
                   justifyContent: 'space-between',
-                  alignItems: 'center',
-                  marginBottom: '24px',
+                  alignItems: isMobile ? 'stretch' : 'center',
+                  marginBottom: isMobile ? '16px' : '24px',
+                  gap: isMobile ? '12px' : '0',
                 }}
               >
-                <h3 style={{ fontSize: '16px', fontWeight: 'bold', color: '#000', margin: 0 }}>
-                  List View of Scheduled Inspections
-                </h3>
+                {!isMobile && (
+                  <h3 style={{ fontSize: '16px', fontWeight: 'bold', color: '#000', margin: 0 }}>
+                    List View of Scheduled Inspections
+                  </h3>
+                )}
                 <InspectionFilters
                   searchText={searchText}
                   onSearchChange={setSearchText}
@@ -226,12 +237,24 @@ export default function InspectionView({ onNavigate, company }: InspectionViewPr
                 />
               </div>
 
-              <InspectionTable
-                inspections={filteredInspections}
-                selectedRowKeys={selectedRowKeys}
-                onSelectionChange={setSelectedRowKeys}
-                onViewInspection={handleViewInspection}
-              />
+              {isMobile || isTablet ? (
+                <div>
+                  {filteredInspections.map((inspection) => (
+                    <InspectionCard
+                      key={inspection.id}
+                      inspection={inspection}
+                      onView={handleViewInspection}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <InspectionTable
+                  inspections={filteredInspections}
+                  selectedRowKeys={selectedRowKeys}
+                  onSelectionChange={setSelectedRowKeys}
+                  onViewInspection={handleViewInspection}
+                />
+              )}
             </>
           )}
         </>
@@ -263,14 +286,18 @@ export default function InspectionView({ onNavigate, company }: InspectionViewPr
               <div
                 style={{
                   display: 'flex',
+                  flexDirection: isMobile ? 'column' : 'row',
                   justifyContent: 'space-between',
-                  alignItems: 'center',
-                  marginBottom: '24px',
+                  alignItems: isMobile ? 'stretch' : 'center',
+                  marginBottom: isMobile ? '16px' : '24px',
+                  gap: isMobile ? '12px' : '0',
                 }}
               >
-                <h3 style={{ fontSize: '16px', fontWeight: 'bold', color: '#000', margin: 0 }}>
-                  List View of Inspection Findings
-                </h3>
+                {!isMobile && (
+                  <h3 style={{ fontSize: '16px', fontWeight: 'bold', color: '#000', margin: 0 }}>
+                    List View of Inspection Findings
+                  </h3>
+                )}
                 <FindingsFilters
                   searchText={findingsSearchText}
                   onSearchChange={setFindingsSearchText}
@@ -283,12 +310,24 @@ export default function InspectionView({ onNavigate, company }: InspectionViewPr
                 />
               </div>
 
-              <FindingsTable
-                findings={filteredFindings}
-                selectedRowKeys={selectedFindingRowKeys}
-                onSelectionChange={setSelectedFindingRowKeys}
-                onViewFinding={handleViewFinding}
-              />
+              {isMobile || isTablet ? (
+                <div>
+                  {filteredFindings.map((finding) => (
+                    <FindingCard
+                      key={finding.id}
+                      finding={finding}
+                      onView={handleViewFinding}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <FindingsTable
+                  findings={filteredFindings}
+                  selectedRowKeys={selectedFindingRowKeys}
+                  onSelectionChange={setSelectedFindingRowKeys}
+                  onViewFinding={handleViewFinding}
+                />
+              )}
             </>
           )}
         </>

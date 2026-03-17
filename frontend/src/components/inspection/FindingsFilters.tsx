@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Input, Button, Popover, Checkbox, Space } from 'antd'
 import { SearchOutlined, FilterOutlined, SortAscendingOutlined } from '@ant-design/icons'
+import { useResponsive } from '@/hooks/useResponsive'
 
 interface FindingsFiltersProps {
   searchText: string
@@ -151,45 +152,49 @@ export default function FindingsFilters({
     </div>
   )
 
+  const { isMobile } = useResponsive()
+
   return (
-    <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+    <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '12px', alignItems: isMobile ? 'stretch' : 'center', width: isMobile ? '100%' : 'auto' }}>
       <Input
         placeholder="Search by facility name"
         prefix={<SearchOutlined />}
         value={searchText}
         onChange={(e) => onSearchChange(e.target.value)}
-        style={{ width: 400 }}
+        style={{ width: isMobile ? '100%' : 400 }}
       />
-      <Popover
-        content={filterContent}
-        title={null}
-        trigger="click"
-        open={filterOpen}
-        onOpenChange={handleFilterOpenChange}
-        placement="bottomRight"
-      >
-        <Button
-          icon={<FilterOutlined />}
-          style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+      <div style={{ display: 'flex', gap: '12px' }}>
+        <Popover
+          content={filterContent}
+          title={null}
+          trigger="click"
+          open={filterOpen}
+          onOpenChange={handleFilterOpenChange}
+          placement="bottomRight"
         >
-          Filters
-        </Button>
-      </Popover>
-      <Popover
-        content={sortContent}
-        title={null}
-        trigger="click"
-        open={sortOpen}
-        onOpenChange={setSortOpen}
-        placement="bottomRight"
-      >
-        <Button
-          icon={<SortAscendingOutlined />}
-          style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+          <Button
+            icon={<FilterOutlined />}
+            style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: isMobile ? 1 : 'none' }}
+          >
+            {!isMobile && 'Filters'}
+          </Button>
+        </Popover>
+        <Popover
+          content={sortContent}
+          title={null}
+          trigger="click"
+          open={sortOpen}
+          onOpenChange={setSortOpen}
+          placement="bottomRight"
         >
-          Sort
-        </Button>
-      </Popover>
+          <Button
+            icon={<SortAscendingOutlined />}
+            style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: isMobile ? 1 : 'none' }}
+          >
+            {!isMobile && 'Sort'}
+          </Button>
+        </Popover>
+      </div>
     </div>
   )
 }

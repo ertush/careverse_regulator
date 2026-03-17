@@ -1,4 +1,6 @@
-import { Modal, Descriptions, Button, Divider } from 'antd'
+import { Modal, Button, Divider, Space } from 'antd'
+import { CalendarOutlined, UserOutlined, IdcardOutlined, FileTextOutlined, CheckCircleOutlined } from '@ant-design/icons'
+import { useResponsive } from '@/hooks/useResponsive'
 import type { Inspection } from '@/stores/inspectionStore'
 import StatusBadge from './StatusBadge'
 
@@ -8,29 +10,48 @@ interface InspectionDetailModalProps {
   inspection: Inspection | null
 }
 
+const InfoRow = ({ icon, label, value, isMobile }: { icon: React.ReactNode; label: string; value: React.ReactNode; isMobile: boolean }) => (
+  <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+    <div style={{ color: '#667085', fontSize: '18px', marginTop: '2px' }}>
+      {icon}
+    </div>
+    <div style={{ flex: 1 }}>
+      <div style={{ fontSize: isMobile ? '12px' : '13px', color: '#667085', marginBottom: '4px' }}>
+        {label}
+      </div>
+      <div style={{ fontSize: isMobile ? '14px' : '15px', color: '#101828', fontWeight: 500 }}>
+        {value}
+      </div>
+    </div>
+  </div>
+)
+
 export default function InspectionDetailModal({ open, onClose, inspection }: InspectionDetailModalProps) {
+  const { isMobile } = useResponsive()
+
   if (!inspection) return null
 
   return (
     <Modal
       title={
         <div>
-          <div style={{ fontSize: '18px', fontWeight: 600, color: '#101828', marginBottom: '4px' }}>
-            Scheduled Inspection Details
+          <div style={{ fontSize: isMobile ? '16px' : '18px', fontWeight: 600, color: '#101828', marginBottom: '4px' }}>
+            Scheduled Inspection
           </div>
-          <div style={{ fontSize: '14px', color: '#475467', fontWeight: 400 }}>
-            Inspection ID: {inspection.inspectionId}
+          <div style={{ fontSize: isMobile ? '13px' : '14px', color: '#475467', fontWeight: 400 }}>
+            {inspection.inspectionId}
           </div>
         </div>
       }
       open={open}
       onCancel={onClose}
       footer={
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', flexDirection: isMobile ? 'column-reverse' : 'row', justifyContent: 'flex-end', gap: '8px' }}>
           <Button
+            size={isMobile ? 'middle' : 'large'}
             style={{
-              borderColor: '#11b5a1',
-              color: '#11b5a1',
+              borderColor: '#d0d5dd',
+              width: isMobile ? '100%' : 'auto',
             }}
             onClick={onClose}
           >
@@ -38,10 +59,10 @@ export default function InspectionDetailModal({ open, onClose, inspection }: Ins
           </Button>
           <Button
             type="primary"
-            style={{ backgroundColor: '#11b5a1', borderColor: '#11b5a1' }}
+            size={isMobile ? 'middle' : 'large'}
+            style={{ backgroundColor: '#11b5a1', borderColor: '#11b5a1', width: isMobile ? '100%' : 'auto' }}
             onClick={() => {
               console.log('Start inspection:', inspection)
-              // TODO: Navigate to inspection form or start inspection process
               onClose()
             }}
           >
@@ -49,65 +70,91 @@ export default function InspectionDetailModal({ open, onClose, inspection }: Ins
           </Button>
         </div>
       }
-      width={700}
+      width={isMobile ? '100%' : 700}
+      style={isMobile ? { top: 0, paddingBottom: 0, maxWidth: '100vw' } : {}}
+      bodyStyle={isMobile ? { maxHeight: 'calc(100vh - 150px)', overflowY: 'auto', padding: isMobile ? '16px' : '24px' } : { padding: '24px' }}
     >
-      <div style={{ marginTop: '24px' }}>
-        <Descriptions column={2} bordered>
-          <Descriptions.Item label="Facility Name" span={2}>
-            <strong>{inspection.facilityName}</strong>
-          </Descriptions.Item>
+      <div>
+        {/* Facility Header */}
+        <div
+          style={{
+            padding: isMobile ? '16px' : '20px',
+            backgroundColor: '#F9FAFB',
+            borderRadius: '12px',
+            border: '1px solid #EAECF0',
+            marginBottom: '20px',
+          }}
+        >
+          <div style={{ fontSize: isMobile ? '18px' : '20px', fontWeight: 600, color: '#101828', marginBottom: '8px' }}>
+            {inspection.facilityName}
+          </div>
+          <StatusBadge status={inspection.status} />
+        </div>
 
-          <Descriptions.Item label="Inspection Date">
-            {inspection.date}
-          </Descriptions.Item>
+        {/* Info Grid */}
+        <Space direction="vertical" size={isMobile ? 16 : 20} style={{ width: '100%', marginBottom: '20px' }}>
+          <InfoRow
+            icon={<CalendarOutlined />}
+            label="Inspection Date"
+            value={inspection.date}
+            isMobile={isMobile}
+          />
+          <InfoRow
+            icon={<UserOutlined />}
+            label="Inspector"
+            value={inspection.inspector}
+            isMobile={isMobile}
+          />
+          <InfoRow
+            icon={<IdcardOutlined />}
+            label="Inspection ID"
+            value={inspection.inspectionId}
+            isMobile={isMobile}
+          />
+        </Space>
 
-          <Descriptions.Item label="Inspector">
-            {inspection.inspector}
-          </Descriptions.Item>
+        <Divider style={{ margin: '20px 0' }} />
 
-          <Descriptions.Item label="Inspection ID">
-            {inspection.inspectionId}
-          </Descriptions.Item>
-
-          <Descriptions.Item label="Status">
-            <StatusBadge status={inspection.status} />
-          </Descriptions.Item>
-        </Descriptions>
-
-        <Divider />
-
-        <div style={{ marginBottom: '16px' }}>
-          <div style={{ fontSize: '14px', fontWeight: 600, color: '#101828', marginBottom: '8px' }}>
-            Note to Inspector
+        {/* Notes Section */}
+        <div style={{ marginBottom: '20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+            <FileTextOutlined style={{ fontSize: '16px', color: '#667085' }} />
+            <div style={{ fontSize: isMobile ? '14px' : '15px', fontWeight: 600, color: '#101828' }}>
+              Note to Inspector
+            </div>
           </div>
           <div
             style={{
-              fontSize: '14px',
+              fontSize: isMobile ? '13px' : '14px',
               color: '#475467',
-              lineHeight: '20px',
-              padding: '12px',
-              backgroundColor: '#F9FAFB',
+              lineHeight: '22px',
+              padding: isMobile ? '12px' : '16px',
+              backgroundColor: '#FFFAEB',
               borderRadius: '8px',
-              border: '1px solid #EAECF0',
+              border: '1px solid #FEDF89',
             }}
           >
             {inspection.noteToInspector || 'No additional notes provided'}
           </div>
         </div>
 
+        {/* Checklist Section */}
         <div
           style={{
-            padding: '16px',
+            padding: isMobile ? '16px' : '20px',
             backgroundColor: '#F0F9FF',
-            borderRadius: '8px',
+            borderRadius: '12px',
             border: '1px solid #B9E6FE',
           }}
         >
-          <div style={{ fontSize: '14px', fontWeight: 600, color: '#026AA2', marginBottom: '8px' }}>
-            📋 Inspection Checklist
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+            <CheckCircleOutlined style={{ fontSize: '18px', color: '#0284C7' }} />
+            <div style={{ fontSize: isMobile ? '14px' : '15px', fontWeight: 600, color: '#0284C7' }}>
+              Inspection Checklist
+            </div>
           </div>
-          <div style={{ fontSize: '13px', color: '#026AA2', lineHeight: '20px' }}>
-            <ul style={{ margin: '8px 0', paddingLeft: '20px' }}>
+          <div style={{ fontSize: isMobile ? '13px' : '14px', color: '#0369A1', lineHeight: '24px' }}>
+            <ul style={{ margin: 0, paddingLeft: isMobile ? '20px' : '24px' }}>
               <li>Verify facility licensing and permits</li>
               <li>Inspect safety equipment and emergency systems</li>
               <li>Review staff credentials and certifications</li>

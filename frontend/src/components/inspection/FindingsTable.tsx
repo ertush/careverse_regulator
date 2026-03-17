@@ -66,7 +66,7 @@ export default function FindingsTable({
       title: 'Action',
       key: 'action',
       width: 100,
-      render: (_: any, record: Finding) => (
+      render: (_, record: Finding) => (
         <Button
           type="primary"
           size="small"

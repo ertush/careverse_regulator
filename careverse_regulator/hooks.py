@@ -21,6 +21,11 @@ after_migrate = [
 
 on_session_creation = "careverse_regulator.api.tenant.initialize_session_company"
 
+# Permission Query Conditions for multi-tenant filtering
+permission_query_conditions = {
+	"Inspection": "careverse_regulator.careverse_regulator.doctype.inspection.inspection.get_permission_query_conditions"
+}
+
 website_route_rules = [
     {"from_route": "/login", "to_route": "login"},
     {"from_route": "/logout", "to_route": "logout"},

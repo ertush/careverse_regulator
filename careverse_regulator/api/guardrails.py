@@ -5,7 +5,7 @@ from typing import Any
 import frappe
 from frappe import _
 
-from compliance_360.api.tenant import evaluate_tenant_context, set_active_company_in_session
+from careverse_regulator.api.tenant import evaluate_tenant_context, set_active_company_in_session
 
 
 def require_active_company(user: str | None = None) -> str:

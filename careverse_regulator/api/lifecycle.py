@@ -4,7 +4,7 @@ from typing import Literal
 
 import frappe
 
-from compliance_360.api.guardrails import require_active_company
+from careverse_regulator.api.guardrails import require_active_company
 
 LifecycleTrack = Literal["health_worker", "facility"]
 

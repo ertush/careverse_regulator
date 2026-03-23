@@ -1,11 +1,8 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { lazy } from 'react'
+import { createFileRoute, Outlet } from '@tanstack/react-router'
 import AppLayout from '@/components/AppLayout'
 import { useAuthStore } from '@/stores/authStore'
 
-const RoadmapShell = lazy(() => import('@/components/RoadmapShell'))
-
-function LicenseManagementComponent() {
+function LicenseManagementLayoutComponent() {
   const navigate = Route.useNavigate()
   const user = useAuthStore((state) => state.user)
 
@@ -25,23 +22,18 @@ function LicenseManagementComponent() {
     <AppLayout
       currentRoute="license-management"
       pageTitle="License Management"
-      pageSubtitle="Process approvals, renewals, and enforcement outcomes."
+      pageSubtitle="Manage facility licenses, applications, and renewals."
       onNavigate={handleNavigate}
       onOpenNotifications={() => handleNavigate('notifications-center')}
       onLogout={handleLogout}
       onSwitchToDesk={handleSwitchToDesk}
       user={user}
     >
-      <div className="hq-page-wrap">
-        <RoadmapShell
-          title="License Management"
-          description="Coordinate application intake, renewals, and enforcement decisions."
-        />
-      </div>
+      <Outlet />
     </AppLayout>
   )
 }
 
 export const Route = createFileRoute('/license-management')({
-  component: LicenseManagementComponent,
+  component: LicenseManagementLayoutComponent,
 })

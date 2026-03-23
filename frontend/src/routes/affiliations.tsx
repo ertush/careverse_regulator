@@ -1,11 +1,8 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { lazy } from 'react'
+import { createFileRoute, Outlet } from '@tanstack/react-router'
 import AppLayout from '@/components/AppLayout'
 import { useAuthStore } from '@/stores/authStore'
 
-const RoadmapShell = lazy(() => import('@/components/RoadmapShell'))
-
-function AffiliationsComponent() {
+function AffiliationsLayoutComponent() {
   const navigate = Route.useNavigate()
   const user = useAuthStore((state) => state.user)
 
@@ -25,23 +22,18 @@ function AffiliationsComponent() {
     <AppLayout
       currentRoute="affiliations"
       pageTitle="Affiliation Operations"
-      pageSubtitle="Review affiliation confirmations and escalations."
+      pageSubtitle="Review professional affiliations and manage confirmations."
       onNavigate={handleNavigate}
       onOpenNotifications={() => handleNavigate('notifications-center')}
       onLogout={handleLogout}
       onSwitchToDesk={handleSwitchToDesk}
       user={user}
     >
-      <div className="hq-page-wrap">
-        <RoadmapShell
-          title="Affiliation Operations"
-          description="Review pending professional affiliations, confirmations, and exception handling."
-        />
-      </div>
+      <Outlet />
     </AppLayout>
   )
 }
 
 export const Route = createFileRoute('/affiliations')({
-  component: AffiliationsComponent,
+  component: AffiliationsLayoutComponent,
 })

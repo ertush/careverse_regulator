@@ -1,0 +1,228 @@
+import { create } from 'zustand'
+import type {
+  License,
+  LicensePaginationMeta,
+  LicenseAction,
+  LicenseApplication,
+  FacilityOption,
+  CreateLicenseAppealPayload,
+} from '@/types/license'
+import * as licensingApi from '@/api/licensingApi'
+import type { LicenseFilters } from '@/api/licensingApi'
+
+export interface LicensingState {
+  // Licenses
+  licenses: License[]
+  licensesLoading: boolean
+  licensesError: string | null
+  licensesPagination: LicensePaginationMeta | null
+  licensesCurrentPage: number
+  licensesPageSize: number
+  licensesFilters: LicenseFilters
+
+  // License Applications
+  applications: LicenseApplication[]
+  applicationsLoading: boolean
+  applicationsError: string | null
+  applicationsPagination: LicensePaginationMeta | null
+  applicationsCurrentPage: number
+  applicationsPageSize: number
+  applicationsFilters: any
+
+  // Facilities (for dropdowns)
+  facilities: FacilityOption[]
+  facilitiesLoading: boolean
+
+  // Actions for Licenses
+  setLicensesFilters: (filters: LicenseFilters) => void
+  fetchLicenses: (page?: number, filters?: LicenseFilters) => Promise<void>
+  getLicense: (licenseNumber: string) => Promise<License>
+  setLicensesPage: (page: number) => void
+  setLicensesPageSize: (pageSize: number) => void
+  updateLicense: (licenseNumber: string, action: LicenseAction) => Promise<void>
+  refreshLicenses: () => Promise<void>
+
+  // Actions for Applications
+  setApplicationsFilters: (filters: any) => void
+  fetchApplications: (page?: number, filters?: any) => Promise<void>
+  setApplicationsPage: (page: number) => void
+  setApplicationsPageSize: (pageSize: number) => void
+  refreshApplications: () => Promise<void>
+
+  // Actions for Facilities
+  fetchFacilities: () => Promise<void>
+
+  // Appeal
+  createAppeal: (payload: CreateLicenseAppealPayload) => Promise<void>
+}
+
+export const useLicensingStore = create<LicensingState>((set, get) => ({
+  // Licenses state
+  licenses: [],
+  licensesLoading: false,
+  licensesError: null,
+  licensesPagination: null,
+  licensesCurrentPage: 1,
+  licensesPageSize: 20,
+  licensesFilters: {},
+
+  // Applications state
+  applications: [],
+  applicationsLoading: false,
+  applicationsError: null,
+  applicationsPagination: null,
+  applicationsCurrentPage: 1,
+  applicationsPageSize: 20,
+  applicationsFilters: {},
+
+  // Facilities state
+  facilities: [],
+  facilitiesLoading: false,
+
+  // Licenses actions
+  setLicensesFilters: (filters) => {
+    set({ licensesFilters: filters, licensesCurrentPage: 1 })
+    get().fetchLicenses(1, filters)
+  },
+
+  setLicensesPage: (page) => {
+    set({ licensesCurrentPage: page })
+    get().fetchLicenses(page)
+  },
+
+  setLicensesPageSize: (pageSize) => {
+    set({ licensesPageSize: pageSize, licensesCurrentPage: 1 })
+    get().fetchLicenses(1)
+  },
+
+  fetchLicenses: async (page, filters) => {
+    const currentPage = page || get().licensesCurrentPage
+    const pageSize = get().licensesPageSize
+    const currentFilters = filters || get().licensesFilters
+
+    set({ licensesLoading: true, licensesError: null })
+    try {
+      const response = await licensingApi.listLicenses(currentPage, pageSize, currentFilters)
+      set({
+        licenses: response.data,
+        licensesPagination: response.pagination,
+        licensesCurrentPage: currentPage,
+        licensesLoading: false,
+      })
+    } catch (error) {
+      set({
+        licensesError: error instanceof Error ? error.message : 'Failed to fetch licenses',
+        licensesLoading: false,
+      })
+    }
+  },
+
+  getLicense: async (licenseNumber) => {
+    set({ licensesLoading: true, licensesError: null })
+    try {
+      const license = await licensingApi.getLicense(licenseNumber)
+      set({ licensesLoading: false })
+      return license
+    } catch (error) {
+      set({
+        licensesError: error instanceof Error ? error.message : 'Failed to fetch license',
+        licensesLoading: false,
+      })
+      throw error
+    }
+  },
+
+  updateLicense: async (licenseNumber, action) => {
+    set({ licensesLoading: true, licensesError: null })
+    try {
+      await licensingApi.updateLicense(licenseNumber, action)
+      set({ licensesLoading: false })
+      // Refresh the list
+      await get().refreshLicenses()
+    } catch (error) {
+      set({
+        licensesError: error instanceof Error ? error.message : 'Failed to update license',
+        licensesLoading: false,
+      })
+      throw error
+    }
+  },
+
+  refreshLicenses: async () => {
+    const { licensesCurrentPage, licensesFilters } = get()
+    await get().fetchLicenses(licensesCurrentPage, licensesFilters)
+  },
+
+  // Applications actions
+  setApplicationsFilters: (filters) => {
+    set({ applicationsFilters: filters, applicationsCurrentPage: 1 })
+    get().fetchApplications(1, filters)
+  },
+
+  setApplicationsPage: (page) => {
+    set({ applicationsCurrentPage: page })
+    get().fetchApplications(page)
+  },
+
+  setApplicationsPageSize: (pageSize) => {
+    set({ applicationsPageSize: pageSize, applicationsCurrentPage: 1 })
+    get().fetchApplications(1)
+  },
+
+  fetchApplications: async (page, filters) => {
+    const currentPage = page || get().applicationsCurrentPage
+    const pageSize = get().applicationsPageSize
+    const currentFilters = filters || get().applicationsFilters
+
+    set({ applicationsLoading: true, applicationsError: null })
+    try {
+      const response = await licensingApi.listLicenseApplications(currentPage, pageSize, currentFilters)
+      set({
+        applications: response.data,
+        applicationsPagination: response.pagination,
+        applicationsCurrentPage: currentPage,
+        applicationsLoading: false,
+      })
+    } catch (error) {
+      set({
+        applicationsError: error instanceof Error ? error.message : 'Failed to fetch applications',
+        applicationsLoading: false,
+      })
+    }
+  },
+
+  refreshApplications: async () => {
+    const { applicationsCurrentPage, applicationsFilters } = get()
+    await get().fetchApplications(applicationsCurrentPage, applicationsFilters)
+  },
+
+  // Facilities actions
+  fetchFacilities: async () => {
+    set({ facilitiesLoading: true })
+    try {
+      const facilities = await licensingApi.listFacilities()
+      set({ facilities, facilitiesLoading: false })
+    } catch (error) {
+      set({ facilitiesLoading: false })
+    }
+  },
+
+  // Appeal
+  createAppeal: async (payload) => {
+    set({ licensesLoading: true, licensesError: null })
+    try {
+      await licensingApi.createLicenseAppeal(payload)
+      set({ licensesLoading: false })
+    } catch (error) {
+      set({
+        licensesError: error instanceof Error ? error.message : 'Failed to create appeal',
+        licensesLoading: false,
+      })
+      throw error
+    }
+  },
+}))
+
+// Initialize on store creation
+useLicensingStore.getState().fetchLicenses()
+useLicensingStore.getState().fetchFacilities()

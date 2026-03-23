@@ -1,6 +1,4 @@
 import { useEffect, useState, useMemo, useCallback } from 'react'
-import { Button, Empty } from 'antd'
-import { ProCard } from '@ant-design/pro-components'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import { useInspectionStore } from '@/stores/inspectionStore'
 import type { Inspection, Finding } from '@/types/inspection'
@@ -19,6 +17,10 @@ import FindingCard from './FindingCard'
 import FindingsFilters from './FindingsFilters'
 import FindingsDrawer from './FindingsDrawer'
 import PaginationControls from './PaginationControls'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { FileText } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import dayjs from 'dayjs'
 
 interface InspectionViewProps {
@@ -267,53 +269,57 @@ export default function InspectionView({ company }: InspectionViewProps) {
   }, [navigate])
 
   return (
-    <div className="inspection-shell" style={{ padding: isMobile ? '16px' : '24px' }}>
-      <ProCard ghost style={{ marginBottom: isMobile ? '16px' : '24px' }}>
-        <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', alignItems: isMobile ? 'stretch' : 'flex-start', gap: isMobile ? '16px' : '0' }}>
-          <div style={{ flex: 1 }}>
-            <h2 style={{ margin: 0, fontSize: isMobile ? '20px' : '24px', fontWeight: 'bold', color: '#000' }}>
+    <div className={cn('inspection-shell', isMobile ? 'p-4' : 'p-6')}>
+      <div className={cn('mb-6', isMobile ? 'mb-4' : 'mb-6')}>
+        <div className={cn(
+          'flex justify-between items-start',
+          isMobile ? 'flex-col gap-4' : 'flex-row gap-0'
+        )}>
+          <div className="flex-1">
+            <h2 className={cn(
+              'font-bold text-foreground m-0',
+              isMobile ? 'text-xl' : 'text-2xl'
+            )}>
               Inspection Management
             </h2>
-            <p style={{ margin: '4px 0 0 0', fontSize: isMobile ? '14px' : '16px', fontWeight: 600, color: '#8c8c8c' }}>
+            <p className={cn(
+              'text-muted-foreground font-semibold mt-1 m-0',
+              isMobile ? 'text-sm' : 'text-base'
+            )}>
               Schedule & View Facility Inspections
             </p>
 
-            <div style={{ display: 'flex', gap: isMobile ? '12px' : '16px', marginTop: isMobile ? '16px' : '29px', overflowX: 'auto' }}>
+            <div className={cn(
+              'flex overflow-x-auto',
+              isMobile ? 'gap-3 mt-4' : 'gap-4 mt-7'
+            )}>
               <div
-                style={{
-                  borderBottom: activeTab === 'scheduled' ? '2px solid #11b5a1' : 'none',
-                  paddingBottom: '11px',
-                  cursor: 'pointer',
-                  whiteSpace: 'nowrap',
-                }}
+                className={cn(
+                  'pb-3 cursor-pointer whitespace-nowrap',
+                  activeTab === 'scheduled' && 'border-b-2 border-primary'
+                )}
                 onClick={() => handleTabChange('scheduled')}
               >
-                <span
-                  style={{
-                    fontSize: isMobile ? '13px' : '14px',
-                    fontWeight: 600,
-                    color: activeTab === 'scheduled' ? '#11b5a1' : '#667085',
-                  }}
-                >
+                <span className={cn(
+                  'font-semibold',
+                  isMobile ? 'text-xs' : 'text-sm',
+                  activeTab === 'scheduled' ? 'text-primary' : 'text-muted-foreground'
+                )}>
                   Scheduled Inspections
                 </span>
               </div>
               <div
-                style={{
-                  borderBottom: activeTab === 'findings' ? '2px solid #11b5a1' : 'none',
-                  paddingBottom: '11px',
-                  cursor: 'pointer',
-                  whiteSpace: 'nowrap',
-                }}
+                className={cn(
+                  'pb-3 cursor-pointer whitespace-nowrap',
+                  activeTab === 'findings' && 'border-b-2 border-primary'
+                )}
                 onClick={() => handleTabChange('findings')}
               >
-                <span
-                  style={{
-                    fontSize: isMobile ? '13px' : '14px',
-                    fontWeight: 600,
-                    color: activeTab === 'findings' ? '#11b5a1' : '#667085',
-                  }}
-                >
+                <span className={cn(
+                  'font-semibold',
+                  isMobile ? 'text-xs' : 'text-sm',
+                  activeTab === 'findings' ? 'text-primary' : 'text-muted-foreground'
+                )}>
                   Inspection Findings
                 </span>
               </div>
@@ -321,54 +327,38 @@ export default function InspectionView({ company }: InspectionViewProps) {
           </div>
 
           <Button
-            type="primary"
-            size={isMobile ? 'middle' : 'large'}
+            size={isMobile ? 'default' : 'lg'}
             onClick={() => {
               setIsModalVisible(true)
               setModalError(null)
             }}
-            block={isMobile}
-            style={{
-              backgroundColor: '#11b5a1',
-              borderColor: '#11b5a1',
-              borderRadius: '10px',
-              height: isMobile ? '40px' : '44px',
-              fontSize: isMobile ? '14px' : '16px',
-              fontWeight: 600,
-            }}
+            className={cn(
+              'font-semibold whitespace-nowrap',
+              isMobile ? 'w-full h-10 text-sm' : 'h-11 text-base'
+            )}
           >
             Schedule Inspection
           </Button>
         </div>
-      </ProCard>
+      </div>
 
       {activeTab === 'scheduled' && (
         <>
           {filteredInspections.length === 0 && searchText === '' && selectedStatuses.includes('all') ? (
-            <ProCard style={{ marginTop: '80px' }}>
-              <Empty
-                description={
-                  <div style={{ textAlign: 'center' }}>
-                    <p style={{ fontSize: '18px', fontWeight: 600, color: '#101828', margin: '8px 0' }}>
-                      No Scheduled Inspections found
-                    </p>
-                    <p style={{ fontSize: '14px', color: '#475467', margin: 0 }}>
-                      Click on "Schedule Inspection" to input new records
-                    </p>
-                  </div>
-                }
-                image={Empty.PRESENTED_IMAGE_SIMPLE}
-              />
-            </ProCard>
+            <Card className="mt-20">
+              <CardContent className={cn('flex flex-col items-center justify-center', isMobile ? 'py-12' : 'py-16')}>
+                <FileText className={cn('text-muted-foreground mb-4', isMobile ? 'w-12 h-12' : 'w-16 h-16')} />
+                <p className={cn('font-semibold text-center mb-2', isMobile ? 'text-base' : 'text-lg')}>
+                  No Scheduled Inspections found
+                </p>
+                <p className={cn('text-muted-foreground text-center m-0', isMobile ? 'text-xs' : 'text-sm')}>
+                  Click on "Schedule Inspection" to input new records
+                </p>
+              </CardContent>
+            </Card>
           ) : (
             <>
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'flex-end',
-                  marginBottom: isMobile ? '16px' : '24px',
-                }}
-              >
+              <div className={cn('flex justify-end', isMobile ? 'mb-4' : 'mb-6')}>
                 <InspectionFilters
                   searchText={localSearchText}
                   onSearchChange={setLocalSearchText}
@@ -417,30 +407,20 @@ export default function InspectionView({ company }: InspectionViewProps) {
           findingsSearchText === '' &&
           selectedSeverities.includes('all') &&
           selectedFindingStatuses.includes('all') ? (
-            <ProCard style={{ marginTop: '80px' }}>
-              <Empty
-                description={
-                  <div style={{ textAlign: 'center' }}>
-                    <p style={{ fontSize: '18px', fontWeight: 600, color: '#101828', margin: '8px 0' }}>
-                      No Inspection Findings available
-                    </p>
-                    <p style={{ fontSize: '14px', color: '#475467', margin: 0 }}>
-                      Inspection findings will appear here once inspections are completed
-                    </p>
-                  </div>
-                }
-                image={Empty.PRESENTED_IMAGE_SIMPLE}
-              />
-            </ProCard>
+            <Card className="mt-20">
+              <CardContent className={cn('flex flex-col items-center justify-center', isMobile ? 'py-12' : 'py-16')}>
+                <FileText className={cn('text-muted-foreground mb-4', isMobile ? 'w-12 h-12' : 'w-16 h-16')} />
+                <p className={cn('font-semibold text-center mb-2', isMobile ? 'text-base' : 'text-lg')}>
+                  No Inspection Findings available
+                </p>
+                <p className={cn('text-muted-foreground text-center m-0', isMobile ? 'text-xs' : 'text-sm')}>
+                  Inspection findings will appear here once inspections are completed
+                </p>
+              </CardContent>
+            </Card>
           ) : (
             <>
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'flex-end',
-                  marginBottom: isMobile ? '16px' : '24px',
-                }}
-              >
+              <div className={cn('flex justify-end', isMobile ? 'mb-4' : 'mb-6')}>
                 <FindingsFilters
                   searchText={findingsSearchText}
                   onSearchChange={setFindingsSearchText}

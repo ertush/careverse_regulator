@@ -1,5 +1,6 @@
-import { Button } from 'antd'
-import { LeftOutlined, RightOutlined } from '@ant-design/icons'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 import type { PaginationMeta } from '@/types/inspection'
 
 interface PaginationControlsProps {
@@ -29,62 +30,50 @@ export default function PaginationControls({ pagination, onPageChange, isMobile 
   }
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        marginTop: '24px',
-        padding: isMobile ? '12px 0' : '16px 0',
-        borderTop: '1px solid #f0f0f0',
-      }}
-    >
-      <div style={{ fontSize: isMobile ? '12px' : '14px', color: '#667085' }}>
+    <div className={cn(
+      'flex items-center justify-between border-t border-border',
+      isMobile ? 'mt-6 pt-3' : 'mt-6 pt-4'
+    )}>
+      <div className={cn(
+        'text-muted-foreground',
+        isMobile ? 'text-xs' : 'text-sm'
+      )}>
         Showing {total_count > 0 ? (page - 1) * pagination.page_size + 1 : 0} to{' '}
         {Math.min(page * pagination.page_size, total_count)} of {total_count} results
       </div>
 
-      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+      <div className="flex gap-2 items-center">
         <Button
-          icon={<LeftOutlined />}
+          variant="outline"
+          size={isMobile ? 'sm' : 'default'}
           disabled={!has_prev}
           onClick={() => onPageChange(page - 1)}
-          style={{
-            borderRadius: '8px',
-            height: isMobile ? '32px' : '36px',
-            minWidth: isMobile ? '32px' : '36px',
-            padding: isMobile ? '4px' : '4px 8px',
-          }}
-        />
+          className={cn('px-2', isMobile ? 'h-8' : 'h-9')}
+        >
+          <ChevronLeft className="w-4 h-4" />
+        </Button>
 
         {start > 1 && (
           <>
             <Button
+              variant="outline"
+              size={isMobile ? 'sm' : 'default'}
               onClick={() => onPageChange(1)}
-              style={{
-                borderRadius: '8px',
-                height: isMobile ? '32px' : '36px',
-                minWidth: isMobile ? '32px' : '36px',
-              }}
+              className={cn('min-w-8', isMobile ? 'h-8' : 'h-9')}
             >
               1
             </Button>
-            {start > 2 && <span style={{ padding: '0 4px' }}>...</span>}
+            {start > 2 && <span className="px-1">...</span>}
           </>
         )}
 
         {pageNumbers.map((pageNum) => (
           <Button
             key={pageNum}
-            type={pageNum === page ? 'primary' : 'default'}
+            variant={pageNum === page ? 'default' : 'outline'}
+            size={isMobile ? 'sm' : 'default'}
             onClick={() => onPageChange(pageNum)}
-            style={{
-              borderRadius: '8px',
-              height: isMobile ? '32px' : '36px',
-              minWidth: isMobile ? '32px' : '36px',
-              backgroundColor: pageNum === page ? '#11b5a1' : undefined,
-              borderColor: pageNum === page ? '#11b5a1' : undefined,
-            }}
+            className={cn('min-w-8', isMobile ? 'h-8' : 'h-9')}
           >
             {pageNum}
           </Button>
@@ -92,14 +81,12 @@ export default function PaginationControls({ pagination, onPageChange, isMobile 
 
         {end < total_pages && (
           <>
-            {end < total_pages - 1 && <span style={{ padding: '0 4px' }}>...</span>}
+            {end < total_pages - 1 && <span className="px-1">...</span>}
             <Button
+              variant="outline"
+              size={isMobile ? 'sm' : 'default'}
               onClick={() => onPageChange(total_pages)}
-              style={{
-                borderRadius: '8px',
-                height: isMobile ? '32px' : '36px',
-                minWidth: isMobile ? '32px' : '36px',
-              }}
+              className={cn('min-w-8', isMobile ? 'h-8' : 'h-9')}
             >
               {total_pages}
             </Button>
@@ -107,16 +94,14 @@ export default function PaginationControls({ pagination, onPageChange, isMobile 
         )}
 
         <Button
-          icon={<RightOutlined />}
+          variant="outline"
+          size={isMobile ? 'sm' : 'default'}
           disabled={!has_next}
           onClick={() => onPageChange(page + 1)}
-          style={{
-            borderRadius: '8px',
-            height: isMobile ? '32px' : '36px',
-            minWidth: isMobile ? '32px' : '36px',
-            padding: isMobile ? '4px' : '4px 8px',
-          }}
-        />
+          className={cn('px-2', isMobile ? 'h-8' : 'h-9')}
+        >
+          <ChevronRight className="w-4 h-4" />
+        </Button>
       </div>
     </div>
   )

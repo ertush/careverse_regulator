@@ -1,4 +1,5 @@
-import { Tag } from 'antd'
+import { Badge } from '@/components/ui/badge'
+import { cn } from '@/lib/utils'
 import type { Inspection } from '@/types/inspection'
 
 interface StatusBadgeProps {
@@ -8,21 +9,18 @@ interface StatusBadgeProps {
 export default function StatusBadge({ status }: StatusBadgeProps) {
   const statusConfig = {
     'Non Compliant': {
-      color: '#FFFAEB',
-      borderColor: '#FEDF89',
-      textColor: '#B54708',
+      className: 'bg-yellow-50 border-yellow-200 text-yellow-800 dark:bg-yellow-950 dark:border-yellow-800 dark:text-yellow-400',
+      dotClassName: 'bg-yellow-800 dark:bg-yellow-400',
       text: 'Non Compliant',
     },
     'Completed': {
-      color: '#ECFDF3',
-      borderColor: '#ABEFC6',
-      textColor: '#067647',
+      className: 'bg-green-50 border-green-200 text-green-800 dark:bg-green-950 dark:border-green-800 dark:text-green-400',
+      dotClassName: 'bg-green-800 dark:bg-green-400',
       text: 'Completed',
     },
     'Pending': {
-      color: '#FEF3F2',
-      borderColor: '#FECDCA',
-      textColor: '#B42318',
+      className: 'bg-red-50 border-red-200 text-red-800 dark:bg-red-950 dark:border-red-800 dark:text-red-400',
+      dotClassName: 'bg-red-800 dark:bg-red-400',
       text: 'Pending',
     },
   }
@@ -30,30 +28,15 @@ export default function StatusBadge({ status }: StatusBadgeProps) {
   const config = statusConfig[status]
 
   return (
-    <Tag
-      style={{
-        backgroundColor: config.color,
-        borderColor: config.borderColor,
-        color: config.textColor,
-        padding: '2px 10px 2px 8px',
-        borderRadius: '16px',
-        fontSize: '14px',
-        fontWeight: 500,
-        border: '1px solid',
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: '6px',
-      }}
+    <Badge
+      variant="outline"
+      className={cn(
+        'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-sm font-medium',
+        config.className
+      )}
     >
-      <span
-        style={{
-          width: '6px',
-          height: '6px',
-          borderRadius: '50%',
-          backgroundColor: config.textColor,
-        }}
-      />
+      <span className={cn('w-1.5 h-1.5 rounded-full', config.dotClassName)} />
       {config.text}
-    </Tag>
+    </Badge>
   )
 }

@@ -1,9 +1,11 @@
 import { useState } from 'react'
-import { Button, DatePicker, Popover, Space } from 'antd'
-import { CalendarOutlined } from '@ant-design/icons'
+import { Calendar as CalendarIcon } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Calendar } from '@/components/ui/calendar'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { cn } from '@/lib/utils'
 import dayjs, { Dayjs } from 'dayjs'
-
-const { RangePicker } = DatePicker
+import type { DateRange as CalendarDateRange } from 'react-day-picker'
 
 export interface DateRange {
   start: string // YYYY-MM-DD
@@ -23,7 +25,7 @@ export default function DateRangeSelector({
   showLabel = true,
 }: DateRangeSelectorProps) {
   const [open, setOpen] = useState(false)
-  const [tempRange, setTempRange] = useState<[Dayjs, Dayjs] | null>(null)
+  const [tempRange, setTempRange] = useState<CalendarDateRange | undefined>(undefined)
   const [selectedPreset, setSelectedPreset] = useState<string | null>(null)
 
   const presets = [
@@ -86,14 +88,15 @@ export default function DateRangeSelector({
       const range = preset.getValue()
       onChange(range)
       setSelectedPreset(presetKey)
-      setTempRange(null)
+      setTempRange(undefined)
       setOpen(false)
     }
   }
 
   const handleCustomApply = () => {
-    if (tempRange && tempRange[0] && tempRange[1]) {
-      const [start, end] = tempRange
+    if (tempRange?.from && tempRange?.to) {
+      const start = dayjs(tempRange.from)
+      const end = dayjs(tempRange.to)
       onChange({
         start: start.format('YYYY-MM-DD'),
         end: end.format('YYYY-MM-DD'),
@@ -106,7 +109,7 @@ export default function DateRangeSelector({
 
   const handleClear = () => {
     onChange(null)
-    setTempRange(null)
+    setTempRange(undefined)
     setSelectedPreset(null)
     setOpen(false)
   }
@@ -115,79 +118,65 @@ export default function DateRangeSelector({
     if (newOpen) {
       // Initialize temp range with current value if exists
       if (value) {
-        setTempRange([dayjs(value.start), dayjs(value.end)])
+        setTempRange({
+          from: dayjs(value.start).toDate(),
+          to: dayjs(value.end).toDate(),
+        })
       }
     } else {
-      setTempRange(null)
+      setTempRange(undefined)
     }
     setOpen(newOpen)
   }
 
   const content = (
-    <div style={{ width: '380px', padding: '12px' }}>
-      <div style={{ marginBottom: '16px' }}>
-        <div style={{ fontSize: '14px', fontWeight: 600, color: '#101828', marginBottom: '12px' }}>
+    <div className="p-3">
+      <div className="mb-4">
+        <div className="text-sm font-semibold mb-3">
           Select Date Range
         </div>
 
         {/* Preset Buttons */}
-        <Space size={8} wrap style={{ marginBottom: '16px' }}>
+        <div className="flex flex-wrap gap-2 mb-4">
           {presets.map((preset) => (
             <Button
               key={preset.key}
-              size="small"
-              type={selectedPreset === preset.key ? 'primary' : 'default'}
+              size="sm"
+              variant={selectedPreset === preset.key ? 'default' : 'outline'}
               onClick={() => handlePresetClick(preset.key)}
-              style={
-                selectedPreset === preset.key
-                  ? {
-                      backgroundColor: '#11b5a1',
-                      borderColor: '#11b5a1',
-                    }
-                  : undefined
-              }
             >
               {preset.label}
             </Button>
           ))}
-        </Space>
+        </div>
 
         {/* Custom Date Picker */}
-        <div style={{ marginBottom: '12px' }}>
-          <div
-            style={{ fontSize: '13px', fontWeight: 500, color: '#667085', marginBottom: '8px' }}
-          >
+        <div className="mb-3">
+          <div className="text-xs font-medium text-muted-foreground mb-2">
             Or select custom range:
           </div>
-          <RangePicker
-            value={tempRange}
-            onChange={(dates) => {
-              setTempRange(dates as [Dayjs, Dayjs] | null)
+          <Calendar
+            mode="range"
+            selected={tempRange}
+            onSelect={(range) => {
+              setTempRange(range)
               setSelectedPreset('custom')
             }}
-            style={{ width: '100%' }}
-            format="MMM D, YYYY"
-            allowClear
+            numberOfMonths={1}
+            className="rounded-md border"
           />
         </div>
       </div>
 
       {/* Action Buttons */}
-      <div
-        style={{ display: 'flex', gap: '8px', paddingTop: '12px', borderTop: '1px solid #EAECF0' }}
-      >
-        <Button style={{ flex: 1 }} onClick={handleClear}>
+      <div className="flex gap-2 pt-3 border-t border-border">
+        <Button variant="outline" className="flex-1" onClick={handleClear}>
           Clear
         </Button>
         <Button
-          type="primary"
-          style={{
-            flex: 1,
-            backgroundColor: '#11b5a1',
-            borderColor: '#11b5a1',
-          }}
+          className="flex-1"
           onClick={handleCustomApply}
-          disabled={!tempRange}
+          disabled={!tempRange?.from || !tempRange?.to}
         >
           Apply
         </Button>
@@ -196,28 +185,23 @@ export default function DateRangeSelector({
   )
 
   return (
-    <Popover
-      content={content}
-      title={null}
-      trigger="click"
-      open={open}
-      onOpenChange={handleOpenChange}
-      placement="bottomRight"
-    >
-      <Button
-        icon={<CalendarOutlined />}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          backgroundColor: value ? '#F0F9FF' : undefined,
-          borderColor: value ? '#11b5a1' : undefined,
-          color: value ? '#11b5a1' : undefined,
-        }}
-      >
-        {showLabel && (value ? value.label : 'Date Range')}
-        {!showLabel && value && <span style={{ fontSize: '10px' }}>●</span>}
-      </Button>
+    <Popover open={open} onOpenChange={handleOpenChange}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          className={cn(
+            'flex items-center gap-2',
+            value && 'bg-blue-50 border-primary text-primary dark:bg-blue-950'
+          )}
+        >
+          <CalendarIcon className="w-4 h-4 shrink-0" />
+          {showLabel && <span className="truncate">{value ? value.label : 'Date Range'}</span>}
+          {!showLabel && value && <span className="text-xs">●</span>}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-0" align="end">
+        {content}
+      </PopoverContent>
     </Popover>
   )
 }

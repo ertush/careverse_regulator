@@ -7,6 +7,7 @@ import { router } from './router'
 import AuthProvider from './components/AuthProvider'
 import { RouterErrorBoundary } from './components/RouterErrorBoundary'
 import { TooltipProvider } from "@/components/ui/tooltip"
+import { Toaster } from 'sonner'
 
 const rootElement = document.getElementById('root')
 if (!rootElement) {
@@ -19,6 +20,7 @@ createRoot(rootElement).render(
       <AuthProvider>
         <TooltipProvider>
           <RouterProvider router={router} />
+          <Toaster />
         </TooltipProvider>
       </AuthProvider>
     </RouterErrorBoundary>

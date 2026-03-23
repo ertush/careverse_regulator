@@ -1,5 +1,5 @@
-@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap');
+@import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/raleway";
@@ -2244,6 +2244,20 @@ body {
   --portal-header-glow: radial-gradient(circle at 84% -42%, rgba(14, 116, 144, 0.16), rgba(14, 116, 144, 0));
 }
 
+/* Ant Design ↔ shadcn theme bridge */
+:root {
+  /* Ant Design tokens in hex format for v5 compatibility */
+  --antd-color-primary: #0f766e;
+  --antd-color-bg-layout: #f4f7fb;
+  --antd-color-bg-container: #ffffff;
+  --antd-color-text: #111827;
+  --antd-color-text-secondary: #64748b;
+  --antd-color-border: #d8e1eb;
+  --antd-color-error: #dc2626;
+  --antd-color-success: #0f766e;
+  --antd-color-warning: #d97706;
+}
+
 :root[data-theme='dark'] {
   --portal-bg: #08101d;
   --portal-bg-deep: #0b1728;
@@ -2260,6 +2274,17 @@ body {
   --portal-control-border: rgba(71, 85, 105, 0.74);
   --portal-header-bg: linear-gradient(155deg, rgba(15, 23, 42, 0.78), rgba(15, 23, 42, 0.64));
   --portal-header-glow: radial-gradient(circle at 84% -42%, rgba(20, 184, 166, 0.22), rgba(20, 184, 166, 0));
+
+  /* Dark mode Ant Design tokens */
+  --antd-color-primary: #0d9488;
+  --antd-color-bg-layout: #08111f;
+  --antd-color-bg-container: #0f1a2a;
+  --antd-color-text: #e2e8f0;
+  --antd-color-text-secondary: #94a3b8;
+  --antd-color-border: #334155;
+  --antd-color-error: #f87171;
+  --antd-color-success: #0d9488;
+  --antd-color-warning: #fbbf24;
 }
 
 html[data-theme='dark'] body {

@@ -1,6 +1,8 @@
 import { useEffect, useState, type ReactNode } from 'react'
-import { Spin, Result, Button } from 'antd'
-import { ReloadOutlined } from '@ant-design/icons'
+import { RotateCw } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Result } from '@/components/ui/result'
+import { Spinner } from '@/components/ui/spinner'
 import { useAuthStore } from '@/stores/authStore'
 
 interface AuthProviderProps {
@@ -61,13 +63,14 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   // Show error state
   if (error) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: '24px' }}>
+      <div className="flex items-center justify-center min-h-screen p-6">
         <Result
           status="error"
           title="Authentication Error"
           subTitle="Failed to initialize authentication. Please check your network connection and try again."
           extra={
-            <Button type="primary" icon={<ReloadOutlined />} onClick={handleRetry}>
+            <Button onClick={handleRetry}>
+              <RotateCw className="w-4 h-4 mr-2" />
               Retry
             </Button>
           }
@@ -79,13 +82,14 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   // Show timeout state
   if (timedOut) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: '24px' }}>
+      <div className="flex items-center justify-center min-h-screen p-6">
         <Result
           status="warning"
           title="Authentication Timeout"
           subTitle="Authentication is taking longer than expected. Please check your connection and try again."
           extra={
-            <Button type="primary" icon={<ReloadOutlined />} onClick={handleRetry}>
+            <Button onClick={handleRetry}>
+              <RotateCw className="w-4 h-4 mr-2" />
               Retry
             </Button>
           }
@@ -97,8 +101,8 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   // Show loading state
   if (status === 'loading') {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
-        <Spin size="large" />
+      <div className="flex items-center justify-center min-h-screen">
+        <Spinner className="w-8 h-8" />
       </div>
     )
   }

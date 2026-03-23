@@ -1,6 +1,7 @@
 import { Component, type ReactNode } from 'react'
-import { Button, Result } from 'antd'
-import { ReloadOutlined } from '@ant-design/icons'
+import { RotateCw } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Result } from '@/components/ui/result'
 
 interface Props {
   children: ReactNode
@@ -32,13 +33,14 @@ export class RouterErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: '24px' }}>
+        <div className="flex items-center justify-center min-h-screen p-6">
           <Result
             status="error"
             title="Application Error"
             subTitle="An unexpected error occurred. Please reload the page to continue."
             extra={
-              <Button type="primary" icon={<ReloadOutlined />} onClick={this.handleReload}>
+              <Button onClick={this.handleReload}>
+                <RotateCw className="w-4 h-4 mr-2" />
                 Reload Page
               </Button>
             }

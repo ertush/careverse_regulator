@@ -1,30 +1,26 @@
-import { message } from 'antd'
+import { toast } from 'sonner'
 
 export function showSuccess(content: string): void {
-  message.success({
-    content,
-    duration: 3,
+  toast.success(content, {
+    duration: 3000,
   })
 }
 
 export function showError(content: string): void {
-  message.error({
-    content,
-    duration: 4,
+  toast.error(content, {
+    duration: 4000,
   })
 }
 
 export function showWarning(content: string): void {
-  message.warning({
-    content,
-    duration: 3,
+  toast.warning(content, {
+    duration: 3000,
   })
 }
 
 export function showInfo(content: string): void {
-  message.info({
-    content,
-    duration: 3,
+  toast.info(content, {
+    duration: 3000,
   })
 }
 

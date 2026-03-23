@@ -1,7 +1,5 @@
-import { List, Tag, Typography } from 'antd'
-import { ProCard } from '@ant-design/pro-components'
-
-const { Paragraph, Title } = Typography
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 interface RoadmapShellProps {
   title: string
@@ -22,30 +20,50 @@ const nextTracks = [
 
 export default function RoadmapShell({ title, description }: RoadmapShellProps) {
   return (
-    <div className="roadmap-wrap">
-      <ProCard className="glass-pro-card roadmap-hero-card" bordered={false}>
-        <Tag className="roadmap-tag">Module status: In progress</Tag>
-        <Title level={3} className="roadmap-hero-title">{title}</Title>
-        <Paragraph type="secondary" className="roadmap-hero-description">{description}</Paragraph>
-      </ProCard>
+    <div className="space-y-4">
+      <Card className="bg-card/50 backdrop-blur-sm">
+        <CardContent className="p-6">
+          <div className="space-y-3">
+            <Badge variant="secondary" className="w-fit">
+              Module status: In progress
+            </Badge>
+            <h3 className="text-2xl font-semibold tracking-tight break-words">{title}</h3>
+            <p className="text-sm text-muted-foreground break-words">{description}</p>
+          </div>
+        </CardContent>
+      </Card>
 
-      <ProCard ghost gutter={[16, 16]} wrap>
-        <ProCard colSpan={{ xs: 24, xl: 12 }} className="glass-pro-card roadmap-card" title="Ready now">
-          <List
-            size="small"
-            dataSource={currentTracks}
-            renderItem={(item) => <List.Item>{item}</List.Item>}
-          />
-        </ProCard>
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+        <Card className="bg-card/50 backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle className="text-lg">Ready now</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2">
+              {currentTracks.map((item, index) => (
+                <li key={index} className="text-sm border-b border-border last:border-0 pb-2 last:pb-0">
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
 
-        <ProCard colSpan={{ xs: 24, xl: 12 }} className="glass-pro-card roadmap-card" title="Next up">
-          <List
-            size="small"
-            dataSource={nextTracks}
-            renderItem={(item) => <List.Item>{item}</List.Item>}
-          />
-        </ProCard>
-      </ProCard>
+        <Card className="bg-card/50 backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle className="text-lg">Next up</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2">
+              {nextTracks.map((item, index) => (
+                <li key={index} className="text-sm border-b border-border last:border-0 pb-2 last:pb-0">
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }

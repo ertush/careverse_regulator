@@ -1,5 +1,8 @@
-import { Card, Button, Space, Tag } from 'antd'
-import { CalendarOutlined, UserOutlined, FileTextOutlined } from '@ant-design/icons'
+import { Calendar, User, FileText } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { cn } from '@/lib/utils'
 import type { Inspection } from '@/types/inspection'
 import StatusBadge from './StatusBadge'
 import dayjs from 'dayjs'
@@ -17,61 +20,55 @@ function isInspectionOverdue(inspection: Inspection): boolean {
 }
 
 export default function InspectionCard({ inspection, onView }: InspectionCardProps) {
+  const isOverdue = isInspectionOverdue(inspection)
+
   return (
-    <Card
-      style={{
-        marginBottom: '12px',
-        borderRadius: '8px',
-        border: isInspectionOverdue(inspection) ? '2px solid #ff4d4f' : '1px solid #EAECF0',
-      }}
-      bodyStyle={{ padding: '16px' }}
-    >
-      <div style={{ marginBottom: '12px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div>
-              <div style={{ fontSize: '12px', color: '#667085', marginBottom: '4px' }}>
-                {inspection.inspectionId}
+    <Card className={cn(
+      'mb-3',
+      isOverdue && 'border-2 border-red-500'
+    )}>
+      <CardContent className="p-4">
+        <div className="mb-3">
+          <div className="flex justify-between items-start gap-2 mb-2">
+            <div className="flex items-center gap-2 min-w-0 flex-1">
+              <div className="min-w-0 flex-1">
+                <div className="text-xs text-muted-foreground mb-1 truncate">
+                  {inspection.inspectionId}
+                </div>
+                <div className="text-base font-semibold truncate">
+                  {inspection.facilityName}
+                </div>
               </div>
-              <div style={{ fontSize: '16px', fontWeight: 600, color: '#101828' }}>
-                {inspection.facilityName}
-              </div>
+              {isOverdue && (
+                <Badge variant="destructive" className="shrink-0">Overdue</Badge>
+              )}
             </div>
-            {isInspectionOverdue(inspection) && (
-              <Tag color="red" style={{ marginLeft: '8px' }}>Overdue</Tag>
-            )}
+            <StatusBadge status={inspection.status} />
           </div>
-          <StatusBadge status={inspection.status} />
         </div>
-      </div>
 
-      <Space direction="vertical" style={{ width: '100%' }} size={8}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: '#475467' }}>
-          <CalendarOutlined style={{ color: '#667085' }} />
-          <span>{inspection.date}</span>
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Calendar className="w-4 h-4 shrink-0" />
+            <span className="truncate">{inspection.date}</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <User className="w-4 h-4 shrink-0" />
+            <span className="truncate">{inspection.inspector}</span>
+          </div>
+          <div className="flex items-start gap-2 text-sm text-muted-foreground">
+            <FileText className="w-4 h-4 mt-0.5 shrink-0" />
+            <span className="flex-1 leading-5 break-words">{inspection.noteToInspector}</span>
+          </div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: '#475467' }}>
-          <UserOutlined style={{ color: '#667085' }} />
-          <span>{inspection.inspector}</span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '14px', color: '#475467' }}>
-          <FileTextOutlined style={{ color: '#667085', marginTop: '2px' }} />
-          <span style={{ flex: 1, lineHeight: '20px' }}>{inspection.noteToInspector}</span>
-        </div>
-      </Space>
 
-      <Button
-        type="primary"
-        block
-        onClick={() => onView(inspection)}
-        style={{
-          marginTop: '16px',
-          backgroundColor: '#11b5a1',
-          borderColor: '#11b5a1',
-        }}
-      >
-        View Details
-      </Button>
+        <Button
+          className="w-full mt-4"
+          onClick={() => onView(inspection)}
+        >
+          View Details
+        </Button>
+      </CardContent>
     </Card>
   )
 }

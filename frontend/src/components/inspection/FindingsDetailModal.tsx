@@ -1,17 +1,21 @@
-import { Modal, Button, Space, Divider, Tag } from 'antd'
 import {
-  FileTextOutlined,
-  DownloadOutlined,
-  CalendarOutlined,
-  UserOutlined,
-  FolderOutlined,
-  WarningOutlined,
-  CheckCircleOutlined,
-  ClockCircleOutlined
-} from '@ant-design/icons'
+  FileText,
+  Download,
+  Calendar,
+  User,
+  Folder,
+  AlertTriangle,
+  CheckCircle,
+  Clock
+} from 'lucide-react'
 import { useResponsive } from '@/hooks/useResponsive'
 import type { Finding } from '@/stores/findingsStore'
 import FindingsBadge from './FindingsBadge'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Separator } from '@/components/ui/separator'
+import { cn } from '@/lib/utils'
 
 interface FindingsDetailModalProps {
   open: boolean
@@ -20,15 +24,15 @@ interface FindingsDetailModalProps {
 }
 
 const InfoRow = ({ icon, label, value, isMobile }: { icon: React.ReactNode; label: string; value: React.ReactNode; isMobile: boolean }) => (
-  <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-    <div style={{ color: '#667085', fontSize: '18px', marginTop: '2px' }}>
+  <div className="flex gap-3 items-start">
+    <div className="text-muted-foreground text-lg mt-0.5 shrink-0">
       {icon}
     </div>
-    <div style={{ flex: 1 }}>
-      <div style={{ fontSize: isMobile ? '12px' : '13px', color: '#667085', marginBottom: '4px' }}>
+    <div className="flex-1">
+      <div className={cn('text-muted-foreground mb-1', isMobile ? 'text-xs' : 'text-sm')}>
         {label}
       </div>
-      <div style={{ fontSize: isMobile ? '14px' : '15px', color: '#101828', fontWeight: 500 }}>
+      <div className={cn('text-foreground font-medium', isMobile ? 'text-sm' : 'text-base')}>
         {value}
       </div>
     </div>
@@ -41,186 +45,157 @@ export default function FindingsDetailModal({ open, onClose, finding }: Findings
   if (!finding) return null
 
   return (
-    <Modal
-      title={
-        <div>
-          <div style={{ fontSize: isMobile ? '16px' : '18px', fontWeight: 600, color: '#101828', marginBottom: '4px' }}>
+    <Dialog open={open} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className={cn('max-w-3xl', isMobile && 'w-full max-h-screen')}>
+        <DialogHeader>
+          <DialogTitle className={cn('font-semibold text-foreground', isMobile ? 'text-base' : 'text-lg')}>
             Inspection Finding
-          </div>
-          <div style={{ fontSize: isMobile ? '13px' : '14px', color: '#475467', fontWeight: 400 }}>
+          </DialogTitle>
+          <div className={cn('text-muted-foreground font-normal', isMobile ? 'text-sm' : 'text-base')}>
             {finding.findingId}
           </div>
-        </div>
-      }
-      open={open}
-      onCancel={onClose}
-      footer={
-        <Button
-          type="primary"
-          size={isMobile ? 'middle' : 'large'}
-          block={isMobile}
-          style={{ backgroundColor: '#11b5a1', borderColor: '#11b5a1' }}
-          onClick={onClose}
-        >
-          Close
-        </Button>
-      }
-      width={isMobile ? '100%' : 800}
-      style={isMobile ? { top: 0, paddingBottom: 0, maxWidth: '100vw' } : {}}
-      bodyStyle={isMobile ? { maxHeight: 'calc(100vh - 120px)', overflowY: 'auto', padding: isMobile ? '16px' : '24px' } : { padding: '24px' }}
-    >
-      <div>
-        {/* Facility Header */}
-        <div
-          style={{
-            padding: isMobile ? '16px' : '20px',
-            backgroundColor: '#F9FAFB',
-            borderRadius: '12px',
-            border: '1px solid #EAECF0',
-            marginBottom: '20px',
-          }}
-        >
-          <div style={{ fontSize: isMobile ? '18px' : '20px', fontWeight: 600, color: '#101828', marginBottom: '12px' }}>
-            {finding.facilityName}
-          </div>
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            <FindingsBadge severity={finding.severity} />
-            <FindingsBadge status={finding.status} />
-            <Tag color="blue">{finding.category}</Tag>
-          </div>
-        </div>
+        </DialogHeader>
 
-        {/* Info Grid */}
-        <Space direction="vertical" size={isMobile ? 16 : 20} style={{ width: '100%', marginBottom: '20px' }}>
-          <InfoRow
-            icon={<CalendarOutlined />}
-            label="Inspection Date"
-            value={finding.inspectionDate}
-            isMobile={isMobile}
-          />
-          <InfoRow
-            icon={<UserOutlined />}
-            label="Inspector"
-            value={finding.inspector}
-            isMobile={isMobile}
-          />
-          <InfoRow
-            icon={<ClockCircleOutlined />}
-            label="Due Date"
-            value={finding.dueDate}
-            isMobile={isMobile}
-          />
-          {finding.resolvedDate && (
-            <InfoRow
-              icon={<CheckCircleOutlined />}
-              label="Resolved Date"
-              value={finding.resolvedDate}
-              isMobile={isMobile}
-            />
-          )}
-        </Space>
-
-        <Divider style={{ margin: '20px 0' }} />
-
-        {/* Description Section */}
-        <div style={{ marginBottom: '20px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-            <WarningOutlined style={{ fontSize: '16px', color: '#DC2626' }} />
-            <div style={{ fontSize: isMobile ? '14px' : '15px', fontWeight: 600, color: '#101828' }}>
-              Finding Description
+        <div className={cn('space-y-5', isMobile ? 'max-h-[calc(100vh-200px)] overflow-y-auto' : '')}>
+          {/* Facility Header */}
+          <div className={cn(
+            'bg-muted/40 rounded-xl border',
+            isMobile ? 'p-4' : 'p-5'
+          )}>
+            <div className={cn('font-semibold text-foreground mb-3', isMobile ? 'text-lg' : 'text-xl')}>
+              {finding.facilityName}
+            </div>
+            <div className="flex gap-2 flex-wrap">
+              <FindingsBadge severity={finding.severity} />
+              <FindingsBadge status={finding.status} />
+              <Badge variant="secondary">{finding.category}</Badge>
             </div>
           </div>
-          <div
-            style={{
-              fontSize: isMobile ? '13px' : '14px',
-              color: '#475467',
-              lineHeight: '22px',
-              padding: isMobile ? '12px' : '16px',
-              backgroundColor: '#FEF3F2',
-              borderRadius: '8px',
-              border: '1px solid #FECDCA',
-            }}
-          >
-            {finding.description}
-          </div>
-        </div>
 
-        {/* Corrective Action */}
-        {finding.correctiveAction && (
-          <div style={{ marginBottom: '20px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-              <CheckCircleOutlined style={{ fontSize: '16px', color: '#059669' }} />
-              <div style={{ fontSize: isMobile ? '14px' : '15px', fontWeight: 600, color: '#101828' }}>
-                Corrective Action Required
+          {/* Info Grid */}
+          <div className={cn('space-y-4 w-full', isMobile ? 'space-y-4' : 'space-y-5')}>
+            <InfoRow
+              icon={<Calendar className="w-[18px] h-[18px] shrink-0" />}
+              label="Inspection Date"
+              value={finding.inspectionDate}
+              isMobile={isMobile}
+            />
+            <InfoRow
+              icon={<User className="w-[18px] h-[18px] shrink-0" />}
+              label="Inspector"
+              value={finding.inspector}
+              isMobile={isMobile}
+            />
+            <InfoRow
+              icon={<Clock className="w-[18px] h-[18px] shrink-0" />}
+              label="Due Date"
+              value={finding.dueDate}
+              isMobile={isMobile}
+            />
+            {finding.resolvedDate && (
+              <InfoRow
+                icon={<CheckCircle className="w-[18px] h-[18px] shrink-0" />}
+                label="Resolved Date"
+                value={finding.resolvedDate}
+                isMobile={isMobile}
+              />
+            )}
+          </div>
+
+          <Separator className="my-5" />
+
+          {/* Description Section */}
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <AlertTriangle className="w-4 h-4 text-destructive shrink-0" />
+              <div className={cn('font-semibold text-foreground', isMobile ? 'text-sm' : 'text-base')}>
+                Finding Description
               </div>
             </div>
             <div
-              style={{
-                fontSize: isMobile ? '13px' : '14px',
-                color: '#475467',
-                lineHeight: '22px',
-                padding: isMobile ? '12px' : '16px',
-                backgroundColor: '#ECFDF3',
-                borderRadius: '8px',
-                border: '1px solid #ABEFC6',
-              }}
+              className={cn(
+                'text-muted-foreground leading-relaxed rounded-lg border border-red-200 bg-red-50',
+                isMobile ? 'text-sm p-3' : 'text-base p-4'
+              )}
             >
-              {finding.correctiveAction}
+              {finding.description}
             </div>
           </div>
-        )}
 
-        {/* Evidence Section */}
-        {finding.evidence && finding.evidence.length > 0 && (
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-              <FolderOutlined style={{ fontSize: '16px', color: '#667085' }} />
-              <div style={{ fontSize: isMobile ? '14px' : '15px', fontWeight: 600, color: '#101828' }}>
-                Evidence & Documentation
+          {/* Corrective Action */}
+          {finding.correctiveAction && (
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <CheckCircle className="w-4 h-4 text-green-600 shrink-0" />
+                <div className={cn('font-semibold text-foreground', isMobile ? 'text-sm' : 'text-base')}>
+                  Corrective Action Required
+                </div>
+              </div>
+              <div
+                className={cn(
+                  'text-muted-foreground leading-relaxed rounded-lg border border-green-200 bg-green-50',
+                  isMobile ? 'text-sm p-3' : 'text-base p-4'
+                )}
+              >
+                {finding.correctiveAction}
               </div>
             </div>
-            <Space direction="vertical" style={{ width: '100%' }} size={8}>
-              {finding.evidence.map((doc, index) => (
-                <div
-                  key={index}
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    padding: isMobile ? '12px' : '14px',
-                    border: '1px solid #D0D5DD',
-                    borderRadius: '8px',
-                    backgroundColor: '#F9FAFB',
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1, minWidth: 0 }}>
-                    <FileTextOutlined style={{ fontSize: '18px', color: '#667085' }} />
-                    <span
-                      style={{
-                        fontSize: isMobile ? '13px' : '14px',
-                        color: '#101828',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      {doc}
-                    </span>
-                  </div>
-                  <Button
-                    type="text"
-                    icon={<DownloadOutlined />}
-                    size={isMobile ? 'small' : 'middle'}
-                    style={{ color: '#11b5a1', flexShrink: 0 }}
-                  >
-                    {!isMobile && 'Download'}
-                  </Button>
+          )}
+
+          {/* Evidence Section */}
+          {finding.evidence && finding.evidence.length > 0 && (
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <Folder className="w-4 h-4 text-muted-foreground shrink-0" />
+                <div className={cn('font-semibold text-foreground', isMobile ? 'text-sm' : 'text-base')}>
+                  Evidence & Documentation
                 </div>
-              ))}
-            </Space>
-          </div>
-        )}
-      </div>
-    </Modal>
+              </div>
+              <div className="space-y-2 w-full">
+                {finding.evidence.map((doc, index) => (
+                  <div
+                    key={index}
+                    className={cn(
+                      'flex justify-between items-center border rounded-lg bg-muted/40',
+                      isMobile ? 'p-3' : 'p-3.5'
+                    )}
+                  >
+                    <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                      <FileText className="w-[18px] h-[18px] text-muted-foreground shrink-0" />
+                      <span
+                        className={cn(
+                          'text-foreground truncate',
+                          isMobile ? 'text-sm' : 'text-base'
+                        )}
+                      >
+                        {doc}
+                      </span>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size={isMobile ? 'sm' : 'default'}
+                      className="text-primary shrink-0"
+                    >
+                      <Download className="w-4 h-4 shrink-0" />
+                      {!isMobile && <span className="ml-2">Download</span>}
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className={cn('flex justify-end pt-4', isMobile && 'pt-3')}>
+          <Button
+            size={isMobile ? 'default' : 'lg'}
+            onClick={onClose}
+            className={cn(isMobile && 'w-full')}
+          >
+            Close
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   )
 }

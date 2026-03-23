@@ -1,9 +1,16 @@
 import { useState } from 'react'
-import { Input, Button, Popover, Checkbox, Space, Badge } from 'antd'
-import { SearchOutlined, FilterOutlined, SortAscendingOutlined } from '@ant-design/icons'
+import { Search, Filter, ArrowUpDown } from 'lucide-react'
 import { useResponsive } from '@/hooks/useResponsive'
 import DateRangeSelector, { type DateRange } from './DateRangeSelector'
 import FilterTags, { type FilterTag } from './FilterTags'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Checkbox } from '@/components/ui/checkbox'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Label } from '@/components/ui/label'
+import { Badge } from '@/components/ui/badge'
+import { cn } from '@/lib/utils'
 
 interface FindingsFiltersProps {
   searchText: string
@@ -114,47 +121,130 @@ export default function FindingsFilters({
     setFilterOpen(open)
   }
 
+  const handleSeverityToggle = (severity: string) => {
+    if (severity === 'all') {
+      setTempSeverities(['all'])
+    } else {
+      const newSeverities = tempSeverities.includes(severity)
+        ? tempSeverities.filter(s => s !== severity)
+        : [...tempSeverities.filter(s => s !== 'all'), severity]
+      setTempSeverities(newSeverities.length === 0 ? ['all'] : newSeverities)
+    }
+  }
+
+  const handleStatusToggle = (status: string) => {
+    if (status === 'all') {
+      setTempStatuses(['all'])
+    } else {
+      const newStatuses = tempStatuses.includes(status)
+        ? tempStatuses.filter(s => s !== status)
+        : [...tempStatuses.filter(s => s !== 'all'), status]
+      setTempStatuses(newStatuses.length === 0 ? ['all'] : newStatuses)
+    }
+  }
+
   const filterContent = (
-    <div style={{ width: '280px', padding: '8px' }}>
-      <div style={{ marginBottom: '16px' }}>
-        <div style={{ fontSize: '14px', fontWeight: 600, color: '#101828', marginBottom: '12px' }}>
+    <div className="w-[280px] p-2">
+      <div className="mb-4">
+        <div className="text-sm font-semibold mb-3">
           Filter by Severity
         </div>
-        <Checkbox.Group
-          value={tempSeverities}
-          onChange={(values) => setTempSeverities(values as string[])}
-          style={{ width: '100%' }}
-        >
-          <Space direction="vertical" style={{ width: '100%' }}>
-            <Checkbox value="all">All Severities</Checkbox>
-            <Checkbox value="critical">Critical</Checkbox>
-            <Checkbox value="major">Major</Checkbox>
-            <Checkbox value="minor">Minor</Checkbox>
-          </Space>
-        </Checkbox.Group>
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id="severity-all"
+              checked={tempSeverities.includes('all')}
+              onCheckedChange={() => handleSeverityToggle('all')}
+            />
+            <Label htmlFor="severity-all" className="cursor-pointer text-sm font-normal">
+              All Severities
+            </Label>
+          </div>
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id="severity-critical"
+              checked={tempSeverities.includes('critical')}
+              onCheckedChange={() => handleSeverityToggle('critical')}
+            />
+            <Label htmlFor="severity-critical" className="cursor-pointer text-sm font-normal">
+              Critical
+            </Label>
+          </div>
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id="severity-major"
+              checked={tempSeverities.includes('major')}
+              onCheckedChange={() => handleSeverityToggle('major')}
+            />
+            <Label htmlFor="severity-major" className="cursor-pointer text-sm font-normal">
+              Major
+            </Label>
+          </div>
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id="severity-minor"
+              checked={tempSeverities.includes('minor')}
+              onCheckedChange={() => handleSeverityToggle('minor')}
+            />
+            <Label htmlFor="severity-minor" className="cursor-pointer text-sm font-normal">
+              Minor
+            </Label>
+          </div>
+        </div>
       </div>
 
-      <div style={{ marginBottom: '12px', paddingTop: '12px', borderTop: '1px solid #EAECF0' }}>
-        <div style={{ fontSize: '14px', fontWeight: 600, color: '#101828', marginBottom: '12px' }}>
+      <div className="mb-3 pt-3 border-t">
+        <div className="text-sm font-semibold mb-3">
           Filter by Status
         </div>
-        <Checkbox.Group
-          value={tempStatuses}
-          onChange={(values) => setTempStatuses(values as string[])}
-          style={{ width: '100%' }}
-        >
-          <Space direction="vertical" style={{ width: '100%' }}>
-            <Checkbox value="all">All Statuses</Checkbox>
-            <Checkbox value="open">Open</Checkbox>
-            <Checkbox value="in progress">In Progress</Checkbox>
-            <Checkbox value="resolved">Resolved</Checkbox>
-          </Space>
-        </Checkbox.Group>
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id="status-all"
+              checked={tempStatuses.includes('all')}
+              onCheckedChange={() => handleStatusToggle('all')}
+            />
+            <Label htmlFor="status-all" className="cursor-pointer text-sm font-normal">
+              All Statuses
+            </Label>
+          </div>
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id="status-open"
+              checked={tempStatuses.includes('open')}
+              onCheckedChange={() => handleStatusToggle('open')}
+            />
+            <Label htmlFor="status-open" className="cursor-pointer text-sm font-normal">
+              Open
+            </Label>
+          </div>
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id="status-in-progress"
+              checked={tempStatuses.includes('in progress')}
+              onCheckedChange={() => handleStatusToggle('in progress')}
+            />
+            <Label htmlFor="status-in-progress" className="cursor-pointer text-sm font-normal">
+              In Progress
+            </Label>
+          </div>
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id="status-resolved"
+              checked={tempStatuses.includes('resolved')}
+              onCheckedChange={() => handleStatusToggle('resolved')}
+            />
+            <Label htmlFor="status-resolved" className="cursor-pointer text-sm font-normal">
+              Resolved
+            </Label>
+          </div>
+        </div>
       </div>
 
-      <div style={{ display: 'flex', gap: '8px', paddingTop: '12px', borderTop: '1px solid #EAECF0' }}>
+      <div className="flex gap-2 pt-3 border-t">
         <Button
-          style={{ flex: 1 }}
+          variant="outline"
+          className="flex-1"
           onClick={() => {
             setTempSeverities(['all'])
             setTempStatuses(['all'])
@@ -166,12 +256,7 @@ export default function FindingsFilters({
           Clear
         </Button>
         <Button
-          type="primary"
-          style={{
-            flex: 1,
-            backgroundColor: '#11b5a1',
-            borderColor: '#11b5a1',
-          }}
+          className="flex-1"
           onClick={handleApplyFilter}
         >
           Apply
@@ -181,79 +266,82 @@ export default function FindingsFilters({
   )
 
   const sortContent = (
-    <div style={{ width: '220px', padding: '8px' }}>
-      <div style={{ fontSize: '14px', fontWeight: 600, color: '#101828', marginBottom: '12px' }}>
+    <div className="w-[220px] p-2">
+      <div className="text-sm font-semibold mb-3">
         Sort by
       </div>
-      <Space direction="vertical" style={{ width: '100%' }}>
-        <Button
-          type={sortOrder === 'asc' ? 'primary' : 'text'}
-          block
-          style={sortOrder === 'asc' ? { backgroundColor: '#11b5a1', borderColor: '#11b5a1' } : {}}
-          onClick={() => {
-            onSortChange('asc')
-            setSortOpen(false)
-          }}
-        >
-          Facility Name (A-Z)
-        </Button>
-        <Button
-          type={sortOrder === 'desc' ? 'primary' : 'text'}
-          block
-          style={sortOrder === 'desc' ? { backgroundColor: '#11b5a1', borderColor: '#11b5a1' } : {}}
-          onClick={() => {
-            onSortChange('desc')
-            setSortOpen(false)
-          }}
-        >
-          Facility Name (Z-A)
-        </Button>
-        <Button
-          type={sortOrder === 'recent' ? 'primary' : 'text'}
-          block
-          style={sortOrder === 'recent' ? { backgroundColor: '#11b5a1', borderColor: '#11b5a1' } : {}}
-          onClick={() => {
-            onSortChange('recent')
-            setSortOpen(false)
-          }}
-        >
-          Most Recent
-        </Button>
-      </Space>
+      <RadioGroup
+        value={sortOrder}
+        onValueChange={(value) => {
+          onSortChange(value as 'asc' | 'desc' | 'recent')
+          setSortOpen(false)
+        }}
+        className="flex flex-col gap-3"
+      >
+        <div className="flex items-center gap-2">
+          <RadioGroupItem value="asc" id="findings-sort-asc" />
+          <Label htmlFor="findings-sort-asc" className="cursor-pointer text-sm font-normal">
+            Facility Name (A-Z)
+          </Label>
+        </div>
+        <div className="flex items-center gap-2">
+          <RadioGroupItem value="desc" id="findings-sort-desc" />
+          <Label htmlFor="findings-sort-desc" className="cursor-pointer text-sm font-normal">
+            Facility Name (Z-A)
+          </Label>
+        </div>
+        <div className="flex items-center gap-2">
+          <RadioGroupItem value="recent" id="findings-sort-recent" />
+          <Label htmlFor="findings-sort-recent" className="cursor-pointer text-sm font-normal">
+            Most Recent
+          </Label>
+        </div>
+      </RadioGroup>
     </div>
   )
 
   return (
-    <div style={{ width: isMobile ? '100%' : 'auto' }}>
+    <div className={cn('w-full', !isMobile && 'w-auto')}>
       {/* Filter Controls */}
-      <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '12px', alignItems: isMobile ? 'stretch' : 'center', marginBottom: filterTags.length > 0 ? '12px' : 0 }}>
-        <Input
-          placeholder="Search by facility name"
-          prefix={<SearchOutlined />}
-          value={searchText}
-          onChange={(e) => onSearchChange(e.target.value)}
-          style={{ width: isMobile ? '100%' : 400 }}
-        />
-        <div style={{ display: 'flex', gap: isMobile ? '12px' : '16px', alignItems: 'center', flexWrap: 'wrap' }}>
-          <div style={{ position: 'relative' }}>
-            <Popover
-              content={filterContent}
-              title={null}
-              trigger="click"
-              open={filterOpen}
-              onOpenChange={handleFilterOpenChange}
-              placement="bottomRight"
-            >
-              <Badge count={activeFilterCount} offset={[-8, 8]}>
-                <Button
-                  icon={<FilterOutlined />}
-                  style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: isMobile ? 1 : 'none' }}
-                >
-                  {!isMobile && 'Filters'}
-                </Button>
-              </Badge>
-            </Popover>
-          </div>
+      <div
+        className={cn(
+          'flex gap-3 items-center',
+          isMobile ? 'flex-col items-stretch' : 'flex-row',
+          filterTags.length > 0 && 'mb-3'
+        )}
+      >
+        <div className="relative w-full sm:w-[400px]">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground shrink-0" />
+          <Input
+            placeholder="Search by facility name"
+            value={searchText}
+            onChange={(e) => onSearchChange(e.target.value)}
+            className="w-full pl-9"
+          />
+        </div>
+        <div className={cn('flex items-center flex-wrap', isMobile ? 'gap-3' : 'gap-4')}>
+          <Popover open={filterOpen} onOpenChange={handleFilterOpenChange}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn('gap-2', isMobile && 'flex-1')}
+              >
+                <Filter className="w-4 h-4 shrink-0" />
+                {!isMobile && <span className="whitespace-nowrap">Filters</span>}
+                {activeFilterCount > 0 && (
+                  <Badge
+                    variant="secondary"
+                    className="ml-1 px-1.5 py-0 text-xs h-5 min-w-[20px] rounded-full"
+                  >
+                    {activeFilterCount}
+                  </Badge>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="p-0">
+              {filterContent}
+            </PopoverContent>
+          </Popover>
 
           <DateRangeSelector
             value={dateRange}
@@ -261,20 +349,19 @@ export default function FindingsFilters({
             showLabel={!isMobile}
           />
 
-          <Popover
-            content={sortContent}
-            title={null}
-            trigger="click"
-            open={sortOpen}
-            onOpenChange={setSortOpen}
-            placement="bottomRight"
-          >
-            <Button
-              icon={<SortAscendingOutlined />}
-              style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: isMobile ? 1 : 'none' }}
-            >
-              {!isMobile && 'Sort'}
-            </Button>
+          <Popover open={sortOpen} onOpenChange={setSortOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn('gap-2', isMobile && 'flex-1')}
+              >
+                <ArrowUpDown className="w-4 h-4 shrink-0" />
+                {!isMobile && <span className="whitespace-nowrap">Sort</span>}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="p-0">
+              {sortContent}
+            </PopoverContent>
           </Popover>
         </div>
       </div>

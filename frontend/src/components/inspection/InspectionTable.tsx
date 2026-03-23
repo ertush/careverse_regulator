@@ -1,10 +1,29 @@
-import { useMemo } from 'react'
-import { Table, Button, Badge } from 'antd'
-import type { ColumnsType } from 'antd/es/table'
-import { ProCard } from '@ant-design/pro-components'
+import { useMemo, useState } from 'react'
+import {
+  useReactTable,
+  getCoreRowModel,
+  getPaginationRowModel,
+  createColumnHelper,
+  flexRender,
+  type RowSelectionState,
+} from '@tanstack/react-table'
 import type { Inspection } from '@/types/inspection'
 import StatusBadge from './StatusBadge'
 import dayjs from 'dayjs'
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Checkbox } from '@/components/ui/checkbox'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface InspectionTableProps {
   inspections: Inspection[]
@@ -20,92 +39,232 @@ function isInspectionOverdue(inspection: Inspection): boolean {
   return inspectionDate.isBefore(today)
 }
 
+const columnHelper = createColumnHelper<Inspection>()
+
 export default function InspectionTable({
   inspections,
   selectedRowKeys,
   onSelectionChange,
   onViewInspection,
 }: InspectionTableProps) {
-  const columns: ColumnsType<Inspection> = useMemo(() => [
-    {
-      title: 'Inspection ID',
-      dataIndex: 'inspectionId',
-      key: 'inspectionId',
-      width: 150,
-    },
-    {
-      title: 'Facility Name',
-      dataIndex: 'facilityName',
-      key: 'facilityName',
-    },
-    {
-      title: 'Date',
-      dataIndex: 'date',
-      key: 'date',
-      width: 150,
-    },
-    {
-      title: 'Inspector',
-      dataIndex: 'inspector',
-      key: 'inspector',
-      width: 180,
-    },
-    {
-      title: 'Note to Inspector',
-      dataIndex: 'noteToInspector',
-      key: 'noteToInspector',
-    },
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      width: 180,
-      render: (status: Inspection['status'], record: Inspection) => {
-        if (isInspectionOverdue(record)) {
-          return <Badge color="red" text="Overdue" />
-        }
-        return <StatusBadge status={status} />
-      },
-    },
-    {
-      title: 'Action',
-      key: 'action',
-      width: 100,
-      render: (_, record: Inspection) => (
-        <Button
-          type="primary"
-          onClick={() => onViewInspection(record)}
-          style={{
-            backgroundColor: '#11b5a1',
-            borderColor: '#11b5a1',
-            borderRadius: '8px',
-            height: '36px',
-            padding: '4px 15px',
-          }}
-        >
-          View
-        </Button>
-      ),
-    },
-  ], [onViewInspection])
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: 10,
+  })
 
-  const rowSelection = useMemo(() => ({
-    selectedRowKeys,
-    onChange: onSelectionChange,
-  }), [selectedRowKeys, onSelectionChange])
+  // Convert selectedRowKeys to row selection state
+  const rowSelection = useMemo(() => {
+    const selection: RowSelectionState = {}
+    selectedRowKeys.forEach((key) => {
+      const index = inspections.findIndex((i) => i.id === key)
+      if (index !== -1) {
+        selection[index] = true
+      }
+    })
+    return selection
+  }, [selectedRowKeys, inspections])
+
+  const columns = useMemo(
+    () => [
+      columnHelper.display({
+        id: 'select',
+        header: ({ table }) => (
+          <Checkbox
+            checked={table.getIsAllPageRowsSelected()}
+            onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+            aria-label="Select all"
+          />
+        ),
+        cell: ({ row }) => (
+          <Checkbox
+            checked={row.getIsSelected()}
+            onCheckedChange={(value) => row.toggleSelected(!!value)}
+            aria-label="Select row"
+          />
+        ),
+        size: 40,
+      }),
+      columnHelper.accessor('inspectionId', {
+        header: 'Inspection ID',
+        cell: (info) => (
+          <span className="font-medium text-sm">{info.getValue()}</span>
+        ),
+        size: 150,
+      }),
+      columnHelper.accessor('facilityName', {
+        header: 'Facility Name',
+        cell: (info) => (
+          <span className="text-sm truncate block max-w-[200px]">{info.getValue()}</span>
+        ),
+      }),
+      columnHelper.accessor('date', {
+        header: 'Date',
+        cell: (info) => <span className="text-sm">{info.getValue()}</span>,
+        size: 120,
+      }),
+      columnHelper.accessor('inspector', {
+        header: 'Inspector',
+        cell: (info) => (
+          <span className="text-sm truncate block max-w-[150px]">{info.getValue()}</span>
+        ),
+        size: 150,
+      }),
+      columnHelper.accessor('noteToInspector', {
+        header: 'Note to Inspector',
+        cell: (info) => (
+          <span className="text-sm text-muted-foreground truncate block max-w-[200px]">
+            {info.getValue() || '-'}
+          </span>
+        ),
+      }),
+      columnHelper.accessor('status', {
+        header: 'Status',
+        cell: (info) => {
+          const inspection = info.row.original
+          if (isInspectionOverdue(inspection)) {
+            return (
+              <Badge variant="destructive" className="gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-current shrink-0" />
+                Overdue
+              </Badge>
+            )
+          }
+          return <StatusBadge status={info.getValue()} />
+        },
+        size: 130,
+      }),
+      columnHelper.display({
+        id: 'action',
+        header: 'Action',
+        cell: (info) => (
+          <Button
+            size="sm"
+            onClick={() => onViewInspection(info.row.original)}
+            className="h-8 whitespace-nowrap"
+          >
+            View
+          </Button>
+        ),
+        size: 100,
+      }),
+    ],
+    [onViewInspection]
+  )
+
+  const table = useReactTable({
+    data: inspections,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    onPaginationChange: setPagination,
+    onRowSelectionChange: (updater) => {
+      const newSelection =
+        typeof updater === 'function' ? updater(rowSelection) : updater
+      const selectedIds = Object.keys(newSelection)
+        .filter((key) => newSelection[key])
+        .map((index) => inspections[parseInt(index)]?.id)
+        .filter(Boolean)
+      onSelectionChange(selectedIds)
+    },
+    state: {
+      pagination,
+      rowSelection,
+    },
+    getRowId: (row) => row.id.toString(),
+    enableRowSelection: true,
+  })
+
+  const totalPages = table.getPageCount()
+  const currentPage = pagination.pageIndex + 1
 
   return (
-    <ProCard>
-      <Table
-        rowSelection={rowSelection}
-        columns={columns}
-        dataSource={inspections}
-        rowKey="id"
-        pagination={{
-          pageSize: 10,
-          showSizeChanger: false,
-        }}
-      />
-    </ProCard>
+    <Card>
+      <CardContent className="p-0">
+        <div className="rounded-lg border">
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <TableHead
+                      key={header.id}
+                      style={{ width: header.getSize() }}
+                      className="whitespace-nowrap"
+                    >
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  ))}
+                </TableRow>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && 'selected'}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell
+                        key={cell.id}
+                        className="whitespace-nowrap"
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center"
+                  >
+                    <span className="text-muted-foreground">No results.</span>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between px-4 py-4 border-t">
+            <div className="text-sm text-muted-foreground">
+              Page {currentPage} of {totalPages}
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+                className="h-8 w-8 p-0"
+              >
+                <ChevronLeft className="w-4 h-4 shrink-0" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+                className="h-8 w-8 p-0"
+              >
+                <ChevronRight className="w-4 h-4 shrink-0" />
+              </Button>
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   )
 }

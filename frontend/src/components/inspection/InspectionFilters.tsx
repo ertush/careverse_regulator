@@ -1,9 +1,15 @@
 import { useState } from 'react'
-import { Input, Button, Popover, Radio, Space, Badge } from 'antd'
-import { SearchOutlined, FilterOutlined, SortAscendingOutlined } from '@ant-design/icons'
+import { Search, Filter, ArrowUpDown } from 'lucide-react'
 import { useResponsive } from '@/hooks/useResponsive'
 import DateRangeSelector, { type DateRange } from './DateRangeSelector'
 import FilterTags, { type FilterTag } from './FilterTags'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Label } from '@/components/ui/label'
+import { Badge } from '@/components/ui/badge'
+import { cn } from '@/lib/utils'
 
 interface InspectionFiltersProps {
   searchText: string
@@ -87,34 +93,52 @@ export default function InspectionFilters({
   }
 
   const filterContent = (
-    <div style={{ width: '280px', padding: '8px' }}>
-      <div style={{ marginBottom: '12px' }}>
-        <div style={{ fontSize: '14px', fontWeight: 600, color: '#101828', marginBottom: '12px' }}>
+    <div className="w-[280px] p-2">
+      <div className="mb-3">
+        <div className="text-sm font-semibold mb-3">
           Filter by Status
         </div>
-        <Radio.Group
+        <RadioGroup
           value={tempStatuses.includes('all') ? 'all' : tempStatuses[0]}
-          onChange={(e) => {
-            const value = e.target.value
+          onValueChange={(value) => {
             if (value === 'all') {
               setTempStatuses(['all'])
             } else {
               setTempStatuses([value])
             }
           }}
-          style={{ width: '100%' }}
+          className="flex flex-col gap-3"
         >
-          <Space direction="vertical" style={{ width: '100%' }}>
-            <Radio value="all">All Statuses</Radio>
-            <Radio value="completed">Completed</Radio>
-            <Radio value="non compliant">Non Compliant</Radio>
-            <Radio value="pending">Pending</Radio>
-          </Space>
-        </Radio.Group>
+          <div className="flex items-center gap-2">
+            <RadioGroupItem value="all" id="status-all" />
+            <Label htmlFor="status-all" className="cursor-pointer text-sm font-normal">
+              All Statuses
+            </Label>
+          </div>
+          <div className="flex items-center gap-2">
+            <RadioGroupItem value="completed" id="status-completed" />
+            <Label htmlFor="status-completed" className="cursor-pointer text-sm font-normal">
+              Completed
+            </Label>
+          </div>
+          <div className="flex items-center gap-2">
+            <RadioGroupItem value="non compliant" id="status-non-compliant" />
+            <Label htmlFor="status-non-compliant" className="cursor-pointer text-sm font-normal">
+              Non Compliant
+            </Label>
+          </div>
+          <div className="flex items-center gap-2">
+            <RadioGroupItem value="pending" id="status-pending" />
+            <Label htmlFor="status-pending" className="cursor-pointer text-sm font-normal">
+              Pending
+            </Label>
+          </div>
+        </RadioGroup>
       </div>
-      <div style={{ display: 'flex', gap: '8px', paddingTop: '8px', borderTop: '1px solid #EAECF0' }}>
+      <div className="flex gap-2 pt-2 border-t">
         <Button
-          style={{ flex: 1 }}
+          variant="outline"
+          className="flex-1"
           onClick={() => {
             setTempStatuses(['all'])
             onStatusChange(['all'])
@@ -124,12 +148,7 @@ export default function InspectionFilters({
           Clear
         </Button>
         <Button
-          type="primary"
-          style={{
-            flex: 1,
-            backgroundColor: '#11b5a1',
-            borderColor: '#11b5a1',
-          }}
+          className="flex-1"
           onClick={handleApplyFilter}
         >
           Apply
@@ -139,58 +158,82 @@ export default function InspectionFilters({
   )
 
   const sortContent = (
-    <div style={{ width: '220px', padding: '8px' }}>
-      <div style={{ fontSize: '14px', fontWeight: 600, color: '#101828', marginBottom: '12px' }}>
+    <div className="w-[220px] p-2">
+      <div className="text-sm font-semibold mb-3">
         Sort by
       </div>
-      <Radio.Group
+      <RadioGroup
         value={sortOrder}
-        onChange={(e) => {
-          onSortChange(e.target.value)
+        onValueChange={(value) => {
+          onSortChange(value as 'asc' | 'desc' | 'recent')
           setSortOpen(false)
         }}
-        style={{ width: '100%' }}
+        className="flex flex-col gap-3"
       >
-        <Space direction="vertical" style={{ width: '100%' }}>
-          <Radio value="asc">Facility Name (A-Z)</Radio>
-          <Radio value="desc">Facility Name (Z-A)</Radio>
-          <Radio value="recent">Most Recent</Radio>
-        </Space>
-      </Radio.Group>
+        <div className="flex items-center gap-2">
+          <RadioGroupItem value="asc" id="sort-asc" />
+          <Label htmlFor="sort-asc" className="cursor-pointer text-sm font-normal">
+            Facility Name (A-Z)
+          </Label>
+        </div>
+        <div className="flex items-center gap-2">
+          <RadioGroupItem value="desc" id="sort-desc" />
+          <Label htmlFor="sort-desc" className="cursor-pointer text-sm font-normal">
+            Facility Name (Z-A)
+          </Label>
+        </div>
+        <div className="flex items-center gap-2">
+          <RadioGroupItem value="recent" id="sort-recent" />
+          <Label htmlFor="sort-recent" className="cursor-pointer text-sm font-normal">
+            Most Recent
+          </Label>
+        </div>
+      </RadioGroup>
     </div>
   )
 
   return (
-    <div style={{ width: isMobile ? '100%' : 'auto' }}>
+    <div className={cn('w-full', !isMobile && 'w-auto')}>
       {/* Filter Controls */}
-      <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '12px', alignItems: isMobile ? 'stretch' : 'center', marginBottom: filterTags.length > 0 ? '12px' : 0 }}>
-        <Input
-          placeholder="Search by facility name"
-          prefix={<SearchOutlined />}
-          value={searchText}
-          onChange={(e) => onSearchChange(e.target.value)}
-          style={{ width: isMobile ? '100%' : 400 }}
-        />
-        <div style={{ display: 'flex', gap: isMobile ? '12px' : '16px', alignItems: 'center', flexWrap: 'wrap' }}>
-          <div style={{ position: 'relative' }}>
-            <Popover
-              content={filterContent}
-              title={null}
-              trigger="click"
-              open={filterOpen}
-              onOpenChange={handleFilterOpenChange}
-              placement="bottomRight"
-            >
-              <Badge count={activeFilterCount} offset={[-8, 8]}>
-                <Button
-                  icon={<FilterOutlined />}
-                  style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: isMobile ? 1 : 'none' }}
-                >
-                  {!isMobile && 'Filters'}
-                </Button>
-              </Badge>
-            </Popover>
-          </div>
+      <div
+        className={cn(
+          'flex gap-3 items-center',
+          isMobile ? 'flex-col items-stretch' : 'flex-row',
+          filterTags.length > 0 && 'mb-3'
+        )}
+      >
+        <div className="relative w-full sm:w-[400px]">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground shrink-0" />
+          <Input
+            placeholder="Search by facility name"
+            value={searchText}
+            onChange={(e) => onSearchChange(e.target.value)}
+            className="w-full pl-9"
+          />
+        </div>
+        <div className={cn('flex items-center flex-wrap', isMobile ? 'gap-3' : 'gap-4')}>
+          <Popover open={filterOpen} onOpenChange={handleFilterOpenChange}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn('gap-2', isMobile && 'flex-1')}
+              >
+                <Filter className="w-4 h-4 shrink-0" />
+                {!isMobile && <span className="whitespace-nowrap">Filters</span>}
+                {activeFilterCount > 0 && (
+                  <Badge
+                    variant="secondary"
+                    className="ml-1 px-1.5 py-0 text-xs h-5 min-w-[20px] rounded-full"
+                  >
+                    {activeFilterCount}
+                  </Badge>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="p-0">
+              {filterContent}
+            </PopoverContent>
+          </Popover>
 
           <DateRangeSelector
             value={dateRange}
@@ -198,20 +241,19 @@ export default function InspectionFilters({
             showLabel={!isMobile}
           />
 
-          <Popover
-            content={sortContent}
-            title={null}
-            trigger="click"
-            open={sortOpen}
-            onOpenChange={setSortOpen}
-            placement="bottomRight"
-          >
-            <Button
-              icon={<SortAscendingOutlined />}
-              style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: isMobile ? 1 : 'none' }}
-            >
-              {!isMobile && 'Sort'}
-            </Button>
+          <Popover open={sortOpen} onOpenChange={setSortOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn('gap-2', isMobile && 'flex-1')}
+              >
+                <ArrowUpDown className="w-4 h-4 shrink-0" />
+                {!isMobile && <span className="whitespace-nowrap">Sort</span>}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="p-0">
+              {sortContent}
+            </PopoverContent>
           </Popover>
         </div>
       </div>

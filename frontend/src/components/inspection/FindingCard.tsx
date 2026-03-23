@@ -1,5 +1,7 @@
-import { Card, Button, Space, Tag } from 'antd'
-import { CalendarOutlined, InfoCircleOutlined } from '@ant-design/icons'
+import { Info } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 import type { Finding } from '@/types/inspection'
 import FindingsBadge from './FindingsBadge'
 
@@ -10,60 +12,49 @@ interface FindingCardProps {
 
 export default function FindingCard({ finding, onView }: FindingCardProps) {
   return (
-    <Card
-      style={{
-        marginBottom: '12px',
-        borderRadius: '8px',
-        border: '1px solid #EAECF0',
-      }}
-      bodyStyle={{ padding: '16px' }}
-    >
-      <div style={{ marginBottom: '12px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: '12px', color: '#667085', marginBottom: '4px' }}>
-              {finding.findingId}
-            </div>
-            <div style={{ fontSize: '16px', fontWeight: 600, color: '#101828', marginBottom: '8px' }}>
-              {finding.facilityName}
-            </div>
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '8px' }}>
-              <FindingsBadge severity={finding.severity} />
-              <FindingsBadge status={finding.status} />
+    <Card className="mb-3">
+      <CardContent className="p-4">
+        <div className="mb-3">
+          <div className="flex justify-between items-start mb-2">
+            <div className="flex-1 min-w-0">
+              <div className="text-xs text-muted-foreground mb-1 truncate">
+                {finding.findingId}
+              </div>
+              <div className="text-base font-semibold mb-2 truncate">
+                {finding.facilityName}
+              </div>
+              <div className="flex gap-2 flex-wrap mb-2">
+                <FindingsBadge severity={finding.severity} />
+                <FindingsBadge status={finding.status} />
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <Space direction="vertical" style={{ width: '100%' }} size={8}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px' }}>
-          <Tag color="blue" style={{ margin: 0 }}>
-            {finding.category}
-          </Tag>
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center gap-2 text-sm">
+            <Badge variant="secondary" className="bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-400 truncate">
+              {finding.category}
+            </Badge>
+          </div>
+          <div className="flex items-start gap-2 text-sm text-muted-foreground">
+            <Info className="w-4 h-4 mt-0.5 shrink-0" />
+            <span className="flex-1 leading-5 break-words">{finding.description}</span>
+          </div>
+          <div className="text-xs text-muted-foreground break-words">
+            {finding.inspectionDate && `Inspection: ${finding.inspectionDate}`}
+            {finding.dueDate && ` | Due: ${finding.dueDate}`}
+            {finding.resolvedDate && ` | Resolved: ${finding.resolvedDate}`}
+          </div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '14px', color: '#475467' }}>
-          <InfoCircleOutlined style={{ color: '#667085', marginTop: '2px' }} />
-          <span style={{ flex: 1, lineHeight: '20px' }}>{finding.description}</span>
-        </div>
-        <div style={{ fontSize: '13px', color: '#667085' }}>
-          {finding.inspectionDate && `Inspection: ${finding.inspectionDate}`}
-          {finding.dueDate && ` | Due: ${finding.dueDate}`}
-          {finding.resolvedDate && ` | Resolved: ${finding.resolvedDate}`}
-        </div>
-      </Space>
 
-      <Button
-        type="primary"
-        block
-        onClick={() => onView(finding)}
-        style={{
-          marginTop: '16px',
-          backgroundColor: '#11b5a1',
-          borderColor: '#11b5a1',
-        }}
-      >
-        View Details
-      </Button>
+        <Button
+          className="w-full mt-4"
+          onClick={() => onView(finding)}
+        >
+          View Details
+        </Button>
+      </CardContent>
     </Card>
   )
 }

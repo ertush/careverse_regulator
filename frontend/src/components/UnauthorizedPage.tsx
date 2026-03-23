@@ -1,22 +1,20 @@
-import { Layout, Typography, Button, Card, Space, theme, Row, Col } from 'antd'
 import {
-  LockOutlined,
-  LoginOutlined,
-  BarChartOutlined,
-  CheckCircleOutlined,
-  FileSearchOutlined,
-  SafetyCertificateOutlined,
-  ArrowRightOutlined,
-  BulbOutlined,
-  BulbFilled,
-  DesktopOutlined,
-  LogoutOutlined,
-} from '@ant-design/icons'
+  Lock,
+  LogIn,
+  BarChart3,
+  CheckCircle,
+  FileSearch,
+  ShieldCheck,
+  ArrowRight,
+  Sun,
+  Moon,
+  Monitor,
+  LogOut,
+} from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
 import { useResponsive } from '@/hooks/useResponsive'
 import { useThemeStore } from '@/stores/themeStore'
-
-const { Header, Content } = Layout
-const { Title, Text, Paragraph } = Typography
 
 interface UnauthorizedPageProps {
   mode: 'guest' | 'forbidden' | 'tenant-misconfigured'
@@ -37,7 +35,6 @@ export default function UnauthorizedPage({
   onLogout,
   onSwitchToDesk,
 }: UnauthorizedPageProps) {
-  const { token } = theme.useToken()
   const { isMobile } = useResponsive()
   const colorMode = useThemeStore((state) => state.mode)
   const toggleMode = useThemeStore((state) => state.toggleMode)
@@ -45,18 +42,6 @@ export default function UnauthorizedPage({
 
   const isGuest = mode === 'guest'
   const isTenantMisconfigured = mode === 'tenant-misconfigured'
-  const brandColor = token.colorPrimary
-  const pageBackground = isDarkMode
-    ? 'linear-gradient(135deg, #08111f 0%, #0f1a2a 100%)'
-    : 'linear-gradient(135deg, #edf3f7 0%, #e7eef5 100%)'
-  const blobPrimary = isDarkMode ? 'rgba(20, 184, 166, 0.16)' : 'rgba(15, 118, 110, 0.14)'
-  const blobSecondary = isDarkMode ? 'rgba(22, 163, 74, 0.14)' : 'rgba(22, 163, 74, 0.12)'
-  const panelBackground = isDarkMode ? 'rgba(15, 23, 42, 0.86)' : 'rgba(255, 255, 255, 0.9)'
-  const panelBorder = isDarkMode ? '1px solid rgba(71, 85, 105, 0.62)' : '1px solid rgba(216, 225, 235, 0.86)'
-  const infoBackground = isDarkMode ? 'rgba(15, 23, 42, 0.78)' : '#f5f8fc'
-  const infoBorder = isDarkMode ? '1px solid rgba(71, 85, 105, 0.62)' : '1px solid #e0e8f5'
-  const primaryButtonGradient = `linear-gradient(135deg, ${brandColor} 0%, #16a34a 100%)`
-  const primaryButtonShadow = isDarkMode ? '0 8px 24px rgba(15, 118, 110, 0.34)' : '0 8px 24px rgba(15, 118, 110, 0.26)'
 
   const pageTitle = isGuest ? 'Sign In Required' : isTenantMisconfigured ? 'Company Setup Required' : 'Access Restricted'
   const pageDescription = isGuest
@@ -72,17 +57,17 @@ export default function UnauthorizedPage({
 
   const features = [
     {
-      icon: <BarChartOutlined style={{ fontSize: '20px', color: brandColor }} />,
+      icon: BarChart3,
       title: 'Executive Monitoring',
       description: 'Real-time oversight of regulator operations, queues, and compliance workload.',
     },
     {
-      icon: <FileSearchOutlined style={{ fontSize: '20px', color: brandColor }} />,
+      icon: FileSearch,
       title: 'Centralized Approvals',
       description: 'Streamlined workflow for processing licensing decisions, renewals, and sanctions.',
     },
     {
-      icon: <SafetyCertificateOutlined style={{ fontSize: '20px', color: brandColor }} />,
+      icon: ShieldCheck,
       title: 'Unified Registry',
       description: 'Single source of truth for health workers, facilities, and lifecycle records.',
     },
@@ -106,351 +91,154 @@ export default function UnauthorizedPage({
         : 'Sign In to Dashboard'
 
   return (
-    <Layout
-      className="unauthorized-layout"
-      style={{
-        minHeight: '100vh',
-        background: pageBackground,
-        position: 'relative',
-        overflow: 'hidden',
-      }}
-    >
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20 relative overflow-hidden">
       {/* Glassmorphic decorative shapes */}
-      <div
-        style={{
-          position: 'absolute',
-          width: '500px',
-          height: '500px',
-          borderRadius: '50%',
-          background: blobPrimary,
-          filter: 'blur(80px)',
-          top: '-100px',
-          left: '-100px',
-          zIndex: 0,
-          pointerEvents: 'none',
-        }}
-      />
-      <div
-        style={{
-          position: 'absolute',
-          width: '400px',
-          height: '400px',
-          borderRadius: '50%',
-          background: blobSecondary,
-          filter: 'blur(80px)',
-          bottom: '-50px',
-          right: '-50px',
-          zIndex: 0,
-          pointerEvents: 'none',
-        }}
-      />
+      <div className="absolute w-[500px] h-[500px] rounded-full bg-primary/10 dark:bg-primary/20 blur-[80px] -top-24 -left-24 pointer-events-none" />
+      <div className="absolute w-[400px] h-[400px] rounded-full bg-green-500/10 dark:bg-green-500/20 blur-[80px] -bottom-12 -right-12 pointer-events-none" />
 
-      <Header
-        style={{
-          backgroundColor: isDarkMode ? 'rgba(30, 41, 59, 0.7)' : 'rgba(255, 255, 255, 0.7)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          borderBottom: isDarkMode ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.06)',
-          padding: '0 20px',
-          position: 'sticky',
-          top: 0,
-          zIndex: 10,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            width: '100%',
-            maxWidth: '1200px',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div
-              style={{
-                width: '32px',
-                height: '32px',
-                borderRadius: '8px',
-                background: isDarkMode ? 'rgba(15, 118, 110, 0.2)' : 'rgba(15, 118, 110, 0.12)',
-                backdropFilter: 'blur(12px)',
-                WebkitBackdropFilter: 'blur(12px)',
-                border: isDarkMode ? '1px solid rgba(20, 184, 166, 0.35)' : '1px solid rgba(15, 118, 110, 0.2)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: brandColor,
-                fontWeight: 'bold',
-                fontSize: '18px',
-              }}
-            >
+      <header className="sticky top-0 z-10 bg-background/70 dark:bg-slate-900/70 backdrop-blur-lg border-b border-border px-5 py-4">
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 dark:bg-primary/20 border border-primary/20 dark:border-primary/30 flex items-center justify-center text-primary font-bold text-lg backdrop-blur-sm">
               C
             </div>
-            <Title level={4} style={{ margin: 0, fontWeight: 600, letterSpacing: '-0.01em' }}>
-              Compliance 360
-            </Title>
+            <h4 className="text-lg font-semibold tracking-tight">Compliance 360</h4>
           </div>
 
-          <Button
-            type="text"
-            icon={isDarkMode ? <BulbFilled /> : <BulbOutlined />}
-            onClick={toggleMode}
-            style={{ borderRadius: '8px' }}
-          >
+          <Button variant="ghost" size="sm" onClick={toggleMode} className="rounded-lg">
+            {isDarkMode ? <Sun className="w-4 h-4 mr-2" /> : <Moon className="w-4 h-4 mr-2" />}
             {isDarkMode ? 'Light' : 'Dark'} Mode
           </Button>
         </div>
-      </Header>
+      </header>
 
-      <Content
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '36px 20px',
-          zIndex: 1,
-        }}
-      >
-        <div style={{ maxWidth: '1100px', width: '100%' }}>
-          <Row gutter={[40, 28]} align="middle">
-            <Col xs={24} lg={11}>
-              <Card
-                style={{
-                  background: panelBackground,
-                  borderRadius: '12px',
-                  border: panelBorder,
-                  boxShadow: isDarkMode ? '0 2px 12px rgba(2, 6, 23, 0.42)' : '0 2px 12px rgba(0, 0, 0, 0.08)',
-                  overflow: 'hidden',
-                }}
-                bodyStyle={{ padding: isMobile ? '24px 20px' : '40px 36px' }}
-              >
-                <Space direction="vertical" size={24} style={{ width: '100%' }}>
-                  <div
-                    style={{
-                      width: '48px',
-                      height: '48px',
-                      borderRadius: '12px',
-                      background: isDarkMode ? 'rgba(15, 118, 110, 0.2)' : 'rgba(15, 118, 110, 0.12)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '20px',
-                      color: brandColor,
-                    }}
-                  >
-                    <LockOutlined />
-                  </div>
+      <main className="flex items-center justify-center px-5 py-9 relative z-[1]">
+        <div className="max-w-7xl w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+            <div>
+              <Card className="bg-card/90 dark:bg-slate-900/90 backdrop-blur-sm shadow-lg">
+                <CardContent className={isMobile ? 'p-6' : 'p-10'}>
+                  <div className="flex flex-col gap-6">
+                    <div className="w-12 h-12 rounded-xl bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary">
+                      <Lock className="w-6 h-6" />
+                    </div>
 
-                  <div>
-                    <Text
-                      type="secondary"
-                      style={{
-                        fontSize: '12px',
-                        fontWeight: '500',
-                        textTransform: 'uppercase',
-                        letterSpacing: '1px',
-                        color: isDarkMode ? '#94a3b8' : '#64748b',
-                        display: 'block',
-                        marginBottom: '10px',
-                      }}
+                    <div>
+                      <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground block mb-2.5">
+                        Organization Portal
+                      </span>
+                      <h1 className={`font-semibold tracking-tight leading-tight ${isMobile ? 'text-2xl' : 'text-3xl'}`}>
+                        {pageTitle}
+                      </h1>
+                      <p className="text-sm leading-relaxed text-muted-foreground mt-3">
+                        {pageDescription}
+                      </p>
+                    </div>
+
+                    <Button
+                      size="lg"
+                      onClick={handlePrimaryAction}
+                      className="w-full h-12 text-sm font-semibold bg-gradient-to-r from-primary to-green-600 hover:from-primary/90 hover:to-green-600/90 shadow-lg shadow-primary/25"
                     >
-                      Organization Portal
-                    </Text>
-                    <Title
-                      level={1}
-                      style={{
-                        margin: 0,
-                        fontWeight: '600',
-                        fontSize: isMobile ? '24px' : '30px',
-                        letterSpacing: '-0.02em',
-                        lineHeight: 1.15,
-                        color: token.colorText,
-                      }}
-                    >
-                      {pageTitle}
-                    </Title>
-                    <Paragraph
-                      style={{
-                        fontSize: '14px',
-                        lineHeight: '1.5',
-                        color: token.colorTextSecondary,
-                        marginTop: '12px',
-                        marginBottom: 0,
-                      }}
-                    >
-                      {pageDescription}
-                    </Paragraph>
+                      <LogIn className="w-4 h-4 mr-2" />
+                      {primaryLabel}
+                      <ArrowRight className="w-4 h-4 ml-3" />
+                    </Button>
+
+                    {(onSwitchToDesk || (!isGuest && onLogout)) && (
+                      <div className="flex flex-wrap gap-2">
+                        {onSwitchToDesk && (
+                          <Button
+                            variant="outline"
+                            onClick={onSwitchToDesk}
+                            className="h-10 font-semibold"
+                          >
+                            <Monitor className="w-4 h-4 mr-2" />
+                            Open Desk
+                          </Button>
+                        )}
+                        {!isGuest && onLogout && (
+                          <Button
+                            variant="destructive"
+                            onClick={onLogout}
+                            className="h-10 font-semibold"
+                          >
+                            <LogOut className="w-4 h-4 mr-2" />
+                            Log Out
+                          </Button>
+                        )}
+                      </div>
+                    )}
+
+                    <div className="p-4 rounded-xl bg-muted/50 dark:bg-slate-800/50 border border-border">
+                      <h5 className="text-sm font-medium text-primary mb-3">
+                        {isGuest ? 'After You Sign In' : 'Current Account'}
+                      </h5>
+                      <p className="text-xs text-muted-foreground leading-relaxed">
+                        {isGuest ? guidance : (userEmail || 'Unknown user')}
+                      </p>
+                    </div>
+
+                    <div className="p-4 rounded-xl bg-muted/50 dark:bg-slate-800/50 border border-border">
+                      <h5 className="text-sm font-medium mb-2">
+                        Need Help?
+                      </h5>
+                      <p className="text-xs text-muted-foreground">
+                        {guidance}
+                      </p>
+                    </div>
                   </div>
-
-                  <Button
-                    type="primary"
-                    size="large"
-                    icon={<LoginOutlined />}
-                    onClick={handlePrimaryAction}
-                    block
-                    style={{
-                      height: '48px',
-                      fontSize: '14px',
-                      fontWeight: '600',
-                      borderRadius: '12px',
-                      background: primaryButtonGradient,
-                      border: 'none',
-                      boxShadow: primaryButtonShadow,
-                      color: '#fff',
-                    }}
-                  >
-                    {primaryLabel}
-                    <ArrowRightOutlined style={{ marginLeft: '12px' }} />
-                  </Button>
-
-                  {(onSwitchToDesk || (!isGuest && onLogout)) && (
-                    <Space size={8} style={{ width: '100%' }} wrap>
-                      {onSwitchToDesk && (
-                        <Button
-                          icon={<DesktopOutlined />}
-                          onClick={onSwitchToDesk}
-                          style={{ borderRadius: '10px', fontWeight: 600, height: 40 }}
-                        >
-                          Open Desk
-                        </Button>
-                      )}
-                      {!isGuest && onLogout && (
-                        <Button
-                          danger
-                          icon={<LogoutOutlined />}
-                          onClick={onLogout}
-                          style={{ borderRadius: '10px', fontWeight: 600, height: 40 }}
-                        >
-                          Log Out
-                        </Button>
-                      )}
-                    </Space>
-                  )}
-
-                  <div
-                    style={{
-                      padding: '16px',
-                      borderRadius: '12px',
-                      background: infoBackground,
-                      border: infoBorder,
-                    }}
-                  >
-                    <Title level={5} style={{ margin: '0 0 12px 0', fontSize: '14px', color: brandColor }}>
-                      {isGuest ? 'After You Sign In' : 'Current Account'}
-                    </Title>
-                    <Text style={{ fontSize: '12px', color: token.colorTextSecondary, lineHeight: '1.5' }}>
-                      {isGuest ? guidance : (userEmail || 'Unknown user')}
-                    </Text>
-                  </div>
-
-                  <div
-                    style={{
-                      padding: '16px',
-                      borderRadius: '12px',
-                      background: infoBackground,
-                      border: infoBorder,
-                    }}
-                  >
-                    <Title level={5} style={{ margin: '0 0 8px 0', fontSize: '14px' }}>
-                      Need Help?
-                    </Title>
-                    <Text style={{ fontSize: '12px', color: token.colorTextTertiary }}>
-                      {guidance}
-                    </Text>
-                  </div>
-                </Space>
+                </CardContent>
               </Card>
-            </Col>
+            </div>
 
-            <Col xs={24} lg={13}>
-              <Space direction="vertical" size={28} style={{ width: '100%', padding: '0 12px' }}>
-                <div>
-                  <Text
-                    type="secondary"
-                    style={{
-                      fontSize: '12px',
-                      fontWeight: '500',
-                      textTransform: 'uppercase',
-                      letterSpacing: '1px',
-                      color: isDarkMode ? '#4ade80' : '#0f766e',
-                      display: 'block',
-                      marginBottom: '12px',
-                    }}
-                  >
-                    Executive Platform
-                  </Text>
-                  <Title level={2} style={{ margin: '0 0 10px 0', fontWeight: '600', fontSize: '28px' }}>
-                    Smarter Organization Management
-                  </Title>
-                  <Paragraph style={{ fontSize: '14px', color: token.colorTextSecondary }}>
-                    Compliance 360 provides integrated oversight of health workers, facilities, licenses, and compliance actions.
-                  </Paragraph>
-                </div>
+            <div className="flex flex-col gap-7 px-3">
+              <div>
+                <span className="text-xs font-medium uppercase tracking-wider text-primary dark:text-green-400 block mb-3">
+                  Executive Platform
+                </span>
+                <h2 className="text-3xl font-semibold mb-2.5">
+                  Smarter Organization Management
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  Compliance 360 provides integrated oversight of health workers, facilities, licenses, and compliance actions.
+                </p>
+              </div>
 
-                <div style={{ display: 'grid', gap: '16px' }}>
-                  {features.map((feature, index) => (
-                    <Card
-                      key={index}
-                      style={{
-                        borderRadius: '12px',
-                        background: panelBackground,
-                        border: panelBorder,
-                        boxShadow: isDarkMode ? '0 2px 12px rgba(2, 6, 23, 0.42)' : '0 2px 12px rgba(0, 0, 0, 0.08)',
-                        transition: 'all 0.3s ease',
-                      }}
-                      bodyStyle={{ padding: '18px' }}
-                    >
-                      <Space size={16} align="start">
-                        <div
-                          style={{
-                            width: '42px',
-                            height: '42px',
-                            borderRadius: '10px',
-                            background: isDarkMode ? 'rgba(15, 118, 110, 0.2)' : 'rgba(15, 118, 110, 0.12)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            flexShrink: 0,
-                            color: brandColor,
-                          }}
-                        >
-                          {feature.icon}
+              <div className="grid gap-4">
+                {features.map((feature, index) => {
+                  const Icon = feature.icon
+                  return (
+                    <Card key={index} className="bg-card/90 dark:bg-slate-900/90 backdrop-blur-sm shadow-md transition-all hover:shadow-lg">
+                      <CardContent className="p-4.5">
+                        <div className="flex gap-4 items-start">
+                          <div className="w-10 h-10 rounded-lg bg-primary/10 dark:bg-primary/20 flex items-center justify-center flex-shrink-0 text-primary">
+                            <Icon className="w-5 h-5" />
+                          </div>
+                          <div className="flex-1">
+                            <h5 className="font-semibold mb-1">
+                              {feature.title}
+                            </h5>
+                            <p className="text-sm text-muted-foreground">
+                              {feature.description}
+                            </p>
+                          </div>
+                          <CheckCircle className="w-5 h-5 text-green-500 ml-auto self-center flex-shrink-0" />
                         </div>
-                        <div>
-                          <Title level={5} style={{ margin: '0 0 4px 0', fontWeight: '600' }}>
-                            {feature.title}
-                          </Title>
-                          <Text style={{ fontSize: '13px', color: token.colorTextSecondary }}>
-                            {feature.description}
-                          </Text>
-                        </div>
-                        <CheckCircleOutlined style={{ fontSize: '18px', color: '#52c41a', marginLeft: 'auto', alignSelf: 'center' }} />
-                      </Space>
+                      </CardContent>
                     </Card>
-                  ))}
-                </div>
+                  )
+                })}
+              </div>
 
-                <div
-                  style={{
-                    marginTop: '16px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
-                    color: token.colorTextTertiary,
-                    fontSize: '12px',
-                  }}
-                >
-                  <SafetyCertificateOutlined style={{ fontSize: '18px' }} />
-                  <span>Secured by enterprise-grade authentication and audit controls</span>
-                </div>
-              </Space>
-            </Col>
-          </Row>
+              <div className="mt-4 flex items-center gap-3 text-muted-foreground text-xs">
+                <ShieldCheck className="w-4.5 h-4.5" />
+                <span>Secured by enterprise-grade authentication and audit controls</span>
+              </div>
+            </div>
+          </div>
         </div>
-      </Content>
-    </Layout>
+      </main>
+    </div>
   )
 }

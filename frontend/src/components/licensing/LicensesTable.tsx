@@ -3,6 +3,7 @@ import { Card } from '@/components/ui/card'
 import type { License } from '@/types/license'
 import StatusBadge from './StatusBadge'
 import { Badge } from '@/components/ui/badge'
+import { EntityLink } from '@/components/entities'
 
 interface LicensesTableProps {
   licenses: License[]
@@ -51,7 +52,11 @@ export default function LicensesTable({ licenses, loading, onRowClick }: License
                 <TableCell className="font-mono text-sm font-medium">{license.licenseNumber}</TableCell>
                 <TableCell className="font-mono text-sm">{license.registrationNumber}</TableCell>
                 <TableCell>{license.facilityType}</TableCell>
-                <TableCell>{license.owner}</TableCell>
+                <TableCell>
+                  <EntityLink type="facility" id={license.registrationNumber}>
+                    {license.owner}
+                  </EntityLink>
+                </TableCell>
                 <TableCell>{license.dateOfIssuance}</TableCell>
                 <TableCell>{license.dateOfExpiry}</TableCell>
                 <TableCell>

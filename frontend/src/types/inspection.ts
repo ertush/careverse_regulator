@@ -1,8 +1,10 @@
 export interface Inspection {
   id: string
   inspectionId: string
+  facilityId: string
   facilityName: string
   date: string
+  professionalId: string
   inspector: string
   noteToInspector: string
   status: 'Non Compliant' | 'Completed' | 'Pending'

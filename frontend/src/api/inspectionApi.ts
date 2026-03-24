@@ -43,8 +43,10 @@ export function transformInspection(backendInspection: BackendInspection): Inspe
   const inspection: Inspection = {
     id: backendInspection.name,
     inspectionId: backendInspection.name,
+    facilityId: backendInspection.facility,
     facilityName: backendInspection.facility_name || backendInspection.facility,
     date: formatDateForFrontend(backendInspection.scheduled_date),
+    professionalId: backendInspection.professional,
     inspector: backendInspection.professional_name || backendInspection.professional,
     noteToInspector: backendInspection.note_to_inspector,
     status: backendInspection.status,

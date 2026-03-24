@@ -132,7 +132,7 @@ export default function DateRangeSelector({
   const content = (
     <div className="p-3">
       <div className="mb-4">
-        <div className="text-sm font-semibold mb-3">
+        <div className="text-sm font-semibold mb-3 text-start">
           Select Date Range
         </div>
 
@@ -152,7 +152,7 @@ export default function DateRangeSelector({
 
         {/* Custom Date Picker */}
         <div className="mb-3">
-          <div className="text-xs font-medium text-muted-foreground mb-2">
+          <div className="text-xs font-medium text-muted-foreground mb-2 text-start">
             Or select custom range:
           </div>
           <Calendar

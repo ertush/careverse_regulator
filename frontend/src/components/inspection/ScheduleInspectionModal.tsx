@@ -77,10 +77,10 @@ export default function ScheduleInspectionModal({
         isMobile ? 'w-full h-full max-w-full rounded-none' : 'max-w-[640px]'
       )}>
         <DialogHeader className="px-6 pt-6 pb-4 shrink-0 border-b">
-          <DialogTitle className={cn(isMobile ? 'text-base' : 'text-lg')}>
+          <DialogTitle className={cn('text-start', isMobile ? 'text-base' : 'text-lg')}>
             Facility Inspection
           </DialogTitle>
-          <DialogDescription className={cn(isMobile ? 'text-xs' : 'text-sm')}>
+          <DialogDescription className={cn('text-start', isMobile ? 'text-xs' : 'text-sm')}>
             Fill in the details below to generate report
           </DialogDescription>
         </DialogHeader>
@@ -103,7 +103,7 @@ export default function ScheduleInspectionModal({
             )}
 
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="facility" className="text-sm font-medium">
+              <Label htmlFor="facility" className="text-sm font-medium text-start">
                 Facility <span className="text-destructive">*</span>
               </Label>
               <Popover open={facilityOpen} onOpenChange={setFacilityOpen}>
@@ -114,7 +114,7 @@ export default function ScheduleInspectionModal({
                     aria-expanded={facilityOpen}
                     className="w-full justify-between h-10"
                   >
-                    <span className="truncate">{selectedFacilityLabel || "Select Facility"}</span>
+                    <span className="truncate text-start">{selectedFacilityLabel || "Select Facility"}</span>
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
@@ -150,7 +150,7 @@ export default function ScheduleInspectionModal({
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="inspector" className="text-sm font-medium">
+              <Label htmlFor="inspector" className="text-sm font-medium text-start">
                 Inspector (User) <span className="text-destructive">*</span>
               </Label>
               <Popover open={inspectorOpen} onOpenChange={setInspectorOpen}>
@@ -161,7 +161,7 @@ export default function ScheduleInspectionModal({
                     aria-expanded={inspectorOpen}
                     className="w-full justify-between h-10"
                   >
-                    <span className="truncate">{selectedInspectorLabel || "Select Inspector"}</span>
+                    <span className="truncate text-start">{selectedInspectorLabel || "Select Inspector"}</span>
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
@@ -197,7 +197,7 @@ export default function ScheduleInspectionModal({
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="date" className="text-sm font-medium">
+              <Label htmlFor="date" className="text-sm font-medium text-start">
                 Set Inspection Date <span className="text-destructive">*</span>
               </Label>
               <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
@@ -206,12 +206,12 @@ export default function ScheduleInspectionModal({
                     id="date"
                     variant="outline"
                     className={cn(
-                      'w-full h-10 justify-start text-left font-normal',
+                      'w-full h-10 justify-start text-left font-normal text-start',
                       !formData.date && 'text-muted-foreground'
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4 shrink-0" />
-                    <span className="truncate">{formData.date || 'Pick a date'}</span>
+                    <span className="truncate text-start">{formData.date || 'Pick a date'}</span>
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
@@ -235,7 +235,7 @@ export default function ScheduleInspectionModal({
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="note" className="text-sm font-medium">
+              <Label htmlFor="note" className="text-sm font-medium text-start">
                 Note To Inspector
               </Label>
               <Textarea
@@ -244,7 +244,7 @@ export default function ScheduleInspectionModal({
                 onChange={(e) => setFormData({ ...formData, note: e.target.value })}
                 placeholder="Check Safety Compliance"
                 rows={4}
-                className="resize-none w-full"
+                className="resize-none w-full text-start"
               />
             </div>
           </div>

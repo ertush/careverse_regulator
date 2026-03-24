@@ -6,12 +6,12 @@ import { useFindingsStore } from '@/stores/findingsStore'
 import * as inspectionApi from '@/api/inspectionApi'
 import { useResponsive } from '@/hooks/useResponsive'
 import { showSuccess, showError, extractErrorMessage } from '@/utils/toast'
+import { useEntityDrawer } from '@/contexts/EntityDrawerContext'
 import InspectionTable from './InspectionTable'
 import InspectionCard from './InspectionCard'
 import InspectionFilters from './InspectionFilters'
 import type { DateRange } from './DateRangeSelector'
 import ScheduleInspectionModal from './ScheduleInspectionModal'
-import InspectionDetailModal from './InspectionDetailModal'
 import FindingsTable from './FindingsTable'
 import FindingCard from './FindingCard'
 import FindingsFilters from './FindingsFilters'
@@ -30,6 +30,7 @@ interface InspectionViewProps {
 export default function InspectionView({ company }: InspectionViewProps) {
   const navigate = useNavigate({ from: '/inspections/list' })
   const searchParams = useSearch({ from: '/inspections/list' })
+  const { openDrawer } = useEntityDrawer()
 
   const { inspections, facilities, professionals, loading, error, pagination, setPage, fetchInspections, fetchFacilities, fetchProfessionals, createInspection } = useInspectionStore()
   const { findings, fetchFindings } = useFindingsStore()
@@ -56,8 +57,6 @@ export default function InspectionView({ company }: InspectionViewProps) {
 
   // Modal and UI state (not in URL)
   const [isModalVisible, setIsModalVisible] = useState(false)
-  const [isInspectionDetailModalVisible, setIsInspectionDetailModalVisible] = useState(false)
-  const [selectedInspection, setSelectedInspection] = useState<Inspection | null>(null)
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
   const [formData, setFormData] = useState({
     facility: '',
@@ -220,9 +219,8 @@ export default function InspectionView({ company }: InspectionViewProps) {
   }
 
   const handleViewInspection = useCallback((inspection: Inspection) => {
-    setSelectedInspection(inspection)
-    setIsInspectionDetailModalVisible(true)
-  }, [])
+    openDrawer('inspection', inspection)
+  }, [openDrawer])
 
   // Use findings directly from store (API-filtered)
   const filteredFindings = findings
@@ -491,15 +489,6 @@ export default function InspectionView({ company }: InspectionViewProps) {
         inspectors={allInspectors}
         loading={submitting}
         error={modalError}
-      />
-
-      <InspectionDetailModal
-        open={isInspectionDetailModalVisible}
-        onClose={() => {
-          setIsInspectionDetailModalVisible(false)
-          setSelectedInspection(null)
-        }}
-        inspection={selectedInspection}
       />
 
       <FindingsDrawer

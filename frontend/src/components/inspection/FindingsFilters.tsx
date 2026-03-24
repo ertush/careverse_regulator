@@ -146,7 +146,7 @@ export default function FindingsFilters({
   const filterContent = (
     <div className="w-[280px] p-2">
       <div className="mb-4">
-        <div className="text-sm font-semibold mb-3">
+        <div className="text-sm font-semibold mb-3 text-start">
           Filter by Severity
         </div>
         <div className="flex flex-col gap-3">
@@ -194,7 +194,7 @@ export default function FindingsFilters({
       </div>
 
       <div className="mb-3 pt-3 border-t">
-        <div className="text-sm font-semibold mb-3">
+        <div className="text-sm font-semibold mb-3 text-start">
           Filter by Status
         </div>
         <div className="flex flex-col gap-3">
@@ -267,7 +267,7 @@ export default function FindingsFilters({
 
   const sortContent = (
     <div className="w-[220px] p-2">
-      <div className="text-sm font-semibold mb-3">
+      <div className="text-sm font-semibold mb-3 text-start">
         Sort by
       </div>
       <RadioGroup
@@ -305,12 +305,12 @@ export default function FindingsFilters({
       {/* Filter Controls */}
       <div
         className={cn(
-          'flex gap-3 items-center',
-          isMobile ? 'flex-col items-stretch' : 'flex-row',
+          'flex gap-2 items-center',
+          isMobile ? 'flex-col items-stretch' : 'flex-row flex-wrap',
           filterTags.length > 0 && 'mb-3'
         )}
       >
-        <div className="relative w-full sm:w-[400px]">
+        <div className={cn('relative', isMobile ? 'w-full' : 'w-full sm:w-[400px]')}>
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground shrink-0" />
           <Input
             placeholder="Search by facility name"
@@ -319,15 +319,16 @@ export default function FindingsFilters({
             className="w-full pl-9"
           />
         </div>
-        <div className={cn('flex items-center flex-wrap', isMobile ? 'gap-3' : 'gap-4')}>
+        <div className={cn('flex items-center', isMobile ? 'gap-2 w-full' : 'gap-2')}>
           <Popover open={filterOpen} onOpenChange={handleFilterOpenChange}>
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
-                className={cn('gap-2', isMobile && 'flex-1')}
+                className={cn('gap-2 whitespace-nowrap', isMobile && 'flex-1')}
               >
                 <Filter className="w-4 h-4 shrink-0" />
-                {!isMobile && <span className="whitespace-nowrap">Filters</span>}
+                {!isMobile && <span>Filters</span>}
+                {isMobile && <span className="text-xs">Filter</span>}
                 {activeFilterCount > 0 && (
                   <Badge
                     variant="secondary"
@@ -343,20 +344,23 @@ export default function FindingsFilters({
             </PopoverContent>
           </Popover>
 
-          <DateRangeSelector
-            value={dateRange}
-            onChange={onDateRangeChange}
-            showLabel={!isMobile}
-          />
+          <div className={cn(isMobile && 'flex-1')}>
+            <DateRangeSelector
+              value={dateRange}
+              onChange={onDateRangeChange}
+              showLabel={false}
+            />
+          </div>
 
           <Popover open={sortOpen} onOpenChange={setSortOpen}>
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
-                className={cn('gap-2', isMobile && 'flex-1')}
+                className={cn('gap-2 whitespace-nowrap', isMobile && 'flex-1')}
               >
                 <ArrowUpDown className="w-4 h-4 shrink-0" />
-                {!isMobile && <span className="whitespace-nowrap">Sort</span>}
+                {!isMobile && <span>Sort</span>}
+                {isMobile && <span className="text-xs">Sort</span>}
               </Button>
             </PopoverTrigger>
             <PopoverContent align="end" className="p-0">

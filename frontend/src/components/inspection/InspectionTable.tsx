@@ -24,6 +24,7 @@ import {
 } from '@/components/ui/table'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { EntityLink } from '@/components/entities'
 
 interface InspectionTableProps {
   inspections: Inspection[]
@@ -94,7 +95,13 @@ export default function InspectionTable({
       columnHelper.accessor('facilityName', {
         header: 'Facility Name',
         cell: (info) => (
-          <span className="text-sm truncate block max-w-[200px]">{info.getValue()}</span>
+          <EntityLink
+            type="facility"
+            id={info.row.original.facilityId}
+            className="text-sm truncate block max-w-[200px]"
+          >
+            {info.getValue()}
+          </EntityLink>
         ),
       }),
       columnHelper.accessor('date', {
@@ -105,7 +112,13 @@ export default function InspectionTable({
       columnHelper.accessor('inspector', {
         header: 'Inspector',
         cell: (info) => (
-          <span className="text-sm truncate block max-w-[150px]">{info.getValue()}</span>
+          <EntityLink
+            type="professional"
+            id={info.row.original.professionalId}
+            className="text-sm truncate block max-w-[150px]"
+          >
+            {info.getValue()}
+          </EntityLink>
         ),
         size: 150,
       }),

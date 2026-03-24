@@ -1,12 +1,19 @@
 import { createRootRoute, Outlet, redirect } from '@tanstack/react-router'
 import { useAuthStore } from '@/stores/authStore'
 import { useThemeBridge } from '@/lib/theme-bridge'
+import { EntityDrawerProvider } from '@/contexts/EntityDrawerContext'
+import { EntityDrawer } from '@/components/entities'
 
 function RootComponent() {
   // Synchronize theme between light/dark modes
   useThemeBridge()
 
-  return <Outlet />
+  return (
+    <EntityDrawerProvider>
+      <Outlet />
+      <EntityDrawer />
+    </EntityDrawerProvider>
+  )
 }
 
 export const Route = createRootRoute({

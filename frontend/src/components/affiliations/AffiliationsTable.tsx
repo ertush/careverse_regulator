@@ -3,6 +3,7 @@ import { Card } from '@/components/ui/card'
 import type { Affiliation } from '@/types/affiliation'
 import StatusBadge from './StatusBadge'
 import { cn } from '@/lib/utils'
+import { EntityLink } from '@/components/entities'
 
 interface AffiliationsTableProps {
   affiliations: Affiliation[]
@@ -52,7 +53,12 @@ export default function AffiliationsTable({
                 onClick={() => onRowClick(affiliation.id)}
               >
                 <TableCell className="font-medium">
-                  {affiliation.healthProfessional.fullName}
+                  <EntityLink
+                    type="professional"
+                    id={affiliation.healthProfessional.registrationNumber}
+                  >
+                    {affiliation.healthProfessional.fullName}
+                  </EntityLink>
                   {affiliation.healthProfessional.professionalCadre && (
                     <div className="text-xs text-muted-foreground mt-0.5">
                       {affiliation.healthProfessional.professionalCadre}
@@ -63,7 +69,12 @@ export default function AffiliationsTable({
                   {affiliation.healthProfessional.registrationNumber}
                 </TableCell>
                 <TableCell>
-                  {affiliation.healthFacility.facilityName}
+                  <EntityLink
+                    type="facility"
+                    id={affiliation.healthFacility.registrationNumber}
+                  >
+                    {affiliation.healthFacility.facilityName}
+                  </EntityLink>
                   {affiliation.healthFacility.facilityCode && (
                     <div className="text-xs text-muted-foreground mt-0.5">
                       Code: {affiliation.healthFacility.facilityCode}

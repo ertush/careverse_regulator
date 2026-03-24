@@ -108,12 +108,12 @@ export default function FindingsDrawer({
       >
         {/* Fixed Header */}
         <SheetHeader className={cn('shrink-0 border-b', isMobile ? 'px-4 pt-4 pb-3' : 'px-6 pt-6 pb-4')}>
-          <SheetTitle className={cn('break-words pr-10', isMobile ? 'text-base' : 'text-lg')}>
+          <SheetTitle className={cn('break-words pr-10 text-start', isMobile ? 'text-base' : 'text-lg')}>
             {inspection.facilityName}
           </SheetTitle>
-          <SheetDescription className={cn('flex items-center gap-2 pr-10', isMobile ? 'text-xs' : 'text-sm')}>
+          <SheetDescription className={cn('flex items-center gap-2 pr-10 text-start', isMobile ? 'text-xs' : 'text-sm')}>
             <Calendar className={cn('shrink-0', isMobile ? 'w-3.5 h-3.5' : 'w-4 h-4')} />
-            <span className="break-words flex-1 min-w-0">
+            <span className="break-words flex-1 min-w-0 text-start">
               {inspection.inspectedDate
                 ? `Inspected: ${inspection.inspectedDate}`
                 : 'Not yet inspected'}
@@ -138,40 +138,40 @@ export default function FindingsDrawer({
               <div className={cn('grid gap-2 mb-4', isMobile ? 'grid-cols-2' : 'grid-cols-4 gap-3 mb-6')}>
                 <Card className="border-t-4 border-t-primary">
                   <CardContent className={cn(isMobile ? 'p-3' : 'p-4')}>
-                    <div className={cn('font-bold', isMobile ? 'text-xl' : 'text-2xl')}>
+                    <div className={cn('font-bold text-start', isMobile ? 'text-xl' : 'text-2xl')}>
                       {findingsSummary.total}
                     </div>
-                    <div className={cn('text-muted-foreground', isMobile ? 'text-[10px]' : 'text-xs')}>
+                    <div className={cn('text-muted-foreground text-start', isMobile ? 'text-[10px]' : 'text-xs')}>
                       Total
                     </div>
                   </CardContent>
                 </Card>
                 <Card className="border-t-4 border-t-red-500">
                   <CardContent className={cn(isMobile ? 'p-3' : 'p-4')}>
-                    <div className={cn('font-bold text-red-600 dark:text-red-400', isMobile ? 'text-xl' : 'text-2xl')}>
+                    <div className={cn('font-bold text-red-600 dark:text-red-400 text-start', isMobile ? 'text-xl' : 'text-2xl')}>
                       {findingsSummary.critical}
                     </div>
-                    <div className={cn('text-muted-foreground', isMobile ? 'text-[10px]' : 'text-xs')}>
+                    <div className={cn('text-muted-foreground text-start', isMobile ? 'text-[10px]' : 'text-xs')}>
                       Critical
                     </div>
                   </CardContent>
                 </Card>
                 <Card className="border-t-4 border-t-orange-500">
                   <CardContent className={cn(isMobile ? 'p-3' : 'p-4')}>
-                    <div className={cn('font-bold text-orange-600 dark:text-orange-400', isMobile ? 'text-xl' : 'text-2xl')}>
+                    <div className={cn('font-bold text-orange-600 dark:text-orange-400 text-start', isMobile ? 'text-xl' : 'text-2xl')}>
                       {findingsSummary.major}
                     </div>
-                    <div className={cn('text-muted-foreground', isMobile ? 'text-[10px]' : 'text-xs')}>
+                    <div className={cn('text-muted-foreground text-start', isMobile ? 'text-[10px]' : 'text-xs')}>
                       Major
                     </div>
                   </CardContent>
                 </Card>
                 <Card className="border-t-4 border-t-yellow-500">
                   <CardContent className={cn(isMobile ? 'p-3' : 'p-4')}>
-                    <div className={cn('font-bold text-yellow-600 dark:text-yellow-400', isMobile ? 'text-xl' : 'text-2xl')}>
+                    <div className={cn('font-bold text-yellow-600 dark:text-yellow-400 text-start', isMobile ? 'text-xl' : 'text-2xl')}>
                       {findingsSummary.minor}
                     </div>
-                    <div className={cn('text-muted-foreground', isMobile ? 'text-[10px]' : 'text-xs')}>
+                    <div className={cn('text-muted-foreground text-start', isMobile ? 'text-[10px]' : 'text-xs')}>
                       Minor
                     </div>
                   </CardContent>
@@ -188,7 +188,7 @@ export default function FindingsDrawer({
                   >
                     <AccordionTrigger className="hover:no-underline py-3">
                       <div className="flex items-center gap-2 flex-1 min-w-0 pr-2">
-                        <span className={cn('font-semibold break-words flex-1', isMobile ? 'text-sm' : 'text-base')}>
+                        <span className={cn('font-semibold break-words flex-1 text-start', isMobile ? 'text-sm' : 'text-base')}>
                           {category}
                         </span>
                         <Badge variant="secondary" className={cn('shrink-0', isMobile && 'text-xs px-1.5 py-0')}>
@@ -213,7 +213,7 @@ export default function FindingsDrawer({
                               </div>
 
                               {/* Description */}
-                              <p className={cn('leading-relaxed break-words overflow-wrap-anywhere', isMobile ? 'text-xs mb-2' : 'text-sm mb-3')}>
+                              <p className={cn('leading-relaxed break-words overflow-wrap-anywhere text-start', isMobile ? 'text-xs mb-2' : 'text-sm mb-3')}>
                                 {finding.description}
                               </p>
 
@@ -224,11 +224,11 @@ export default function FindingsDrawer({
                                   <div className={cn('bg-blue-50 dark:bg-blue-950/20 rounded-lg overflow-hidden', isMobile ? 'p-2' : 'p-3')}>
                                     <div className={cn('flex items-start gap-2 flex-wrap', isMobile ? 'mb-1' : 'mb-2')}>
                                       <AlertCircle className={cn('text-blue-600 dark:text-blue-400 mt-0.5 shrink-0', isMobile ? 'w-3.5 h-3.5' : 'w-4 h-4')} />
-                                      <span className={cn('font-semibold text-blue-600 dark:text-blue-400 break-words flex-1 min-w-0', isMobile ? 'text-[10px]' : 'text-xs')}>
+                                      <span className={cn('font-semibold text-blue-600 dark:text-blue-400 break-words flex-1 min-w-0 text-start', isMobile ? 'text-[10px]' : 'text-xs')}>
                                         Corrective Action Required
                                       </span>
                                     </div>
-                                    <p className={cn('text-blue-900 dark:text-blue-200 break-words overflow-wrap-anywhere', isMobile ? 'text-xs' : 'text-sm')}>
+                                    <p className={cn('text-blue-900 dark:text-blue-200 break-words overflow-wrap-anywhere text-start', isMobile ? 'text-xs' : 'text-sm')}>
                                       {finding.correctiveAction}
                                     </p>
                                   </div>
@@ -240,7 +240,7 @@ export default function FindingsDrawer({
                                 <>
                                   <Separator className={cn(isMobile ? 'my-2' : 'my-3')} />
                                   <div className="overflow-hidden">
-                                    <div className={cn('font-semibold text-muted-foreground break-words', isMobile ? 'text-[10px] mb-1.5' : 'text-xs mb-2')}>
+                                    <div className={cn('font-semibold text-muted-foreground break-words text-start', isMobile ? 'text-[10px] mb-1.5' : 'text-xs mb-2')}>
                                       Attachments ({finding.attachments.length})
                                     </div>
                                     <div className={cn('w-full', isMobile ? 'space-y-1.5' : 'space-y-2')}>
@@ -254,10 +254,10 @@ export default function FindingsDrawer({
                                         >
                                           <Download className={cn('shrink-0 mr-2', isMobile ? 'w-3.5 h-3.5' : 'w-4 h-4')} />
                                           <div className="flex-1 min-w-0 text-left overflow-hidden">
-                                            <div className={cn('break-words overflow-wrap-anywhere w-full', isMobile ? 'text-xs' : 'text-sm')}>
+                                            <div className={cn('break-words overflow-wrap-anywhere w-full text-start', isMobile ? 'text-xs' : 'text-sm')}>
                                               {attachment.file_name}
                                             </div>
-                                            <div className={cn('text-muted-foreground truncate', isMobile ? 'text-[10px]' : 'text-xs')}>
+                                            <div className={cn('text-muted-foreground truncate text-start', isMobile ? 'text-[10px]' : 'text-xs')}>
                                               {formatFileSize(attachment.file_size)}
                                             </div>
                                           </div>
@@ -274,15 +274,15 @@ export default function FindingsDrawer({
                                   <Separator className={cn(isMobile ? 'my-2' : 'my-3')} />
                                   <div className={cn('flex flex-wrap text-muted-foreground overflow-hidden', isMobile ? 'gap-2 text-[10px]' : 'gap-4 text-xs')}>
                                     {finding.dueDate && (
-                                      <div className="flex items-center gap-1.5 break-words">
+                                      <div className="flex items-center gap-1.5 break-words text-start">
                                         <Clock className={cn('shrink-0', isMobile ? 'w-3 h-3' : 'w-3.5 h-3.5')} />
-                                        <span className="break-words">Due: {finding.dueDate}</span>
+                                        <span className="break-words text-start">Due: {finding.dueDate}</span>
                                       </div>
                                     )}
                                     {finding.resolvedDate && (
-                                      <div className="flex items-center gap-1.5 text-green-600 dark:text-green-400 break-words">
+                                      <div className="flex items-center gap-1.5 text-green-600 dark:text-green-400 break-words text-start">
                                         <CheckCircle2 className={cn('shrink-0', isMobile ? 'w-3 h-3' : 'w-3.5 h-3.5')} />
-                                        <span className="break-words">Resolved: {finding.resolvedDate}</span>
+                                        <span className="break-words text-start">Resolved: {finding.resolvedDate}</span>
                                       </div>
                                     )}
                                   </div>

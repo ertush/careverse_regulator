@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react'
 import {
   AppWindow,
   ClipboardCheck,
-  Bell,
   LayoutDashboard,
   Link as LinkIcon,
   LogOut,
@@ -17,11 +16,15 @@ import {
   User,
   ChevronDown,
   ChevronRight,
+  BarChart3,
+  FileText,
+  FileEdit,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
+import NotificationCenter from '@/components/shared/NotificationCenter'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -67,6 +70,9 @@ function selectedMenuKeyForRoute(route: string): string {
   if (route.startsWith('license-management')) return 'license-management'
   if (route.startsWith('affiliations')) return 'affiliations'
   if (route.startsWith('inspection')) return 'inspection'
+  if (route.startsWith('analytics')) return 'analytics'
+  if (route.startsWith('documents')) return 'documents'
+  if (route.startsWith('forms')) return 'forms'
   if (route.startsWith('users-roles')) return 'users-roles'
   if (route.startsWith('regulator-settings')) return 'regulator-settings'
   if (route.startsWith('dashboard')) return 'dashboard'
@@ -116,6 +122,21 @@ export default function AppLayout({
       label: 'Dashboard',
     },
     {
+      key: 'analytics',
+      icon: BarChart3,
+      label: 'Analytics',
+    },
+    {
+      key: 'documents',
+      icon: FileText,
+      label: 'Documents',
+    },
+    {
+      key: 'forms',
+      icon: FileEdit,
+      label: 'Forms',
+    },
+    {
       key: 'modules',
       icon: AppWindow,
       label: 'Modules',
@@ -156,7 +177,6 @@ export default function AppLayout({
     },
   ]
 
-  const notificationCount = 0
   const [openGroups, setOpenGroups] = useState<string[]>(['modules', 'administration'])
 
   const handleMenuClick = (key: string) => {
@@ -310,24 +330,7 @@ export default function AppLayout({
             </div>
 
             <div className="flex items-center gap-2">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={onOpenNotifications}
-                    className={cn("relative", isMobile ? "w-9 h-9" : "w-10 h-10")}
-                  >
-                    <Bell className="w-4 h-4" />
-                    {notificationCount > 0 && (
-                      <Badge className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center p-0 text-xs">
-                        {notificationCount}
-                      </Badge>
-                    )}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Notifications</TooltipContent>
-              </Tooltip>
+              <NotificationCenter />
 
               <Tooltip>
                 <TooltipTrigger asChild>

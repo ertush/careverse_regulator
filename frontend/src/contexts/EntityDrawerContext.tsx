@@ -1,7 +1,9 @@
 import { createContext, useContext, useState, useCallback, ReactNode } from 'react'
 import type { EntityType, EntityDrawerState, Professional, Facility } from '@/types/entity'
 import type { Inspection } from '@/types/inspection'
+import type { License } from '@/types/license'
 import { apiRequest } from '@/utils/api'
+import { getLicense } from '@/api/licensingApi'
 
 interface HistoryEntry {
   type: EntityType
@@ -82,7 +84,7 @@ export function EntityDrawerProvider({ children }: EntityDrawerProviderProps) {
           }))
           return
         case 'license':
-          // Will implement later if needed
+          data = await fetchLicense(id)
           break
       }
 
@@ -217,4 +219,9 @@ async function fetchFacility(id: string): Promise<Facility> {
     })),
     licenses: data.licenses || [],
   }
+}
+
+async function fetchLicense(id: string): Promise<License> {
+  const license = await getLicense(id)
+  return license
 }

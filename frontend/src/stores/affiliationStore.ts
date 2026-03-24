@@ -17,6 +17,10 @@ export interface AffiliationState {
   pageSize: number
   filters: AffiliationFilters
 
+  // Bulk selection
+  selectedIds: Set<string>
+  bulkActionLoading: boolean
+
   // Actions
   setFilters: (filters: AffiliationFilters) => void
   fetchAffiliations: (page?: number, filters?: AffiliationFilters) => Promise<void>
@@ -27,6 +31,13 @@ export interface AffiliationState {
   rejectAffiliation: (id: string, reason?: string) => Promise<void>
   createAffiliation: (payload: CreateAffiliationPayload) => Promise<void>
   refreshAffiliations: () => Promise<void>
+
+  // Bulk actions
+  toggleSelection: (id: string) => void
+  selectAll: () => void
+  deselectAll: () => void
+  bulkApprove: (ids: string[], reason?: string) => Promise<{ succeeded: string[], failed: string[] }>
+  bulkReject: (ids: string[], reason?: string) => Promise<{ succeeded: string[], failed: string[] }>
 }
 
 export const useAffiliationStore = create<AffiliationState>((set, get) => ({
@@ -37,6 +48,8 @@ export const useAffiliationStore = create<AffiliationState>((set, get) => ({
   currentPage: 1,
   pageSize: 20,
   filters: {},
+  selectedIds: new Set<string>(),
+  bulkActionLoading: false,
 
   setFilters: (filters) => {
     set({ filters, currentPage: 1 })
@@ -142,6 +155,98 @@ export const useAffiliationStore = create<AffiliationState>((set, get) => ({
   refreshAffiliations: async () => {
     const { currentPage, filters } = get()
     await get().fetchAffiliations(currentPage, filters)
+  },
+
+  // Bulk selection actions
+  toggleSelection: (id) => {
+    const selectedIds = new Set(get().selectedIds)
+    if (selectedIds.has(id)) {
+      selectedIds.delete(id)
+    } else {
+      selectedIds.add(id)
+    }
+    set({ selectedIds })
+  },
+
+  selectAll: () => {
+    const selectedIds = new Set(get().affiliations.map(a => a.affiliationId))
+    set({ selectedIds })
+  },
+
+  deselectAll: () => {
+    set({ selectedIds: new Set<string>() })
+  },
+
+  bulkApprove: async (ids, reason) => {
+    set({ bulkActionLoading: true, error: null })
+    const succeeded: string[] = []
+    const failed: string[] = []
+
+    try {
+      // Process each ID sequentially to avoid overwhelming the API
+      for (const id of ids) {
+        try {
+          await affiliationApi.approveAffiliation(id, reason)
+          succeeded.push(id)
+        } catch (error) {
+          console.error(`Failed to approve affiliation ${id}:`, error)
+          failed.push(id)
+        }
+      }
+
+      // Remove succeeded IDs from selection
+      const selectedIds = new Set(get().selectedIds)
+      succeeded.forEach(id => selectedIds.delete(id))
+
+      set({ bulkActionLoading: false, selectedIds })
+
+      // Refresh the list
+      await get().refreshAffiliations()
+
+      return { succeeded, failed }
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : 'Bulk approve operation failed',
+        bulkActionLoading: false,
+      })
+      throw error
+    }
+  },
+
+  bulkReject: async (ids, reason) => {
+    set({ bulkActionLoading: true, error: null })
+    const succeeded: string[] = []
+    const failed: string[] = []
+
+    try {
+      // Process each ID sequentially to avoid overwhelming the API
+      for (const id of ids) {
+        try {
+          await affiliationApi.rejectAffiliation(id, reason)
+          succeeded.push(id)
+        } catch (error) {
+          console.error(`Failed to reject affiliation ${id}:`, error)
+          failed.push(id)
+        }
+      }
+
+      // Remove succeeded IDs from selection
+      const selectedIds = new Set(get().selectedIds)
+      succeeded.forEach(id => selectedIds.delete(id))
+
+      set({ bulkActionLoading: false, selectedIds })
+
+      // Refresh the list
+      await get().refreshAffiliations()
+
+      return { succeeded, failed }
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : 'Bulk reject operation failed',
+        bulkActionLoading: false,
+      })
+      throw error
+    }
   },
 }))
 

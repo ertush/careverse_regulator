@@ -267,9 +267,11 @@ export function FacilityDrawer({ facility, loading }: FacilityDrawerProps) {
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-gray-900 font-mono text-sm mb-1 text-start">
-                          {license.licenseNumber}
-                        </p>
+                        <EntityLink type="license" id={license.licenseNumber}>
+                          <span className="font-medium text-gray-900 font-mono text-sm mb-1 text-start block">
+                            {license.licenseNumber}
+                          </span>
+                        </EntityLink>
                         {license.expiryDate && (
                           <p className="text-sm text-muted-foreground flex items-center gap-1 text-start">
                             <Calendar className="w-4 h-4" />

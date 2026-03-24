@@ -3,6 +3,7 @@ import { useAuthStore } from '@/stores/authStore'
 import { useThemeBridge } from '@/lib/theme-bridge'
 import { EntityDrawerProvider } from '@/contexts/EntityDrawerContext'
 import { EntityDrawer } from '@/components/entities'
+import NotificationListener from '@/components/shared/NotificationListener'
 
 function RootComponent() {
   // Synchronize theme between light/dark modes
@@ -12,6 +13,7 @@ function RootComponent() {
     <EntityDrawerProvider>
       <Outlet />
       <EntityDrawer />
+      <NotificationListener />
     </EntityDrawerProvider>
   )
 }

@@ -1,216 +1,245 @@
 import { create } from 'zustand'
-import type { Notification, NotificationFilters, NotificationType, NotificationPriority } from '@/types/notification'
+import { persist } from 'zustand/middleware'
 
-// Mock data generator
-const generateMockNotifications = (): Notification[] => {
-  const now = new Date()
-  return [
-    {
-      id: '1',
-      type: 'alert',
-      priority: 'high',
-      title: 'Overdue Inspection',
-      message: 'ABC Dental Clinic inspection scheduled for 3 days ago is still pending.',
-      isRead: false,
-      timestamp: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-      actionUrl: '/inspections',
-      actionLabel: 'View Inspection',
-    },
-    {
-      id: '2',
-      type: 'reminder',
-      priority: 'medium',
-      title: 'License Renewal Due',
-      message: 'General Hospital license expires in 30 days. Renewal application not yet submitted.',
-      isRead: false,
-      timestamp: new Date(now.getTime() - 2 * 60 * 60 * 1000).toISOString(),
-      actionUrl: '/license-management',
-      actionLabel: 'View License',
-    },
-    {
-      id: '3',
-      type: 'followup',
-      priority: 'high',
-      title: 'Critical Finding Unresolved',
-      message: 'Critical finding from XYZ Clinic inspection (Finding #CR-123) is overdue for resolution.',
-      isRead: false,
-      timestamp: new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-      actionUrl: '/inspections',
-      actionLabel: 'View Finding',
-    },
-    {
-      id: '4',
-      type: 'system',
-      priority: 'low',
-      title: 'System Maintenance Scheduled',
-      message: 'The platform will undergo scheduled maintenance on Saturday, 2:00 AM - 4:00 AM.',
-      isRead: true,
-      timestamp: new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-    },
-    {
-      id: '5',
-      type: 'alert',
-      priority: 'medium',
-      title: 'New Affiliation Pending Approval',
-      message: 'Dr. Jane Smith has submitted an affiliation request with City Hospital.',
-      isRead: false,
-      timestamp: new Date(now.getTime() - 6 * 60 * 60 * 1000).toISOString(),
-      actionUrl: '/affiliations',
-      actionLabel: 'Review Affiliation',
-    },
-    {
-      id: '6',
-      type: 'reminder',
-      priority: 'low',
-      title: 'Monthly Report Due',
-      message: 'Your monthly compliance report is due in 5 days.',
-      isRead: true,
-      timestamp: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-    },
-    {
-      id: '7',
-      type: 'followup',
-      priority: 'medium',
-      title: 'Inspection Report Awaiting Signature',
-      message: 'Inspection report for Sunshine Pharmacy requires your signature.',
-      isRead: false,
-      timestamp: new Date(now.getTime() - 12 * 60 * 60 * 1000).toISOString(),
-      actionUrl: '/inspections',
-      actionLabel: 'Sign Report',
-    },
-    {
-      id: '8',
-      type: 'system',
-      priority: 'medium',
-      title: 'New Feature Available',
-      message: 'Bulk export functionality is now available in License Management.',
-      isRead: true,
-      timestamp: new Date(now.getTime() - 10 * 24 * 60 * 60 * 1000).toISOString(),
-    },
-  ]
+export type NotificationType = 'success' | 'error' | 'warning' | 'info'
+export type NotificationCategory =
+  | 'affiliation'
+  | 'license'
+  | 'inspection'
+  | 'system'
+  | 'bulk_action'
+
+export interface Notification {
+  id: string
+  type: NotificationType
+  category: NotificationCategory
+  title: string
+  message: string
+  timestamp: string
+  read: boolean
+  actionUrl?: string
+  actionLabel?: string
+  metadata?: Record<string, any>
+}
+
+export interface NotificationPreferences {
+  enabled: boolean
+  showToasts: boolean
+  playSound: boolean
+  categories: {
+    affiliation: boolean
+    license: boolean
+    inspection: boolean
+    system: boolean
+    bulk_action: boolean
+  }
 }
 
 interface NotificationState {
   notifications: Notification[]
-  filters: NotificationFilters
-  selectedIds: string[]
-  isLoading: boolean
+  preferences: NotificationPreferences
+  unreadCount: number
 
   // Actions
-  initialize: () => void
-  markAsRead: (ids: string[]) => void
-  markAsUnread: (ids: string[]) => void
-  deleteNotifications: (ids: string[]) => void
+  addNotification: (notification: Omit<Notification, 'id' | 'timestamp' | 'read'>) => void
+  markAsRead: (id: string) => void
   markAllAsRead: () => void
-  updateFilters: (filters: Partial<NotificationFilters>) => void
-  setSelectedIds: (ids: string[]) => void
-  clearFilters: () => void
+  deleteNotification: (id: string) => void
+  clearAll: () => void
+  updatePreferences: (preferences: Partial<NotificationPreferences>) => void
+  getNotificationsByCategory: (category: NotificationCategory) => Notification[]
 }
 
-export const useNotificationStore = create<NotificationState>((set, get) => ({
-  notifications: [],
-  filters: {
-    type: 'all',
-    status: 'all',
-    priority: 'all',
+const defaultPreferences: NotificationPreferences = {
+  enabled: true,
+  showToasts: true,
+  playSound: false,
+  categories: {
+    affiliation: true,
+    license: true,
+    inspection: true,
+    system: true,
+    bulk_action: true,
   },
-  selectedIds: [],
-  isLoading: false,
+}
 
-  initialize: () => {
-    const notifications = generateMockNotifications()
-    set({ notifications, isLoading: false })
-  },
+export const useNotificationStore = create<NotificationState>()(
+  persist(
+    (set, get) => ({
+      notifications: [],
+      preferences: defaultPreferences,
+      unreadCount: 0,
 
-  markAsRead: (ids: string[]) => {
-    set((state) => ({
-      notifications: state.notifications.map((n) =>
-        ids.includes(n.id) ? { ...n, isRead: true } : n
-      ),
-      selectedIds: [],
-    }))
-  },
+      addNotification: (notification) => {
+        const newNotification: Notification = {
+          ...notification,
+          id: `notif_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          timestamp: new Date().toISOString(),
+          read: false,
+        }
 
-  markAsUnread: (ids: string[]) => {
-    set((state) => ({
-      notifications: state.notifications.map((n) =>
-        ids.includes(n.id) ? { ...n, isRead: false } : n
-      ),
-      selectedIds: [],
-    }))
-  },
+        set((state) => ({
+          notifications: [newNotification, ...state.notifications].slice(0, 100),
+          unreadCount: state.unreadCount + 1,
+        }))
 
-  deleteNotifications: (ids: string[]) => {
-    set((state) => ({
-      notifications: state.notifications.filter((n) => !ids.includes(n.id)),
-      selectedIds: [],
-    }))
-  },
-
-  markAllAsRead: () => {
-    set((state) => ({
-      notifications: state.notifications.map((n) => ({ ...n, isRead: true })),
-    }))
-  },
-
-  updateFilters: (newFilters: Partial<NotificationFilters>) => {
-    set((state) => ({
-      filters: { ...state.filters, ...newFilters },
-    }))
-  },
-
-  setSelectedIds: (ids: string[]) => {
-    set({ selectedIds: ids })
-  },
-
-  clearFilters: () => {
-    set({
-      filters: {
-        type: 'all',
-        status: 'all',
-        priority: 'all',
+        const { preferences } = get()
+        if (preferences.enabled && preferences.playSound && preferences.categories[notification.category]) {
+          try {
+            const audio = new Audio('/notification.mp3')
+            audio.volume = 0.5
+            audio.play().catch(() => {})
+          } catch (error) {}
+        }
       },
-    })
-  },
-}))
 
-// Selector for filtered notifications
-export const getFilteredNotifications = (state: NotificationState): Notification[] => {
-  let filtered = state.notifications
+      markAsRead: (id) => {
+        set((state) => ({
+          notifications: state.notifications.map((n) =>
+            n.id === id ? { ...n, read: true } : n
+          ),
+          unreadCount: Math.max(0, state.unreadCount - 1),
+        }))
+      },
 
-  // Filter by search
-  if (state.filters.search) {
-    const search = state.filters.search.toLowerCase()
-    filtered = filtered.filter(
-      (n) =>
-        n.title.toLowerCase().includes(search) ||
-        n.message.toLowerCase().includes(search)
-    )
-  }
+      markAllAsRead: () => {
+        set((state) => ({
+          notifications: state.notifications.map((n) => ({ ...n, read: true })),
+          unreadCount: 0,
+        }))
+      },
 
-  // Filter by type
-  if (state.filters.type && state.filters.type !== 'all') {
-    filtered = filtered.filter((n) => n.type === state.filters.type)
-  }
+      deleteNotification: (id) => {
+        set((state) => {
+          const notification = state.notifications.find((n) => n.id === id)
+          const wasUnread = notification && !notification.read
 
-  // Filter by status (read/unread)
-  if (state.filters.status && state.filters.status !== 'all') {
-    const isRead = state.filters.status === 'read'
-    filtered = filtered.filter((n) => n.isRead === isRead)
-  }
+          return {
+            notifications: state.notifications.filter((n) => n.id !== id),
+            unreadCount: wasUnread ? Math.max(0, state.unreadCount - 1) : state.unreadCount,
+          }
+        })
+      },
 
-  // Filter by priority
-  if (state.filters.priority && state.filters.priority !== 'all') {
-    filtered = filtered.filter((n) => n.priority === state.filters.priority)
-  }
+      clearAll: () => {
+        set({
+          notifications: [],
+          unreadCount: 0,
+        })
+      },
 
-  // Sort by timestamp (newest first)
-  filtered.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+      updatePreferences: (newPreferences) => {
+        set((state) => ({
+          preferences: {
+            ...state.preferences,
+            ...newPreferences,
+            categories: {
+              ...state.preferences.categories,
+              ...(newPreferences.categories || {}),
+            },
+          },
+        }))
+      },
 
-  return filtered
-}
+      getNotificationsByCategory: (category) => {
+        return get().notifications.filter((n) => n.category === category)
+      },
+    }),
+    {
+      name: 'notification-storage',
+      partialize: (state) => ({
+        notifications: state.notifications,
+        preferences: state.preferences,
+        unreadCount: state.unreadCount,
+      }),
+    }
+  )
+)
 
-// Selector for unread count
-export const getUnreadCount = (state: NotificationState): number => {
-  return state.notifications.filter((n) => !n.isRead).length
+// Helper function to create notifications with consistent formatting
+export const createNotification = {
+  affiliationApproved: (professionalName: string, facilityName: string) => ({
+    type: 'success' as NotificationType,
+    category: 'affiliation' as NotificationCategory,
+    title: 'Affiliation Approved',
+    message: `${professionalName}'s affiliation with ${facilityName} has been approved.`,
+    actionUrl: '/affiliations',
+    actionLabel: 'View Affiliations',
+  }),
+
+  affiliationRejected: (professionalName: string, facilityName: string) => ({
+    type: 'error' as NotificationType,
+    category: 'affiliation' as NotificationCategory,
+    title: 'Affiliation Rejected',
+    message: `${professionalName}'s affiliation with ${facilityName} has been rejected.`,
+    actionUrl: '/affiliations',
+    actionLabel: 'View Affiliations',
+  }),
+
+  licenseApproved: (licenseNumber: string) => ({
+    type: 'success' as NotificationType,
+    category: 'license' as NotificationCategory,
+    title: 'License Approved',
+    message: `License ${licenseNumber} has been approved.`,
+    actionUrl: `/license-management/${licenseNumber}`,
+    actionLabel: 'View License',
+  }),
+
+  licenseDenied: (licenseNumber: string) => ({
+    type: 'error' as NotificationType,
+    category: 'license' as NotificationCategory,
+    title: 'License Denied',
+    message: `License ${licenseNumber} has been denied.`,
+    actionUrl: `/license-management/${licenseNumber}`,
+    actionLabel: 'View License',
+  }),
+
+  licenseExpiring: (licenseNumber: string, daysUntilExpiry: number) => ({
+    type: 'warning' as NotificationType,
+    category: 'license' as NotificationCategory,
+    title: 'License Expiring Soon',
+    message: `License ${licenseNumber} will expire in ${daysUntilExpiry} days.`,
+    actionUrl: `/license-management/${licenseNumber}`,
+    actionLabel: 'Renew License',
+  }),
+
+  inspectionScheduled: (facilityName: string, date: string) => ({
+    type: 'info' as NotificationType,
+    category: 'inspection' as NotificationCategory,
+    title: 'Inspection Scheduled',
+    message: `Inspection scheduled for ${facilityName} on ${date}.`,
+    actionUrl: '/inspections',
+    actionLabel: 'View Inspections',
+  }),
+
+  inspectionCompleted: (facilityName: string) => ({
+    type: 'success' as NotificationType,
+    category: 'inspection' as NotificationCategory,
+    title: 'Inspection Completed',
+    message: `Inspection for ${facilityName} has been completed.`,
+    actionUrl: '/inspections',
+    actionLabel: 'View Report',
+  }),
+
+  bulkActionCompleted: (action: string, succeeded: number, failed: number) => ({
+    type: failed > 0 ? ('warning' as NotificationType) : ('success' as NotificationType),
+    category: 'bulk_action' as NotificationCategory,
+    title: 'Bulk Action Completed',
+    message: `${action}: ${succeeded} succeeded, ${failed} failed.`,
+    metadata: { action, succeeded, failed },
+  }),
+
+  systemUpdate: (message: string) => ({
+    type: 'info' as NotificationType,
+    category: 'system' as NotificationCategory,
+    title: 'System Update',
+    message,
+  }),
+
+  systemError: (message: string) => ({
+    type: 'error' as NotificationType,
+    category: 'system' as NotificationCategory,
+    title: 'System Error',
+    message,
+  }),
 }

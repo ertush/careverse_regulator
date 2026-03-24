@@ -11,8 +11,10 @@ import { ChevronLeft } from 'lucide-react'
 import { ProfessionalDrawer } from './ProfessionalDrawer'
 import { FacilityDrawer } from './FacilityDrawer'
 import { InspectionDrawer } from './InspectionDrawer'
+import { LicenseDrawer } from './LicenseDrawer'
 import type { Professional, Facility } from '@/types/entity'
 import type { Inspection } from '@/types/inspection'
+import type { License } from '@/types/license'
 
 export function EntityDrawer() {
   const { state, closeDrawer, goBack, canGoBack } = useEntityDrawer()
@@ -56,7 +58,12 @@ export function EntityDrawer() {
           />
         )
       case 'license':
-        return <div>License details coming soon...</div>
+        return (
+          <LicenseDrawer
+            license={state.data as License}
+            loading={state.loading}
+          />
+        )
       default:
         return null
     }

@@ -145,7 +145,9 @@ export function ProfessionalDrawer({ professional, loading }: ProfessionalDrawer
                 <Award className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-900 text-start">License Number</p>
-                  <p className="text-sm text-muted-foreground font-mono text-start">{professional.licenseNumber}</p>
+                  <EntityLink type="license" id={professional.licenseNumber}>
+                    <span className="text-sm text-muted-foreground font-mono text-start">{professional.licenseNumber}</span>
+                  </EntityLink>
                 </div>
               </div>
             )}
@@ -241,9 +243,11 @@ export function ProfessionalDrawer({ professional, loading }: ProfessionalDrawer
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-gray-900 font-mono text-sm mb-1 text-start">
-                          {license.licenseNumber}
-                        </p>
+                        <EntityLink type="license" id={license.licenseNumber}>
+                          <span className="font-medium text-gray-900 font-mono text-sm mb-1 text-start block">
+                            {license.licenseNumber}
+                          </span>
+                        </EntityLink>
                         {license.expiryDate && (
                           <p className="text-sm text-muted-foreground text-start">
                             Expires: {dayjs(license.expiryDate, 'YYYY-MM-DD').format('DD MMM YYYY')}

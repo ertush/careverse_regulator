@@ -100,6 +100,9 @@ export function FacilityLicensesDashboard() {
 
   return (
     <div className="space-y-6">
+      {/* Quick Actions */}
+      <QuickActions actions={quickActions} title="Quick Actions" />
+
       {/* Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <MetricCard
@@ -154,9 +157,6 @@ export function FacilityLicensesDashboard() {
           emptyMessage="No licenses expiring in the next 30 days"
         />
       </div>
-
-      {/* Quick Actions */}
-      <QuickActions actions={quickActions} title="Quick Actions" />
     </div>
   )
 }

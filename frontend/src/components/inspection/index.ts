@@ -12,3 +12,9 @@ export { default as FindingsFilters } from './FindingsFilters'
 export { default as FindingsDetailModal } from './FindingsDetailModal'
 export { default as FindingsBadge } from './FindingsBadge'
 export { InspectionsDashboard } from './InspectionsDashboard'
+
+// Enhanced UX components (from March 2026 brainstorming session)
+export { default as VisualFindingsBadge } from './VisualFindingsBadge'
+export { default as EnhancedInspectionFilters } from './EnhancedInspectionFilters'
+export { default as FindingCardGrid } from './FindingCardGrid'
+export { default as EnhancedInspectionDrawer } from './EnhancedInspectionDrawer'

@@ -33,6 +33,10 @@ export interface LicensingState {
   facilities: FacilityOption[]
   facilitiesLoading: boolean
 
+  // Bulk selection
+  selectedLicenseIds: Set<string>
+  bulkLicenseActionLoading: boolean
+
   // Actions for Licenses
   setLicensesFilters: (filters: LicenseFilters) => void
   fetchLicenses: (page?: number, filters?: LicenseFilters) => Promise<void>
@@ -54,6 +58,12 @@ export interface LicensingState {
 
   // Appeal
   createAppeal: (payload: CreateLicenseAppealPayload) => Promise<void>
+
+  // Bulk license actions
+  toggleLicenseSelection: (licenseNumber: string) => void
+  selectAllLicenses: () => void
+  deselectAllLicenses: () => void
+  bulkUpdateLicenseStatus: (licenseNumbers: string[], action: LicenseAction) => Promise<{ succeeded: string[], failed: string[] }>
 }
 
 export const useLicensingStore = create<LicensingState>((set, get) => ({
@@ -78,6 +88,10 @@ export const useLicensingStore = create<LicensingState>((set, get) => ({
   // Facilities state
   facilities: [],
   facilitiesLoading: false,
+
+  // Bulk selection state
+  selectedLicenseIds: new Set<string>(),
+  bulkLicenseActionLoading: false,
 
   // Licenses actions
   setLicensesFilters: (filters) => {
@@ -217,6 +231,62 @@ export const useLicensingStore = create<LicensingState>((set, get) => ({
       set({
         licensesError: error instanceof Error ? error.message : 'Failed to create appeal',
         licensesLoading: false,
+      })
+      throw error
+    }
+  },
+
+  // Bulk license selection actions
+  toggleLicenseSelection: (licenseNumber) => {
+    const selectedLicenseIds = new Set(get().selectedLicenseIds)
+    if (selectedLicenseIds.has(licenseNumber)) {
+      selectedLicenseIds.delete(licenseNumber)
+    } else {
+      selectedLicenseIds.add(licenseNumber)
+    }
+    set({ selectedLicenseIds })
+  },
+
+  selectAllLicenses: () => {
+    const selectedLicenseIds = new Set(get().licenses.map(l => l.licenseNumber))
+    set({ selectedLicenseIds })
+  },
+
+  deselectAllLicenses: () => {
+    set({ selectedLicenseIds: new Set<string>() })
+  },
+
+  bulkUpdateLicenseStatus: async (licenseNumbers, action) => {
+    set({ bulkLicenseActionLoading: true, licensesError: null })
+    const succeeded: string[] = []
+    const failed: string[] = []
+
+    try {
+      // Process each license sequentially to avoid overwhelming the API
+      for (const licenseNumber of licenseNumbers) {
+        try {
+          await licensingApi.updateLicense(licenseNumber, action)
+          succeeded.push(licenseNumber)
+        } catch (error) {
+          console.error(`Failed to update license ${licenseNumber}:`, error)
+          failed.push(licenseNumber)
+        }
+      }
+
+      // Remove succeeded IDs from selection
+      const selectedLicenseIds = new Set(get().selectedLicenseIds)
+      succeeded.forEach(id => selectedLicenseIds.delete(id))
+
+      set({ bulkLicenseActionLoading: false, selectedLicenseIds })
+
+      // Refresh the list
+      await get().refreshLicenses()
+
+      return { succeeded, failed }
+    } catch (error) {
+      set({
+        licensesError: error instanceof Error ? error.message : 'Bulk update operation failed',
+        bulkLicenseActionLoading: false,
       })
       throw error
     }

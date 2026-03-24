@@ -1,12 +1,12 @@
-import type { LucideIcon } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
+import type React from 'react'
 
 export interface MetricCardProps {
   title: string
   value: number | string
   trend?: string
-  icon?: LucideIcon
+  icon?: React.ComponentType<{ className?: string }>
   variant?: 'success' | 'warning' | 'danger' | 'info' | 'neutral'
   onClick?: () => void
   className?: string

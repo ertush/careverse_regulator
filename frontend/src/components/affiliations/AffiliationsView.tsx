@@ -1,15 +1,18 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useAffiliationStore } from '@/stores/affiliationStore'
+import { useNotificationStore, createNotification } from '@/stores/notificationStore'
 import { useResponsive } from '@/hooks/useResponsive'
 import AffiliationsTable from './AffiliationsTable'
 import AffiliationCard from './AffiliationCard'
 import AffiliationsFilters from './AffiliationsFilters'
 import PaginationControls from './PaginationControls'
+import BulkActionsBar from '@/components/shared/BulkActionsBar'
+import BulkActionConfirmDialog from '@/components/shared/BulkActionConfirmDialog'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Users, ArrowLeft } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { Users, ArrowLeft, CheckCircle, XCircle } from 'lucide-react'
+import { toast } from 'sonner'
 
 interface AffiliationsViewProps {
   company?: string | null
@@ -17,7 +20,23 @@ interface AffiliationsViewProps {
 
 export default function AffiliationsView({ company }: AffiliationsViewProps) {
   const navigate = useNavigate()
-  const { affiliations, loading, error, pagination, filters, setFilters, setPage } = useAffiliationStore()
+  const {
+    affiliations,
+    loading,
+    error,
+    pagination,
+    filters,
+    setFilters,
+    setPage,
+    selectedIds,
+    bulkActionLoading,
+    toggleSelection,
+    selectAll,
+    deselectAll,
+    bulkApprove,
+    bulkReject,
+  } = useAffiliationStore()
+  const { addNotification } = useNotificationStore()
   const { isMobile, isTablet } = useResponsive()
 
   // Local state for filters
@@ -28,6 +47,10 @@ export default function AffiliationsView({ company }: AffiliationsViewProps) {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc' | 'recent'>(
     filters.sortOrder === 'desc' ? 'desc' : filters.sortOrder === 'asc' ? 'asc' : 'recent'
   )
+
+  // Bulk action dialog state
+  const [showApproveDialog, setShowApproveDialog] = useState(false)
+  const [showRejectDialog, setShowRejectDialog] = useState(false)
 
   // Debounce search text
   useEffect(() => {
@@ -73,6 +96,49 @@ export default function AffiliationsView({ company }: AffiliationsViewProps) {
   // Handle pagination
   const handlePageChange = (page: number) => {
     setPage(page)
+  }
+
+  // Bulk action handlers
+  const handleBulkApprove = async (reason?: string) => {
+    const ids = Array.from(selectedIds)
+    const result = await bulkApprove(ids, reason)
+
+    if (result.succeeded.length > 0) {
+      toast.success(`Successfully approved ${result.succeeded.length} affiliation(s)`)
+      addNotification(
+        createNotification.bulkActionCompleted(
+          'Bulk Approve Affiliations',
+          result.succeeded.length,
+          result.failed.length
+        )
+      )
+    }
+    if (result.failed.length > 0) {
+      toast.error(`Failed to approve ${result.failed.length} affiliation(s)`)
+    }
+
+    return result
+  }
+
+  const handleBulkReject = async (reason?: string) => {
+    const ids = Array.from(selectedIds)
+    const result = await bulkReject(ids, reason)
+
+    if (result.succeeded.length > 0) {
+      toast.success(`Successfully rejected ${result.succeeded.length} affiliation(s)`)
+      addNotification(
+        createNotification.bulkActionCompleted(
+          'Bulk Reject Affiliations',
+          result.succeeded.length,
+          result.failed.length
+        )
+      )
+    }
+    if (result.failed.length > 0) {
+      toast.error(`Failed to reject ${result.failed.length} affiliation(s)`)
+    }
+
+    return result
   }
 
   // Calculate active filters count
@@ -148,8 +214,60 @@ export default function AffiliationsView({ company }: AffiliationsViewProps) {
           affiliations={affiliations}
           loading={loading}
           onRowClick={handleRowClick}
+          selectedIds={selectedIds}
+          onToggleSelection={toggleSelection}
+          onSelectAll={selectAll}
+          onDeselectAll={deselectAll}
         />
       )}
+
+      {/* Bulk Actions Bar */}
+      <BulkActionsBar
+        selectedCount={selectedIds.size}
+        onClear={deselectAll}
+        actions={[
+          {
+            label: 'Approve Selected',
+            onClick: () => setShowApproveDialog(true),
+            variant: 'default',
+            icon: <CheckCircle className="w-4 h-4" />,
+            loading: bulkActionLoading,
+          },
+          {
+            label: 'Reject Selected',
+            onClick: () => setShowRejectDialog(true),
+            variant: 'destructive',
+            icon: <XCircle className="w-4 h-4" />,
+            loading: bulkActionLoading,
+          },
+        ]}
+      />
+
+      {/* Bulk Approve Dialog */}
+      <BulkActionConfirmDialog
+        isOpen={showApproveDialog}
+        onClose={() => setShowApproveDialog(false)}
+        title="Approve Selected Affiliations"
+        description="You are about to approve the selected affiliations. This action will change their status to Active."
+        selectedCount={selectedIds.size}
+        actionLabel="Approve All"
+        requiresReason={false}
+        onConfirm={handleBulkApprove}
+        variant="default"
+      />
+
+      {/* Bulk Reject Dialog */}
+      <BulkActionConfirmDialog
+        isOpen={showRejectDialog}
+        onClose={() => setShowRejectDialog(false)}
+        title="Reject Selected Affiliations"
+        description="You are about to reject the selected affiliations. This action will change their status to Rejected."
+        selectedCount={selectedIds.size}
+        actionLabel="Reject All"
+        requiresReason={true}
+        onConfirm={handleBulkReject}
+        variant="destructive"
+      />
 
       {/* Pagination */}
       {pagination && pagination.total_pages > 1 && (

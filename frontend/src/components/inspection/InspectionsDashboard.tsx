@@ -140,6 +140,9 @@ export function InspectionsDashboard() {
         </p>
       </div>
 
+      {/* Quick Actions */}
+      <QuickActions actions={quickActions} title="Quick Actions" />
+
       {/* Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <MetricCard
@@ -216,9 +219,6 @@ export function InspectionsDashboard() {
           title="Recent Activity"
         />
       )}
-
-      {/* Quick Actions */}
-      <QuickActions actions={quickActions} title="Quick Actions" />
     </div>
   )
 }

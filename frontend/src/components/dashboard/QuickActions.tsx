@@ -1,12 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import type { LucideIcon } from 'lucide-react'
+import type React from 'react'
 
 export interface QuickAction {
   label: string
   onClick: () => void
   variant?: 'default' | 'secondary' | 'outline' | 'ghost'
-  icon?: LucideIcon
+  icon?: React.ComponentType<{ className?: string }>
 }
 
 export interface QuickActionsProps {

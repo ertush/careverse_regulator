@@ -2,6 +2,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import type { License } from '@/types/license'
 import StatusBadge from './StatusBadge'
+import { EntityLink } from '@/components/entities'
 import { Building2, Calendar, CreditCard, FileText, User } from 'lucide-react'
 
 interface LicenseCardProps {
@@ -15,7 +16,11 @@ export default function LicenseCard({ license, onClick }: LicenseCardProps) {
       <CardContent className="pt-6">
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
-            <h3 className="font-semibold text-lg mb-1 font-mono">{license.licenseNumber}</h3>
+            <div onClick={(e) => e.stopPropagation()}>
+              <EntityLink type="license" id={license.licenseNumber}>
+                <h3 className="font-semibold text-lg mb-1 font-mono">{license.licenseNumber}</h3>
+              </EntityLink>
+            </div>
             <p className="text-sm text-muted-foreground">{license.facilityType}</p>
           </div>
           <StatusBadge status={license.status} />

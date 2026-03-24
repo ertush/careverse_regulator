@@ -196,6 +196,9 @@ export default function MainDashboard({ onNavigate, company }: MainDashboardProp
         </p>
       </div>
 
+      {/* Quick Actions */}
+      <QuickActions actions={quickActions} title="Navigate to Sections" />
+
       {/* Primary Metrics - Items Requiring Attention */}
       <Card className="bg-gradient-to-br from-orange-50 to-yellow-50 border-orange-200">
         <CardContent className="p-6">
@@ -384,9 +387,6 @@ export default function MainDashboard({ onNavigate, company }: MainDashboardProp
         title="Overall Compliance Status"
         type="bar"
       />
-
-      {/* Quick Actions */}
-      <QuickActions actions={quickActions} title="Navigate to Sections" />
     </div>
   )
 }

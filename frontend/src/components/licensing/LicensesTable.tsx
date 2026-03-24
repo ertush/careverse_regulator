@@ -1,5 +1,6 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Card } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
 import type { License } from '@/types/license'
 import StatusBadge from './StatusBadge'
 import { Badge } from '@/components/ui/badge'
@@ -9,14 +10,48 @@ interface LicensesTableProps {
   licenses: License[]
   loading?: boolean
   onRowClick: (licenseNumber: string) => void
+  selectedIds?: Set<string>
+  onToggleSelection?: (licenseNumber: string) => void
+  onSelectAll?: () => void
+  onDeselectAll?: () => void
 }
 
-export default function LicensesTable({ licenses, loading, onRowClick }: LicensesTableProps) {
+export default function LicensesTable({
+  licenses,
+  loading,
+  onRowClick,
+  selectedIds,
+  onToggleSelection,
+  onSelectAll,
+  onDeselectAll,
+}: LicensesTableProps) {
+  const selectionEnabled = selectedIds !== undefined && onToggleSelection !== undefined
+  const allSelected = selectionEnabled && licenses.length > 0 && licenses.every(l => selectedIds.has(l.licenseNumber))
+  const someSelected = selectionEnabled && licenses.some(l => selectedIds.has(l.licenseNumber)) && !allSelected
+
+  const handleSelectAll = () => {
+    if (allSelected && onDeselectAll) {
+      onDeselectAll()
+    } else if (onSelectAll) {
+      onSelectAll()
+    }
+  }
+
+  const totalColumns = selectionEnabled ? 9 : 8
+
   return (
     <Card>
       <Table>
         <TableHeader>
           <TableRow>
+            {selectionEnabled && (
+              <TableHead className="w-12">
+                <Checkbox
+                  checked={allSelected || (someSelected ? 'indeterminate' : false)}
+                  onCheckedChange={handleSelectAll}
+                />
+              </TableHead>
+            )}
             <TableHead>License #</TableHead>
             <TableHead>Registration #</TableHead>
             <TableHead>Facility Type</TableHead>
@@ -30,7 +65,7 @@ export default function LicensesTable({ licenses, loading, onRowClick }: License
         <TableBody>
           {loading && licenses.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={8} className="text-center py-8">
+              <TableCell colSpan={totalColumns} className="text-center py-8">
                 <div className="flex items-center justify-center">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                 </div>
@@ -38,18 +73,35 @@ export default function LicensesTable({ licenses, loading, onRowClick }: License
             </TableRow>
           ) : licenses.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={totalColumns} className="text-center py-8 text-muted-foreground">
                 No licenses found
               </TableCell>
             </TableRow>
           ) : (
-            licenses.map((license) => (
-              <TableRow
-                key={license.id}
-                className="cursor-pointer hover:bg-muted/50 transition-colors"
-                onClick={() => onRowClick(license.licenseNumber)}
-              >
-                <TableCell className="font-mono text-sm font-medium">{license.licenseNumber}</TableCell>
+            licenses.map((license) => {
+              const isSelected = selectionEnabled && selectedIds.has(license.licenseNumber)
+              return (
+                <TableRow
+                  key={license.id}
+                  className="cursor-pointer hover:bg-muted/50 transition-colors"
+                  onClick={() => onRowClick(license.licenseNumber)}
+                >
+                  {selectionEnabled && (
+                    <TableCell onClick={(e) => e.stopPropagation()}>
+                      <Checkbox
+                        checked={isSelected}
+                        onCheckedChange={() => onToggleSelection(license.licenseNumber)}
+                      />
+                    </TableCell>
+                  )}
+                  <TableCell
+                    className="font-mono text-sm font-medium"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <EntityLink type="license" id={license.licenseNumber}>
+                      {license.licenseNumber}
+                    </EntityLink>
+                  </TableCell>
                 <TableCell className="font-mono text-sm">{license.registrationNumber}</TableCell>
                 <TableCell>{license.facilityType}</TableCell>
                 <TableCell>
@@ -71,7 +123,8 @@ export default function LicensesTable({ licenses, loading, onRowClick }: License
                   <StatusBadge status={license.status} />
                 </TableCell>
               </TableRow>
-            ))
+              )
+            })
           )}
         </TableBody>
       </Table>

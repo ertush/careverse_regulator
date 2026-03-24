@@ -17,11 +17,22 @@ import FindingCard from './FindingCard'
 import FindingsFilters from './FindingsFilters'
 import FindingsDrawer from './FindingsDrawer'
 import PaginationControls from './PaginationControls'
+import ExportButton from '@/components/shared/ExportButton'
+import SavedFiltersManager from '@/components/shared/SavedFiltersManager'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { FileText, ArrowLeft } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import dayjs from 'dayjs'
+// import type { Inspection, Finding } from '@/types/inspection'
+import type { ExportConfig } from '@/utils/exportUtils'
+
+interface InspectionFiltersState {
+  search?: string
+  status?: string[]
+  dateRange?: DateRange | null
+  sortOrder?: 'asc' | 'desc' | 'recent'
+}
 
 interface InspectionViewProps {
   company?: string | null
@@ -195,6 +206,20 @@ export default function InspectionView({ company }: InspectionViewProps) {
   // Use inspections directly from store (API-filtered)
   const filteredInspections = inspections
 
+  // Export configuration for inspections
+  const inspectionExportConfig: ExportConfig<Inspection> = {
+    filename: `inspections-${dayjs().format('YYYY-MM-DD')}`,
+    title: 'Scheduled Inspections Report',
+    columns: [
+      { key: 'inspectionId', label: 'Inspection ID' },
+      { key: 'facilityName', label: 'Facility Name' },
+      { key: 'inspector', label: 'Inspector' },
+      { key: 'date', label: 'Date' },
+      { key: 'status', label: 'Status' },
+      { key: 'findingCount', label: 'Findings Count' },
+    ],
+  }
+
   const handleScheduleInspection = async () => {
     setSubmitting(true)
     setModalError(null)
@@ -224,6 +249,20 @@ export default function InspectionView({ company }: InspectionViewProps) {
 
   // Use findings directly from store (API-filtered)
   const filteredFindings = findings
+
+  // Export configuration for findings
+  const findingsExportConfig: ExportConfig<Finding> = {
+    filename: `findings-${dayjs().format('YYYY-MM-DD')}`,
+    title: 'Inspection Findings Report',
+    columns: [
+      { key: 'findingId', label: 'Finding ID' },
+      { key: 'facilityName', label: 'Facility' },
+      { key: 'category', label: 'Category' },
+      { key: 'severity', label: 'Severity' },
+      { key: 'status', label: 'Status' },
+      { key: 'description', label: 'Description' },
+    ],
+  }
 
   const handleViewFinding = useCallback(async (finding: Finding) => {
     if (!finding.inspectionId || loadingInspectionDetails) return
@@ -273,6 +312,43 @@ export default function InspectionView({ company }: InspectionViewProps) {
       }),
     })
   }, [navigate])
+
+  // Saved Filters Integration
+  const currentInspectionFilters: InspectionFiltersState = {
+    search: searchText || undefined,
+    status: selectedStatuses.includes('all') ? undefined : selectedStatuses,
+    dateRange: dateRange || undefined,
+    sortOrder: sortOrder,
+  }
+
+  const handleApplySavedFilters = (filters: InspectionFiltersState) => {
+    setLocalSearchText(filters.search || '')
+    navigate({
+      search: {
+        activeTab,
+        search: filters.search,
+        status: filters.status,
+        startDate: filters.dateRange?.start,
+        endDate: filters.dateRange?.end,
+        sortOrder: filters.sortOrder,
+      },
+    })
+  }
+
+  const getInspectionFilterSummary = (filters: InspectionFiltersState): string => {
+    const parts: string[] = []
+    if (filters.search) parts.push(`Search: "${filters.search}"`)
+    if (filters.status && !filters.status.includes('all')) {
+      parts.push(`Status: ${filters.status.join(', ')}`)
+    }
+    if (filters.dateRange) {
+      parts.push(`Date: ${filters.dateRange.start} to ${filters.dateRange.end}`)
+    }
+    if (filters.sortOrder && filters.sortOrder !== 'recent') {
+      parts.push(`Sort: ${filters.sortOrder === 'asc' ? 'A-Z' : 'Z-A'}`)
+    }
+    return parts.join(' • ')
+  }
 
   return (
     <div className={cn('inspection-shell', isMobile ? 'p-4' : 'p-6')}>
@@ -373,7 +449,7 @@ export default function InspectionView({ company }: InspectionViewProps) {
             </Card>
           ) : (
             <>
-              <div className={cn('flex justify-end', isMobile ? 'mb-4' : 'mb-6')}>
+              <div className={cn('flex justify-between items-start gap-4', isMobile ? 'mb-4 flex-col' : 'mb-6 flex-row')}>
                 <InspectionFilters
                   searchText={localSearchText}
                   onSearchChange={setLocalSearchText}
@@ -385,6 +461,19 @@ export default function InspectionView({ company }: InspectionViewProps) {
                   onSortChange={handleSortChange}
                   activeFilterCount={activeInspectionFiltersCount}
                 />
+                <div className="flex gap-2">
+                  <SavedFiltersManager
+                    storageKey="inspection-saved-filters"
+                    currentFilters={currentInspectionFilters}
+                    onApplyFilters={handleApplySavedFilters}
+                    getFilterSummary={getInspectionFilterSummary}
+                  />
+                  <ExportButton
+                    data={filteredInspections}
+                    config={inspectionExportConfig}
+                    size="default"
+                  />
+                </div>
               </div>
 
               {isMobile || isTablet ? (
@@ -435,7 +524,7 @@ export default function InspectionView({ company }: InspectionViewProps) {
             </Card>
           ) : (
             <>
-              <div className={cn('flex justify-end', isMobile ? 'mb-4' : 'mb-6')}>
+              <div className={cn('flex justify-between items-start gap-4', isMobile ? 'mb-4 flex-col' : 'mb-6 flex-row')}>
                 <FindingsFilters
                   searchText={findingsSearchText}
                   onSearchChange={setFindingsSearchText}
@@ -448,6 +537,11 @@ export default function InspectionView({ company }: InspectionViewProps) {
                   sortOrder={findingsSortOrder}
                   onSortChange={setFindingsSortOrder}
                   activeFilterCount={activeFindingsFiltersCount}
+                />
+                <ExportButton
+                  data={filteredFindings}
+                  config={findingsExportConfig}
+                  size="default"
                 />
               </div>
 

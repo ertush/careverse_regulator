@@ -1,34 +1,23 @@
-import { useEffect, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
-import { CheckCheck, Trash2, Mail, MailOpen } from 'lucide-react'
-import { useNotificationStore, getFilteredNotifications, getUnreadCount } from '@/stores/notificationStore'
-import NotificationFilters from './NotificationFilters'
-import NotificationCard from './NotificationCard'
+import { CheckCheck, Trash2, Mail, Bell } from 'lucide-react'
+import { useNotificationStore } from '@/stores/notificationStore'
 
 export default function NotificationsView() {
   const navigate = useNavigate()
   const {
-    initialize,
-    filters,
-    selectedIds,
+    notifications,
+    unreadCount,
     markAsRead,
-    markAsUnread,
-    deleteNotifications,
     markAllAsRead,
-    updateFilters,
-    setSelectedIds,
-    clearFilters,
+    deleteNotification,
+    clearAll,
   } = useNotificationStore()
 
-  const notifications = useNotificationStore(getFilteredNotifications)
-  const unreadCount = useNotificationStore(getUnreadCount)
-
-  useEffect(() => {
-    initialize()
-  }, [initialize])
+  const [selectedIds, setSelectedIds] = useState<string[]>([])
 
   const allSelected = notifications.length > 0 && selectedIds.length === notifications.length
   const someSelected = selectedIds.length > 0 && selectedIds.length < notifications.length
@@ -50,19 +39,18 @@ export default function NotificationsView() {
   }
 
   const handleMarkRead = (id: string) => {
-    markAsRead([id])
+    markAsRead(id)
+    setSelectedIds(selectedIds.filter(selectedId => selectedId !== id))
   }
 
   const handleBulkMarkRead = () => {
-    markAsRead(selectedIds)
-  }
-
-  const handleBulkMarkUnread = () => {
-    markAsUnread(selectedIds)
+    selectedIds.forEach(id => markAsRead(id))
+    setSelectedIds([])
   }
 
   const handleBulkDelete = () => {
-    deleteNotifications(selectedIds)
+    selectedIds.forEach(id => deleteNotification(id))
+    setSelectedIds([])
   }
 
   const handleAction = (url: string) => {
@@ -71,13 +59,14 @@ export default function NotificationsView() {
 
   return (
     <div className="space-y-6">
-      {/* Filters */}
-      <NotificationFilters
-        filters={filters}
-        onFilterChange={updateFilters}
-        onClearFilters={clearFilters}
-        unreadCount={unreadCount}
-      />
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h2 className="text-2xl font-bold">Notifications</h2>
+          <p className="text-muted-foreground mt-1">
+            {unreadCount > 0 ? `${unreadCount} unread notification${unreadCount !== 1 ? 's' : ''}` : 'All caught up!'}
+          </p>
+        </div>
+      </div>
 
       {/* Bulk Actions */}
       {notifications.length > 0 && (
@@ -110,17 +99,8 @@ export default function NotificationsView() {
                     onClick={handleBulkMarkRead}
                     className="h-8"
                   >
-                    <MailOpen className="w-4 h-4 mr-2" />
+                    <CheckCheck className="w-4 h-4 mr-2" />
                     Mark Read
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleBulkMarkUnread}
-                    className="h-8"
-                  >
-                    <Mail className="w-4 h-4 mr-2" />
-                    Mark Unread
                   </Button>
                   <Button
                     variant="ghost"
@@ -159,35 +139,65 @@ export default function NotificationsView() {
           <CardContent className="p-12 text-center">
             <div className="flex flex-col items-center gap-3">
               <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
-                <Mail className="w-8 h-8 text-muted-foreground" />
+                <Bell className="w-8 h-8 text-muted-foreground" />
               </div>
               <div>
                 <h3 className="text-lg font-semibold mb-1">No notifications</h3>
                 <p className="text-sm text-muted-foreground">
-                  {filters.search || filters.type !== 'all' || filters.status !== 'all'
-                    ? "No notifications match your filters. Try adjusting your search criteria."
-                    : "You're all caught up! No new notifications at this time."}
+                  You're all caught up! No new notifications at this time.
                 </p>
               </div>
-              {(filters.search || filters.type !== 'all' || filters.status !== 'all') && (
-                <Button variant="outline" onClick={clearFilters} className="mt-2">
-                  Clear Filters
-                </Button>
-              )}
             </div>
           </CardContent>
         </Card>
       ) : (
-        <div>
+        <div className="space-y-2">
           {notifications.map((notification) => (
-            <NotificationCard
+            <Card
               key={notification.id}
-              notification={notification}
-              isSelected={selectedIds.includes(notification.id)}
-              onToggleSelect={handleToggleSelect}
-              onMarkRead={handleMarkRead}
-              onAction={handleAction}
-            />
+              className={`cursor-pointer transition-colors hover:bg-muted/50 ${
+                !notification.read ? 'bg-blue-50/50 dark:bg-blue-950/20' : ''
+              }`}
+              onClick={() => {
+                if (!notification.read) {
+                  handleMarkRead(notification.id)
+                }
+                if (notification.actionUrl) {
+                  handleAction(notification.actionUrl)
+                }
+              }}
+            >
+              <CardContent className="p-4">
+                <div className="flex gap-3">
+                  <Checkbox
+                    checked={selectedIds.includes(notification.id)}
+                    onCheckedChange={() => handleToggleSelect(notification.id)}
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2 mb-1">
+                      <p className="font-medium text-sm">{notification.title}</p>
+                      {!notification.read && (
+                        <div className="h-2 w-2 bg-blue-500 rounded-full flex-shrink-0 mt-1" />
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      {notification.message}
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-muted-foreground">
+                        {new Date(notification.timestamp).toLocaleString()}
+                      </span>
+                      {notification.actionUrl && (
+                        <span className="text-xs text-primary">
+                          {notification.actionLabel || 'View'}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
       )}

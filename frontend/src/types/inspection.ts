@@ -99,7 +99,9 @@ export interface Finding {
   resolvedDate?: string
   attachments?: Attachment[]
   // Context fields (populated from parent inspection)
+  facilityId?: string
   facilityName?: string
+  professionalId?: string
   inspectorName?: string
   inspectionId?: string
   inspectionDate?: string

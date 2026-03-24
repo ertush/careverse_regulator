@@ -32,7 +32,9 @@ export function transformFinding(backendFinding: BackendFinding, parentInspectio
     resolvedDate: backendFinding.resolved_date ? formatDateForFrontend(backendFinding.resolved_date) : undefined,
     attachments: backendFinding.attachments || [],
     // Add context from parent inspection if provided
+    facilityId: parentInspection?.facilityId,
     facilityName: parentInspection?.facilityName,
+    professionalId: parentInspection?.professionalId,
     inspectorName: parentInspection?.inspector,
     inspectionId: parentInspection?.inspectionId,
     inspectionDate: parentInspection?.date,

@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import type { Finding } from '@/types/inspection'
 import FindingsBadge from './FindingsBadge'
+import { EntityLink } from '@/components/entities/EntityLink'
 
 interface FindingCardProps {
   finding: Finding
@@ -21,7 +22,17 @@ export default function FindingCard({ finding, onView }: FindingCardProps) {
                 {finding.findingId}
               </div>
               <div className="text-base font-semibold mb-2 truncate">
-                {finding.facilityName}
+                {finding.facilityId ? (
+                  <EntityLink
+                    type="facility"
+                    id={finding.facilityId}
+                    className="underline hover:no-underline"
+                  >
+                    {finding.facilityName}
+                  </EntityLink>
+                ) : (
+                  finding.facilityName
+                )}
               </div>
               <div className="flex gap-2 flex-wrap mb-2">
                 <FindingsBadge severity={finding.severity} />

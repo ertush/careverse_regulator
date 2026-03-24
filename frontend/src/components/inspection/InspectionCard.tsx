@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import type { Inspection } from '@/types/inspection'
 import StatusBadge from './StatusBadge'
+import { EntityLink } from '@/components/entities/EntityLink'
 import dayjs from 'dayjs'
 
 interface InspectionCardProps {
@@ -36,7 +37,17 @@ export default function InspectionCard({ inspection, onView }: InspectionCardPro
                   {inspection.inspectionId}
                 </div>
                 <div className="text-base font-semibold truncate">
-                  {inspection.facilityName}
+                  {inspection.facilityId ? (
+                    <EntityLink
+                      type="facility"
+                      id={inspection.facilityId}
+                      className="underline hover:no-underline"
+                    >
+                      {inspection.facilityName}
+                    </EntityLink>
+                  ) : (
+                    inspection.facilityName
+                  )}
                 </div>
               </div>
               {isOverdue && (
@@ -54,7 +65,19 @@ export default function InspectionCard({ inspection, onView }: InspectionCardPro
           </div>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <User className="w-4 h-4 shrink-0" />
-            <span className="truncate">{inspection.inspector}</span>
+            <span className="truncate">
+              {inspection.professionalId ? (
+                <EntityLink
+                  type="professional"
+                  id={inspection.professionalId}
+                  className="underline hover:no-underline"
+                >
+                  {inspection.inspector}
+                </EntityLink>
+              ) : (
+                inspection.inspector
+              )}
+            </span>
           </div>
           <div className="flex items-start gap-2 text-sm text-muted-foreground">
             <FileText className="w-4 h-4 mt-0.5 shrink-0" />

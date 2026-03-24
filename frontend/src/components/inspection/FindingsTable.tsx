@@ -9,6 +9,7 @@ import {
 } from '@tanstack/react-table'
 import type { Finding } from '@/stores/findingsStore'
 import FindingsBadge from './FindingsBadge'
+import { EntityLink } from '@/components/entities/EntityLink'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -84,9 +85,20 @@ export default function FindingsTable({
       }),
       columnHelper.accessor('facilityName', {
         header: 'Facility Name',
-        cell: (info) => (
-          <span className="text-sm truncate block max-w-[180px]">{info.getValue()}</span>
-        ),
+        cell: (info) => {
+          const finding = info.row.original
+          return finding.facilityId ? (
+            <EntityLink
+              type="facility"
+              id={finding.facilityId}
+              className="text-sm truncate block max-w-[180px] underline hover:no-underline"
+            >
+              {info.getValue()}
+            </EntityLink>
+          ) : (
+            <span className="text-sm truncate block max-w-[180px]">{info.getValue()}</span>
+          )
+        },
         size: 200,
       }),
       columnHelper.accessor('category', {

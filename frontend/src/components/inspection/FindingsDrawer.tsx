@@ -3,6 +3,7 @@ import { Download, Calendar, AlertCircle, CheckCircle2, Clock, FileText } from '
 import { useResponsive } from '@/hooks/useResponsive'
 import type { Inspection, Finding, Attachment } from '@/types/inspection'
 import FindingsBadge from './FindingsBadge'
+import { EntityLink } from '@/components/entities/EntityLink'
 import {
   Sheet,
   SheetContent,
@@ -107,17 +108,46 @@ export default function FindingsDrawer({
         )}
       >
         {/* Fixed Header */}
-        <SheetHeader className={cn('shrink-0 border-b', isMobile ? 'px-4 pt-4 pb-3' : 'px-6 pt-6 pb-4')}>
+        <SheetHeader className={cn('shrink-0 border-b space-y-2', isMobile ? 'px-4 pt-4 pb-3' : 'px-6 pt-6 pb-4')}>
           <SheetTitle className={cn('break-words pr-10 text-start', isMobile ? 'text-base' : 'text-lg')}>
-            {inspection.facilityName}
+            {inspection.facilityId ? (
+              <EntityLink
+                type="facility"
+                id={inspection.facilityId}
+                className="underline hover:no-underline"
+              >
+                {inspection.facilityName}
+              </EntityLink>
+            ) : (
+              inspection.facilityName
+            )}
           </SheetTitle>
-          <SheetDescription className={cn('flex items-center gap-2 pr-10 text-start', isMobile ? 'text-xs' : 'text-sm')}>
-            <Calendar className={cn('shrink-0', isMobile ? 'w-3.5 h-3.5' : 'w-4 h-4')} />
-            <span className="break-words flex-1 min-w-0 text-start">
-              {inspection.inspectedDate
-                ? `Inspected: ${inspection.inspectedDate}`
-                : 'Not yet inspected'}
-            </span>
+          <SheetDescription className={cn('flex flex-col gap-1 pr-10', isMobile ? 'text-xs' : 'text-sm')}>
+            <div className="flex items-center gap-2 text-start">
+              <Calendar className={cn('shrink-0', isMobile ? 'w-3.5 h-3.5' : 'w-4 h-4')} />
+              <span className="break-words flex-1 min-w-0 text-start">
+                {inspection.inspectedDate
+                  ? `Inspected: ${inspection.inspectedDate}`
+                  : 'Not yet inspected'}
+              </span>
+            </div>
+            {inspection.inspector && (
+              <div className="flex items-center gap-2 text-start">
+                <span className="break-words flex-1 min-w-0 text-start">
+                  Inspector: {inspection.professionalId ? (
+                    <EntityLink
+                      type="professional"
+                      id={inspection.professionalId}
+                      className="underline hover:no-underline"
+                    >
+                      {inspection.inspector}
+                    </EntityLink>
+                  ) : (
+                    inspection.inspector
+                  )}
+                </span>
+              </div>
+            )}
           </SheetDescription>
         </SheetHeader>
 

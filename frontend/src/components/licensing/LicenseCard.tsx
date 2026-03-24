@@ -23,17 +23,17 @@ export default function LicenseCard({ license, onClick }: LicenseCardProps) {
 
         <div className="space-y-2.5 text-sm">
           <div className="flex items-center gap-2 text-muted-foreground">
-            <FileText className="w-4 h-4 flex-shrink-0" />
+            <FileText className="w-4 h-4 shrink-0" />
             <span className="font-mono">{license.registrationNumber}</span>
           </div>
 
           <div className="flex items-center gap-2 text-muted-foreground">
-            <User className="w-4 h-4 flex-shrink-0" />
+            <User className="w-4 h-4 shrink-0" />
             <span>{license.owner}</span>
           </div>
 
           <div className="flex items-center gap-2 text-muted-foreground">
-            <Calendar className="w-4 h-4 flex-shrink-0" />
+            <Calendar className="w-4 h-4 shrink-0" />
             <div className="flex-1">
               <div className="text-xs">Issued: {license.dateOfIssuance}</div>
               <div className="text-xs">Expires: {license.dateOfExpiry}</div>
@@ -41,7 +41,7 @@ export default function LicenseCard({ license, onClick }: LicenseCardProps) {
           </div>
 
           <div className="flex items-center gap-2">
-            <CreditCard className="w-4 h-4 flex-shrink-0 text-muted-foreground" />
+            <CreditCard className="w-4 h-4 shrink-0 text-muted-foreground" />
             <Badge
               variant={license.paymentStatus === 'Paid' ? 'default' : 'secondary'}
               className="capitalize text-xs"

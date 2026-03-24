@@ -6,12 +6,13 @@ import { useAuthStore } from '@/stores/authStore'
 // Search param schema for type-safe URL params
 const inspectionSearchSchema = z.object({
   search: z.string().optional(),
-  status: z.array(z.string()).optional(),
+  status: z.union([z.string(), z.array(z.string())]).optional(),
   startDate: z.string().optional(),
   endDate: z.string().optional(),
   sortBy: z.enum(['facility_name', 'modified']).optional(),
   sortOrder: z.enum(['asc', 'desc']).optional(),
-  activeTab: z.enum(['scheduled', 'findings']).default('scheduled'),
+  activeTab: z.enum(['scheduled', 'findings']).optional().default('scheduled'),
+  modal: z.enum(['schedule']).optional(),
 })
 
 export type InspectionSearch = z.infer<typeof inspectionSearchSchema>

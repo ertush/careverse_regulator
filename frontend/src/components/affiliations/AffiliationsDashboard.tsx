@@ -1,12 +1,12 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useAffiliationStore } from '@/stores/affiliationStore'
 import {
   MetricCard,
   StatusDistribution,
   PrioritySection,
-  RecentActivity,
   QuickActions,
+  TrendChart,
 } from '@/components/dashboard'
 import {
   CheckCircle,
@@ -17,121 +17,61 @@ import {
   FileText,
 } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
+import dayjs from 'dayjs'
 import { Button } from '@/components/ui/button'
-import type { Affiliation } from '@/types/affiliation'
+import { getAffiliationDashboardStats, type AffiliationDashboardStats } from '@/api/affiliationApi'
 
 export function AffiliationsDashboard() {
   const navigate = useNavigate()
-  const { affiliations, loading, fetchAffiliations, approveAffiliation, rejectAffiliation } =
-    useAffiliationStore()
+  const { approveAffiliation, rejectAffiliation } = useAffiliationStore()
+  const [dashboardData, setDashboardData] = useState<AffiliationDashboardStats | null>(null)
+  const [loading, setLoading] = useState(true)
 
-  // Load affiliations for dashboard (limited to first 100 for metrics)
+  // Load dashboard stats from backend
   useEffect(() => {
-    fetchAffiliations(1, {})
-  }, [fetchAffiliations])
-
-  // Compute metrics
-  const metrics = useMemo(() => {
-    const pending = affiliations.filter(
-      (a) => a.affiliationStatus === 'Pending'
-    ).length
-    const active = affiliations.filter(
-      (a) => a.affiliationStatus === 'Active'
-    ).length
-    const rejected = affiliations.filter(
-      (a) => a.affiliationStatus === 'Rejected'
-    ).length
-    const total = affiliations.length
-
-    return { pending, active, rejected, total }
-  }, [affiliations])
-
-  // Status distribution data
-  const statusDistribution = useMemo(() => {
-    const statusCounts = affiliations.reduce(
-      (acc, affiliation) => {
-        const status = affiliation.affiliationStatus
-        acc[status] = (acc[status] || 0) + 1
-        return acc
-      },
-      {} as Record<string, number>
-    )
-
-    const statusColors: Record<string, string> = {
-      Pending: '#f59e0b',
-      Active: '#10b981',
-      Rejected: '#ef4444',
-      Inactive: '#6b7280',
+    async function loadStats() {
+      setLoading(true)
+      try {
+        const stats = await getAffiliationDashboardStats()
+        setDashboardData(stats)
+      } catch (error) {
+        console.error('Failed to load affiliation dashboard stats:', error)
+      } finally {
+        setLoading(false)
+      }
     }
-
-    return Object.entries(statusCounts).map(([status, count]) => ({
-      status,
-      count,
-      color: statusColors[status] || '#6b7280',
-    }))
-  }, [affiliations])
-
-  // Pending affiliations for priority section
-  const pendingAffiliations = useMemo(
-    () => affiliations.filter((a) => a.affiliationStatus === 'Pending').slice(0, 5),
-    [affiliations]
-  )
-
-  // Recent activity (most recent first)
-  const recentActivity = useMemo(() => {
-    return affiliations
-      .filter((a) => a.affiliationStatus !== 'Pending')
-      .slice(0, 5)
-      .map((affiliation) => ({
-        id: affiliation.id,
-        type: affiliation.affiliationStatus.toLowerCase(),
-        description: `${affiliation.healthProfessional.fullName} affiliation with ${affiliation.healthFacility.facilityName} ${affiliation.affiliationStatus.toLowerCase()}`,
-        timestamp: affiliation.startDate,
-        status: affiliation.affiliationStatus,
-      }))
-  }, [affiliations])
+    loadStats()
+  }, [])
 
   // Quick actions
-  const quickActions = useMemo(
-    () => [
-      {
-        label: 'View All Affiliations',
-        onClick: () => navigate({ to: '/affiliations/list' }),
-        variant: 'default' as const,
-        icon: Users,
-      },
-      {
-        label: 'Review Pending',
-        onClick: () =>
-          navigate({ to: '/affiliations/list', search: { status: 'Pending' } }),
-        variant: 'secondary' as const,
-        icon: Clock,
-      },
-      {
-        label: 'Generate Report',
-        onClick: () => {
-          // TODO: Implement report generation
-          console.log('Generate report')
-        },
-        variant: 'outline' as const,
-        icon: FileText,
-      },
-    ],
-    [navigate]
-  )
+  const quickActions = [
+    {
+      label: 'View All Affiliations',
+      onClick: () => navigate({ to: '/affiliations/list' }),
+      variant: 'default' as const,
+      icon: Users,
+    },
+    {
+      label: 'Review Pending',
+      onClick: () =>
+        navigate({ to: '/affiliations/list', search: { status: 'Pending' } }),
+      variant: 'secondary' as const,
+      icon: Clock,
+    },
+  ]
 
-  const renderPendingItem = (affiliation: Affiliation) => {
+  const renderPendingItem = (item: AffiliationDashboardStats['pending_affiliations'][0]) => {
     return (
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
           <p className="font-medium text-gray-900 truncate">
-            {affiliation.healthProfessional.fullName}
+            {item.professional_full_name}
           </p>
           <p className="text-sm text-gray-600 truncate">
-            {affiliation.healthFacility.facilityName}
+            {item.facility_name}
           </p>
           <p className="text-xs text-muted-foreground mt-1">
-            Submitted {formatDistanceToNow(new Date(affiliation.startDate), { addSuffix: true })}
+            Submitted {formatDistanceToNow(dayjs(item.start_date, 'YYYY-MM-DD').toDate(), { addSuffix: true })}
           </p>
         </div>
         <div className="flex gap-2">
@@ -140,7 +80,7 @@ export function AffiliationsDashboard() {
             variant="default"
             onClick={(e) => {
               e.stopPropagation()
-              approveAffiliation(affiliation.id)
+              approveAffiliation(item.id)
             }}
           >
             <CheckCircle className="h-4 w-4 mr-1" />
@@ -151,7 +91,7 @@ export function AffiliationsDashboard() {
             variant="destructive"
             onClick={(e) => {
               e.stopPropagation()
-              rejectAffiliation(affiliation.id)
+              rejectAffiliation(item.id)
             }}
           >
             <XCircle className="h-4 w-4 mr-1" />
@@ -160,7 +100,7 @@ export function AffiliationsDashboard() {
           <Button
             size="sm"
             variant="ghost"
-            onClick={() => navigate({ to: `/affiliations/${affiliation.id}` })}
+            onClick={() => navigate({ to: `/affiliations/${item.id}` })}
           >
             Details
           </Button>
@@ -169,7 +109,7 @@ export function AffiliationsDashboard() {
     )
   }
 
-  if (loading && affiliations.length === 0) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
         <div className="text-center">
@@ -194,7 +134,7 @@ export function AffiliationsDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <MetricCard
           title="Pending Review"
-          value={metrics.pending}
+          value={dashboardData?.metrics.pending || 0}
           variant="warning"
           icon={Clock}
           onClick={() =>
@@ -203,7 +143,7 @@ export function AffiliationsDashboard() {
         />
         <MetricCard
           title="Active Affiliations"
-          value={metrics.active}
+          value={dashboardData?.metrics.active || 0}
           variant="success"
           icon={CheckCircle}
           onClick={() =>
@@ -212,22 +152,30 @@ export function AffiliationsDashboard() {
         />
         <MetricCard
           title="Rejected This Month"
-          value={metrics.rejected}
+          value={dashboardData?.metrics.rejected || 0}
           variant="danger"
           icon={XCircle}
         />
         <MetricCard
           title="Total Affiliations"
-          value={metrics.total}
+          value={dashboardData?.metrics.total || 0}
           variant="neutral"
           icon={Users}
         />
       </div>
 
+      {/* Trend Chart */}
+      <TrendChart
+        data={dashboardData?.trend_data || []}
+        title="Affiliation Activity Trend"
+        subtitle="New affiliations over last 6 months"
+        height={240}
+      />
+
       {/* Status Distribution and Priority Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <StatusDistribution
-          data={statusDistribution}
+          data={dashboardData?.status_distribution || []}
           title="Status Distribution"
           onSegmentClick={(status) =>
             navigate({ to: '/affiliations/list', search: { status } })
@@ -235,7 +183,7 @@ export function AffiliationsDashboard() {
         />
         <PrioritySection
           title="Pending Affiliations Requiring Review"
-          items={pendingAffiliations}
+          items={dashboardData?.pending_affiliations || []}
           renderItem={renderPendingItem}
           onViewAll={() =>
             navigate({ to: '/affiliations/list', search: { status: 'Pending' } })
@@ -243,9 +191,6 @@ export function AffiliationsDashboard() {
           emptyMessage="No pending affiliations to review"
         />
       </div>
-
-      {/* Recent Activity */}
-      <RecentActivity activities={recentActivity} title="Recent Affiliation Actions" />
 
       {/* Quick Actions */}
       <QuickActions actions={quickActions} title="Quick Actions" />

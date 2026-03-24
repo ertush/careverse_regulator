@@ -8,7 +8,7 @@ import AffiliationsFilters from './AffiliationsFilters'
 import PaginationControls from './PaginationControls'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Users } from 'lucide-react'
+import { Users, ArrowLeft } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface AffiliationsViewProps {
@@ -100,6 +100,17 @@ export default function AffiliationsView({ company }: AffiliationsViewProps) {
 
   return (
     <div className="space-y-6">
+      {/* Back to Dashboard */}
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => navigate({ to: '/affiliations' })}
+        className="-ml-2"
+      >
+        <ArrowLeft className="h-4 w-4 mr-1" />
+        Back to Dashboard
+      </Button>
+
       {/* Filters */}
       <AffiliationsFilters
         searchText={searchText}

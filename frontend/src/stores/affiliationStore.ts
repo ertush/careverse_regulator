@@ -55,8 +55,8 @@ export const useAffiliationStore = create<AffiliationState>((set, get) => ({
 
   fetchAffiliations: async (page, filters) => {
     const currentPage = page || get().currentPage
-    const pageSize = get().pageSize
     const currentFilters = filters || get().filters
+    const pageSize = currentFilters.page_size || get().pageSize
 
     set({ loading: true, error: null })
     try {

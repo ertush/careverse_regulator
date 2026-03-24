@@ -29,17 +29,17 @@ export default function ApplicationCard({ application, onClick }: ApplicationCar
           </div>
 
           <div className="flex items-center gap-2 text-muted-foreground">
-            <FileText className="w-4 h-4 flex-shrink-0" />
+            <FileText className="w-4 h-4 shrink-0" />
             <span>{application.licenseTypeName}</span>
           </div>
 
           <div className="flex items-center gap-2 text-muted-foreground">
-            <Calendar className="w-4 h-4 flex-shrink-0" />
+            <Calendar className="w-4 h-4 shrink-0" />
             <span>Applied: {application.applicationDate}</span>
           </div>
 
           <div className="flex items-center gap-2 text-muted-foreground">
-            <DollarSign className="w-4 h-4 flex-shrink-0" />
+            <DollarSign className="w-4 h-4 shrink-0" />
             <span>KES {application.licenseFee.toLocaleString()}</span>
           </div>
 

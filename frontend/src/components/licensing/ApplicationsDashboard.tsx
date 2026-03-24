@@ -5,8 +5,8 @@ import {
   MetricCard,
   StatusDistribution,
   PrioritySection,
-  RecentActivity,
   QuickActions,
+  TrendChart,
 } from '@/components/dashboard'
 import {
   CheckCircle,
@@ -24,9 +24,9 @@ export function ApplicationsDashboard() {
   const navigate = useNavigate()
   const { applications, applicationsLoading, fetchApplications } = useLicensingStore()
 
-  // Load applications for dashboard
+  // Load applications for dashboard (fetch more data for accurate metrics)
   useEffect(() => {
-    fetchApplications(1, {})
+    fetchApplications(1, { page_size: 100 })
   }, [fetchApplications])
 
   // Compute metrics
@@ -85,20 +85,6 @@ export function ApplicationsDashboard() {
         .slice(0, 5),
     [applications]
   )
-
-  // Recent activity
-  const recentActivity = useMemo(() => {
-    return applications
-      .filter((a) => a.applicationStatus !== 'Pending')
-      .slice(0, 5)
-      .map((app) => ({
-        id: app.id,
-        type: app.applicationStatus.toLowerCase().replace(' ', '_'),
-        description: `${app.applicationType} application for ${app.facilityName} - ${app.applicationStatus}`,
-        timestamp: app.applicationDate,
-        status: app.applicationStatus,
-      }))
-  }, [applications])
 
   // Quick actions
   const quickActions = useMemo(
@@ -236,9 +222,6 @@ export function ApplicationsDashboard() {
           emptyMessage="No pending applications to review"
         />
       </div>
-
-      {/* Recent Activity */}
-      <RecentActivity activities={recentActivity} title="Recent Application Actions" />
 
       {/* Quick Actions */}
       <QuickActions actions={quickActions} title="Quick Actions" />

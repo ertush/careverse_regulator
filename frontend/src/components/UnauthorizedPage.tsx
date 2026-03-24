@@ -91,7 +91,7 @@ export default function UnauthorizedPage({
         : 'Sign In to Dashboard'
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20 relative overflow-hidden">
+    <div className="min-h-screen bg-linear-to-br from-background via-background to-secondary/20 relative overflow-hidden">
       {/* Glassmorphic decorative shapes */}
       <div className="absolute w-[500px] h-[500px] rounded-full bg-primary/10 dark:bg-primary/20 blur-[80px] -top-24 -left-24 pointer-events-none" />
       <div className="absolute w-[400px] h-[400px] rounded-full bg-green-500/10 dark:bg-green-500/20 blur-[80px] -bottom-12 -right-12 pointer-events-none" />
@@ -212,7 +212,7 @@ export default function UnauthorizedPage({
                     <Card key={index} className="bg-card/90 dark:bg-slate-900/90 backdrop-blur-sm shadow-md transition-all hover:shadow-lg">
                       <CardContent className="p-4.5">
                         <div className="flex gap-4 items-start">
-                          <div className="w-10 h-10 rounded-lg bg-primary/10 dark:bg-primary/20 flex items-center justify-center flex-shrink-0 text-primary">
+                          <div className="w-10 h-10 rounded-lg bg-primary/10 dark:bg-primary/20 flex items-center justify-center shrink-0 text-primary">
                             <Icon className="w-5 h-5" />
                           </div>
                           <div className="flex-1">
@@ -223,7 +223,7 @@ export default function UnauthorizedPage({
                               {feature.description}
                             </p>
                           </div>
-                          <CheckCircle className="w-5 h-5 text-green-500 ml-auto self-center flex-shrink-0" />
+                          <CheckCircle className="w-5 h-5 text-green-500 ml-auto self-center shrink-0" />
                         </div>
                       </CardContent>
                     </Card>

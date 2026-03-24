@@ -19,7 +19,7 @@ import FindingsDrawer from './FindingsDrawer'
 import PaginationControls from './PaginationControls'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { FileText } from 'lucide-react'
+import { FileText, ArrowLeft } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import dayjs from 'dayjs'
 
@@ -28,8 +28,8 @@ interface InspectionViewProps {
 }
 
 export default function InspectionView({ company }: InspectionViewProps) {
-  const navigate = useNavigate({ from: '/inspection' })
-  const searchParams = useSearch({ from: '/inspection' })
+  const navigate = useNavigate({ from: '/inspections/list' })
+  const searchParams = useSearch({ from: '/inspections/list' })
 
   const { inspections, facilities, professionals, loading, error, pagination, setPage, fetchInspections, fetchFacilities, fetchProfessionals, createInspection } = useInspectionStore()
   const { findings, fetchFindings } = useFindingsStore()
@@ -38,10 +38,11 @@ export default function InspectionView({ company }: InspectionViewProps) {
   // Get filter values from URL params - memoize to prevent infinite loops
   const activeTab = searchParams.activeTab || 'scheduled'
   const searchText = searchParams.search || ''
-  const selectedStatuses = useMemo(() =>
-    searchParams.status && searchParams.status.length > 0 ? searchParams.status : ['all'],
-    [searchParams.status]
-  )
+  const modalParam = searchParams.modal
+  const selectedStatuses = useMemo(() => {
+    if (!searchParams.status) return ['all']
+    return Array.isArray(searchParams.status) ? searchParams.status : [searchParams.status]
+  }, [searchParams.status])
   const dateRange: DateRange | null = useMemo(() =>
     searchParams.startDate && searchParams.endDate
       ? { start: searchParams.startDate, end: searchParams.endDate }
@@ -95,6 +96,13 @@ export default function InspectionView({ company }: InspectionViewProps) {
   useEffect(() => {
     setLocalSearchText(searchText)
   }, [searchText])
+
+  // Handle modal URL param
+  useEffect(() => {
+    if (modalParam === 'schedule') {
+      setIsModalVisible(true)
+    }
+  }, [modalParam])
 
   // Calculate active findings filter count
   const activeFindingsFiltersCount =
@@ -276,6 +284,15 @@ export default function InspectionView({ company }: InspectionViewProps) {
           isMobile ? 'flex-col gap-4' : 'flex-row gap-0'
         )}>
           <div className="flex-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate({ to: '/inspections' })}
+              className={cn('mb-2 -ml-2', isMobile ? 'text-xs' : 'text-sm')}
+            >
+              <ArrowLeft className="h-4 w-4 mr-1" />
+              Back to Dashboard
+            </Button>
             <h2 className={cn(
               'font-bold text-foreground m-0',
               isMobile ? 'text-xl' : 'text-2xl'
@@ -329,7 +346,7 @@ export default function InspectionView({ company }: InspectionViewProps) {
           <Button
             size={isMobile ? 'default' : 'lg'}
             onClick={() => {
-              setIsModalVisible(true)
+              navigate({ search: (prev) => ({ ...prev, modal: 'schedule' }) })
               setModalError(null)
             }}
             className={cn(
@@ -464,6 +481,8 @@ export default function InspectionView({ company }: InspectionViewProps) {
         onClose={() => {
           setIsModalVisible(false)
           setModalError(null)
+          // Clear modal param from URL
+          navigate({ search: (prev) => ({ ...prev, modal: undefined }) })
         }}
         onSubmit={handleScheduleInspection}
         formData={formData}

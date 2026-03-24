@@ -97,8 +97,8 @@ export const useLicensingStore = create<LicensingState>((set, get) => ({
 
   fetchLicenses: async (page, filters) => {
     const currentPage = page || get().licensesCurrentPage
-    const pageSize = get().licensesPageSize
     const currentFilters = filters || get().licensesFilters
+    const pageSize = currentFilters.page_size || get().licensesPageSize
 
     set({ licensesLoading: true, licensesError: null })
     try {
@@ -171,8 +171,8 @@ export const useLicensingStore = create<LicensingState>((set, get) => ({
 
   fetchApplications: async (page, filters) => {
     const currentPage = page || get().applicationsCurrentPage
-    const pageSize = get().applicationsPageSize
     const currentFilters = filters || get().applicationsFilters
+    const pageSize = currentFilters.page_size || get().applicationsPageSize
 
     set({ applicationsLoading: true, applicationsError: null })
     try {

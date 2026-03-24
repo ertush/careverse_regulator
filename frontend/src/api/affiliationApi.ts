@@ -60,6 +60,7 @@ export interface AffiliationFilters {
   status?: string // comma-separated list
   sortBy?: string
   sortOrder?: 'asc' | 'desc'
+  page_size?: number // Number of items per page
 }
 
 export async function listAffiliations(
@@ -213,4 +214,39 @@ export async function updateAffiliation(id: string, payload: UpdateAffiliationPa
   // The API uses the same save_affiliations endpoint for updates
   // We need to fetch the existing affiliation first, then update it
   throw new Error('Update affiliation endpoint not yet fully implemented')
+}
+
+export interface AffiliationDashboardStats {
+  metrics: {
+    pending: number
+    active: number
+    rejected: number
+    total: number
+  }
+  pending_affiliations: Array<{
+    id: string
+    start_date: string
+    affiliation_status: string
+    professional_registration_number: string
+    professional_full_name: string
+    facility_name: string
+    facility_registration_number: string
+  }>
+  status_distribution: Array<{
+    status: string
+    count: number
+    color: string
+  }>
+  trend_data: Array<{
+    label: string
+    value: number
+    color: string
+  }>
+}
+
+export async function getAffiliationDashboardStats(): Promise<AffiliationDashboardStats> {
+  const response = await apiRequest<{ message: AffiliationDashboardStats }>(
+    `/api/method/compliance_360.api.license_management.fetch_hw_affiliations.get_affiliation_dashboard_stats`
+  )
+  return response.message
 }

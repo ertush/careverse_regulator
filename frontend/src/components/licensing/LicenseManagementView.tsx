@@ -5,7 +5,7 @@ import { useResponsive } from '@/hooks/useResponsive'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { FileText, Plus } from 'lucide-react'
+import { FileText, Plus, ArrowLeft } from 'lucide-react'
 import LicensesTable from './LicensesTable'
 import LicenseCard from './LicenseCard'
 import LicensesFilters from './LicensesFilters'
@@ -137,6 +137,17 @@ export default function LicenseManagementView({ company }: LicenseManagementView
 
   return (
     <div className="space-y-6">
+      {/* Back to Dashboard */}
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => navigate({ to: '/license-management' })}
+        className="-ml-2"
+      >
+        <ArrowLeft className="h-4 w-4 mr-1" />
+        Back to Dashboard
+      </Button>
+
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full">
         <div className="flex items-center justify-between mb-6">
           <TabsList>

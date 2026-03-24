@@ -69,6 +69,7 @@ export interface LicenseFilters {
   isArchived?: boolean
   sortBy?: string
   sortOrder?: 'asc' | 'desc'
+  page_size?: number // Number of items per page
 }
 
 export async function listLicenses(
@@ -270,4 +271,33 @@ export async function listFacilities(): Promise<FacilityOption[]> {
     `/api/resource/Facility Record?fields=["name","facility_name","registration_number","facility_code"]&limit_page_length=1000`
   )
   return response.data || []
+}
+
+export interface LicenseDashboardStats {
+  metrics: {
+    expiring_soon: number
+    active: number
+    suspended_denied: number
+    pending_renewals: number
+    total: number
+  }
+  expiring_licenses: Array<{
+    license_number: string
+    date_of_expiry: string
+    facility_type: string
+    owner: string
+    status: string
+  }>
+  status_distribution: Array<{
+    status: string
+    count: number
+    color: string
+  }>
+}
+
+export async function getLicenseDashboardStats(): Promise<LicenseDashboardStats> {
+  const response = await apiRequest<{ message: LicenseDashboardStats }>(
+    `/api/method/compliance_360.api.license_management.facility_license.get_license_dashboard_stats`
+  )
+  return response.message
 }

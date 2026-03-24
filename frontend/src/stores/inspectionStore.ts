@@ -57,7 +57,7 @@ export const useInspectionStore = create<InspectionState>((set, get) => ({
 
   fetchInspections: async (page, filters) => {
     const currentPage = page || get().currentPage
-    const pageSize = get().pageSize
+    const pageSize = filters?.page_size || get().pageSize
     set({ loading: true, error: null })
     try {
       const response = await inspectionApi.listInspections(currentPage, pageSize, filters)

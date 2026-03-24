@@ -1,12 +1,13 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
-import { useInspectionStore } from '@/stores/inspectionStore'
 import {
   MetricCard,
   StatusDistribution,
   PrioritySection,
   RecentActivity,
   QuickActions,
+  ComplianceRateGauge,
+  TrendChart,
 } from '@/components/dashboard'
 import {
   CheckCircle,
@@ -16,157 +17,109 @@ import {
   List,
   Calendar,
 } from 'lucide-react'
-import { differenceInDays, formatDistanceToNow, isAfter, isBefore } from 'date-fns'
+import { differenceInDays } from 'date-fns'
+import dayjs from 'dayjs'
+import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { Button } from '@/components/ui/button'
-import type { Inspection } from '@/types/inspection'
+import { getDashboardStats, type DashboardStats } from '@/api/inspectionApi'
+
+dayjs.extend(customParseFormat)
 
 export function InspectionsDashboard() {
   const navigate = useNavigate()
-  const { inspections, loading, fetchInspections } = useInspectionStore()
+  const [dashboardData, setDashboardData] = useState<DashboardStats | null>(null)
+  const [loading, setLoading] = useState(true)
 
-  // Load inspections for dashboard
+  // Load dashboard stats from backend
   useEffect(() => {
-    fetchInspections(1, {})
-  }, [fetchInspections])
-
-  // Compute metrics
-  const metrics = useMemo(() => {
-    const now = new Date()
-
-    // Inspections due within next 7 days
-    const dueSoon = inspections.filter((i) => {
-      const inspectionDate = new Date(i.date)
-      const daysUntilDue = differenceInDays(inspectionDate, now)
-      return i.status === 'Pending' && daysUntilDue >= 0 && daysUntilDue <= 7
-    }).length
-
-    // Completed inspections
-    const completed = inspections.filter((i) => i.status === 'Completed').length
-
-    // In progress (could be "Pending" as status)
-    const inProgress = inspections.filter((i) => i.status === 'Pending').length
-
-    // Overdue inspections (past scheduled date and still pending)
-    const overdue = inspections.filter((i) => {
-      const inspectionDate = new Date(i.date)
-      return i.status === 'Pending' && isBefore(inspectionDate, now)
-    }).length
-
-    const total = inspections.length
-
-    return { dueSoon, completed, inProgress, overdue, total }
-  }, [inspections])
-
-  // Status distribution data
-  const statusDistribution = useMemo(() => {
-    const statusCounts = inspections.reduce(
-      (acc, inspection) => {
-        const status = inspection.status
-        acc[status] = (acc[status] || 0) + 1
-        return acc
-      },
-      {} as Record<string, number>
-    )
-
-    const statusColors: Record<string, string> = {
-      Completed: '#10b981',
-      Pending: '#f59e0b',
-      'Non Compliant': '#ef4444',
+    async function loadStats() {
+      setLoading(true)
+      try {
+        const stats = await getDashboardStats()
+        setDashboardData(stats)
+      } catch (error) {
+        console.error('Failed to load dashboard stats:', error)
+      } finally {
+        setLoading(false)
+      }
     }
-
-    return Object.entries(statusCounts).map(([status, count]) => ({
-      status,
-      count,
-      color: statusColors[status] || '#6b7280',
-    }))
-  }, [inspections])
-
-  // Upcoming inspections for priority section
-  const upcomingInspections = useMemo(() => {
-    const now = new Date()
-    return inspections
-      .filter((i) => {
-        const inspectionDate = new Date(i.date)
-        return i.status === 'Pending' && !isBefore(inspectionDate, now)
-      })
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-      .slice(0, 5)
-  }, [inspections])
-
-  // Recent activity (completed inspections)
-  const recentActivity = useMemo(() => {
-    return inspections
-      .filter((i) => i.status === 'Completed')
-      .slice(0, 5)
-      .map((inspection) => ({
-        id: inspection.id,
-        type: 'completed',
-        description: `Inspection at ${inspection.facilityName} completed${inspection.findingCount ? ` with ${inspection.findingCount} finding(s)` : ''}`,
-        timestamp: inspection.inspectedDate || inspection.date,
-        status: inspection.status,
-      }))
-  }, [inspections])
+    loadStats()
+  }, [])
 
   // Quick actions
-  const quickActions = useMemo(
-    () => [
-      {
-        label: 'View All Inspections',
-        onClick: () => navigate({ to: '/inspections/list' }),
-        variant: 'default' as const,
-        icon: List,
-      },
-      {
-        label: 'Review Overdue',
-        onClick: () =>
-          navigate({ to: '/inspections/list', search: { status: 'Overdue' } }),
-        variant: 'secondary' as const,
-        icon: AlertTriangle,
-      },
-      {
-        label: 'Schedule Inspection',
-        onClick: () => navigate({ to: '/inspections/list' }),
-        variant: 'outline' as const,
-        icon: Calendar,
-      },
-    ],
-    [navigate]
-  )
+  const quickActions = [
+    {
+      label: 'View All Inspections',
+      onClick: () => navigate({ to: '/inspections/list' }),
+      variant: 'default' as const,
+      icon: List,
+    },
+    {
+      label: 'Review Overdue',
+      onClick: () =>
+        navigate({ to: '/inspections/list', search: { status: 'Pending' } }),
+      variant: 'secondary' as const,
+      icon: AlertTriangle,
+    },
+    {
+      label: 'Schedule Inspection',
+      onClick: () => navigate({ to: '/inspections/list', search: { modal: 'schedule' } }),
+      variant: 'outline' as const,
+      icon: Calendar,
+    },
+  ]
 
-  const renderUpcomingItem = (inspection: Inspection) => {
-    const daysUntilDue = differenceInDays(new Date(inspection.date), new Date())
+  const renderUpcomingItem = (item: DashboardStats['upcoming_inspections'][0]) => {
+    const scheduledDate = dayjs(item.scheduled_date, 'YYYY-MM-DD').toDate()
+    const daysUntilDue = differenceInDays(scheduledDate, new Date())
+    const isValidDate = !isNaN(daysUntilDue)
 
     return (
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex items-center justify-between gap-4 py-2">
         <div className="flex-1 min-w-0">
-          <p className="font-medium text-gray-900 truncate">
-            {inspection.facilityName}
-          </p>
-          <p className="text-sm text-gray-600 truncate">
-            Inspector: {inspection.inspector}
-          </p>
-          <p className="text-xs text-muted-foreground mt-1">
-            {daysUntilDue === 0
-              ? 'Due today'
-              : daysUntilDue === 1
-                ? 'Due tomorrow'
-                : `Due in ${daysUntilDue} days`}
-          </p>
+          <div className="flex items-center gap-2">
+            <p className="font-medium text-gray-900 truncate">
+              {item.facility_name}
+            </p>
+            {isValidDate && (
+              <span className={`text-xs px-2 py-1 rounded-full whitespace-nowrap ${
+                daysUntilDue === 0
+                  ? 'bg-red-100 text-red-700'
+                  : daysUntilDue <= 3
+                    ? 'bg-orange-100 text-orange-700'
+                    : 'bg-blue-100 text-blue-700'
+              }`}>
+                {daysUntilDue === 0
+                  ? 'Today'
+                  : daysUntilDue === 1
+                    ? 'Tomorrow'
+                    : `${daysUntilDue}d`}
+              </span>
+            )}
+          </div>
         </div>
-        <div className="flex gap-2">
-          <Button
-            size="sm"
-            variant="default"
-            onClick={() => navigate({ to: '/inspections/list' })}
-          >
-            View Details
-          </Button>
-        </div>
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={() => navigate({ to: '/inspections/list' })}
+          className="shrink-0"
+        >
+          View
+        </Button>
       </div>
     )
   }
 
-  if (loading && inspections.length === 0) {
+  // Recent activity mapping
+  const recentActivityItems = dashboardData?.recent_activity.map((item) => ({
+    id: item.name,
+    type: 'completed' as const,
+    description: `Inspection at ${item.facility_name} completed${item.finding_count > 0 ? ` with ${item.finding_count} finding(s)` : ''}`,
+    timestamp: item.inspected_date || item.scheduled_date, // ISO format works with new Date()
+    status: item.status,
+  })) || []
+
+  if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
         <div className="text-center">
@@ -191,16 +144,16 @@ export function InspectionsDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <MetricCard
           title="Due This Week"
-          value={metrics.dueSoon}
+          value={dashboardData?.metrics.due_soon || 0}
           variant="warning"
           icon={Clock}
           onClick={() =>
-            navigate({ to: '/inspections/list', search: { status: 'Due Soon' } })
+            navigate({ to: '/inspections/list', search: { status: 'Pending' } })
           }
         />
         <MetricCard
-          title="Completed This Month"
-          value={metrics.completed}
+          title="Completed"
+          value={dashboardData?.metrics.completed || 0}
           variant="success"
           icon={CheckCircle}
           onClick={() =>
@@ -208,47 +161,61 @@ export function InspectionsDashboard() {
           }
         />
         <MetricCard
-          title="In Progress"
-          value={metrics.inProgress}
-          variant="info"
-          icon={FileText}
+          title="Non-Compliant"
+          value={dashboardData?.metrics.non_compliant || 0}
+          variant="danger"
+          icon={AlertTriangle}
           onClick={() =>
-            navigate({ to: '/inspections/list', search: { status: 'Pending' } })
+            navigate({ to: '/inspections/list', search: { status: 'Non Compliant' } })
           }
         />
         <MetricCard
           title="Overdue"
-          value={metrics.overdue}
+          value={dashboardData?.metrics.overdue || 0}
           variant="danger"
-          icon={AlertTriangle}
+          icon={Clock}
           onClick={() =>
-            navigate({ to: '/inspections/list', search: { status: 'Overdue' } })
-          }
-        />
-      </div>
-
-      {/* Status Distribution and Priority Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <StatusDistribution
-          data={statusDistribution}
-          title="Inspection Status Distribution"
-          onSegmentClick={(status) =>
-            navigate({ to: '/inspections/list', search: { status } })
-          }
-        />
-        <PrioritySection
-          title="Upcoming Inspections"
-          items={upcomingInspections}
-          renderItem={renderUpcomingItem}
-          onViewAll={() =>
             navigate({ to: '/inspections/list', search: { status: 'Pending' } })
           }
-          emptyMessage="No upcoming inspections scheduled"
         />
       </div>
 
+      {/* Charts Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <ComplianceRateGauge
+          compliantCount={dashboardData?.compliance_rate.compliant || 0}
+          totalCount={dashboardData?.compliance_rate.total || 0}
+          title="Overall Compliance Rate"
+          subtitle="Completed inspections without violations"
+        />
+        <div className="lg:col-span-2">
+          <TrendChart
+            data={dashboardData?.trend_data || []}
+            title="Inspection Activity Trend"
+            subtitle="Last 6 months"
+            height={240}
+          />
+        </div>
+      </div>
+
+      {/* Upcoming Inspections */}
+      <PrioritySection
+        title="Next Upcoming Inspections"
+        items={dashboardData?.upcoming_inspections || []}
+        renderItem={renderUpcomingItem}
+        onViewAll={() =>
+          navigate({ to: '/inspections/list', search: { status: 'Pending' } })
+        }
+        emptyMessage="No upcoming inspections scheduled"
+      />
+
       {/* Recent Activity */}
-      <RecentActivity activities={recentActivity} title="Recent Inspection Completions" />
+      {recentActivityItems.length > 0 && (
+        <RecentActivity
+          activities={recentActivityItems}
+          title="Recent Activity"
+        />
+      )}
 
       {/* Quick Actions */}
       <QuickActions actions={quickActions} title="Quick Actions" />

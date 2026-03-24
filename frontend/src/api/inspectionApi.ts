@@ -77,6 +77,7 @@ export interface InspectionFilters {
   sortOrder?: 'asc' | 'desc'
   severity?: string // For findings: comma-separated list
   status?: string // For inspections/findings: comma-separated list
+  page_size?: number // Number of items per page
 }
 
 export async function listInspections(
@@ -211,4 +212,44 @@ export async function listFindings(filters?: InspectionFilters): Promise<Finding
   return fullInspections
     .filter(i => i.findings && i.findings.length > 0)
     .flatMap(i => i.findings!)
+}
+
+export interface DashboardStats {
+  metrics: {
+    due_soon: number
+    completed: number
+    non_compliant: number
+    overdue: number
+    total: number
+  }
+  upcoming_inspections: Array<{
+    name: string
+    facility_name: string
+    scheduled_date: string
+    status: string
+  }>
+  compliance_rate: {
+    compliant: number
+    total: number
+  }
+  trend_data: Array<{
+    label: string
+    value: number
+    color: string
+  }>
+  recent_activity: Array<{
+    name: string
+    facility_name: string
+    inspected_date: string | null
+    scheduled_date: string
+    status: string
+    finding_count: number
+  }>
+}
+
+export async function getDashboardStats(): Promise<DashboardStats> {
+  const response = await apiRequest<{ message: DashboardStats }>(
+    `/api/method/compliance_360.api.inspection.get_dashboard_stats`
+  )
+  return response.message
 }

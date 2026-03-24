@@ -3,7 +3,7 @@ import { lazy } from 'react'
 import AppLayout from '@/components/AppLayout'
 import { useAuthStore } from '@/stores/authStore'
 
-const DashboardView = lazy(() => import('@/components/DashboardView'))
+const MainDashboard = lazy(() => import('@/components/MainDashboard'))
 
 function DashboardComponent() {
   const navigate = Route.useNavigate()
@@ -32,9 +32,7 @@ function DashboardComponent() {
       onSwitchToDesk={handleSwitchToDesk}
       user={user}
     >
-      <div className="hq-page-wrap">
-        <DashboardView emptyState={false} onNavigate={handleNavigate} company={user?.company} />
-      </div>
+      <MainDashboard onNavigate={handleNavigate} company={user?.company} />
     </AppLayout>
   )
 }

@@ -1,12 +1,11 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
-import { useLicensingStore } from '@/stores/licensingStore'
 import {
   MetricCard,
   StatusDistribution,
   PrioritySection,
-  RecentActivity,
   QuickActions,
+  TrendChart,
 } from '@/components/dashboard'
 import {
   CheckCircle,
@@ -16,135 +15,60 @@ import {
   FileText,
   List,
 } from 'lucide-react'
-import { differenceInDays, formatDistanceToNow } from 'date-fns'
+import { differenceInDays } from 'date-fns'
+import dayjs from 'dayjs'
 import { Button } from '@/components/ui/button'
-import type { License } from '@/types/license'
+import { getLicenseDashboardStats, type LicenseDashboardStats } from '@/api/licensingApi'
 
 export function FacilityLicensesDashboard() {
   const navigate = useNavigate()
-  const { licenses, licensesLoading, fetchLicenses, updateLicense } = useLicensingStore()
+  const [dashboardData, setDashboardData] = useState<LicenseDashboardStats | null>(null)
+  const [loading, setLoading] = useState(true)
 
-  // Load licenses for dashboard
+  // Load dashboard stats from backend
   useEffect(() => {
-    fetchLicenses(1, {})
-  }, [fetchLicenses])
-
-  // Compute metrics
-  const metrics = useMemo(() => {
-    const now = new Date()
-
-    const expiringSoon = licenses.filter((l) => {
-      const daysUntilExpiry = differenceInDays(new Date(l.dateOfExpiry), now)
-      return daysUntilExpiry > 0 && daysUntilExpiry <= 30 && l.status === 'Active'
-    }).length
-
-    const active = licenses.filter((l) => l.status === 'Active').length
-    const suspended = licenses.filter(
-      (l) => l.status === 'Suspended' || l.status === 'Denied'
-    ).length
-    const pendingRenewals = licenses.filter(
-      (l) => l.status === 'In Review' || l.status === 'Renewal Reviewed'
-    ).length
-    const total = licenses.length
-
-    return { expiringSoon, active, suspended, pendingRenewals, total }
-  }, [licenses])
-
-  // Status distribution data
-  const statusDistribution = useMemo(() => {
-    const statusCounts = licenses.reduce(
-      (acc, license) => {
-        const status = license.status
-        acc[status] = (acc[status] || 0) + 1
-        return acc
-      },
-      {} as Record<string, number>
-    )
-
-    const statusColors: Record<string, string> = {
-      Active: '#10b981',
-      Expired: '#6b7280',
-      Suspended: '#f59e0b',
-      Denied: '#ef4444',
-      Pending: '#3b82f6',
-      'In Review': '#8b5cf6',
-      'Renewal Reviewed': '#06b6d4',
-      Approved: '#10b981',
-      'Info Requested': '#f59e0b',
+    async function loadStats() {
+      setLoading(true)
+      try {
+        const stats = await getLicenseDashboardStats()
+        setDashboardData(stats)
+      } catch (error) {
+        console.error('Failed to load license dashboard stats:', error)
+      } finally {
+        setLoading(false)
+      }
     }
-
-    return Object.entries(statusCounts).map(([status, count]) => ({
-      status,
-      count,
-      color: statusColors[status] || '#6b7280',
-    }))
-  }, [licenses])
-
-  // Expiring licenses for priority section
-  const expiringLicenses = useMemo(() => {
-    const now = new Date()
-    return licenses
-      .filter((l) => {
-        const daysUntilExpiry = differenceInDays(new Date(l.dateOfExpiry), now)
-        return daysUntilExpiry > 0 && daysUntilExpiry <= 30 && l.status === 'Active'
-      })
-      .sort((a, b) => new Date(a.dateOfExpiry).getTime() - new Date(b.dateOfExpiry).getTime())
-      .slice(0, 5)
-  }, [licenses])
-
-  // Recent activity
-  const recentActivity = useMemo(() => {
-    return licenses
-      .filter((l) => l.status !== 'Pending')
-      .slice(0, 5)
-      .map((license) => ({
-        id: license.licenseNumber,
-        type: license.status.toLowerCase().replace(' ', '_'),
-        description: `License ${license.licenseNumber} for ${license.owner} - ${license.status}`,
-        timestamp: license.dateOfIssuance,
-        status: license.status,
-      }))
-  }, [licenses])
+    loadStats()
+  }, [])
 
   // Quick actions
-  const quickActions = useMemo(
-    () => [
-      {
-        label: 'View All Licenses',
-        onClick: () => navigate({ to: '/license-management/licenses' }),
-        variant: 'default' as const,
-        icon: List,
-      },
-      {
-        label: 'Review Expiring',
-        onClick: () =>
-          navigate({ to: '/license-management/licenses', search: { status: 'Expiring' } }),
-        variant: 'secondary' as const,
-        icon: Clock,
-      },
-      {
-        label: 'Generate Report',
-        onClick: () => {
-          console.log('Generate report')
-        },
-        variant: 'outline' as const,
-        icon: FileText,
-      },
-    ],
-    [navigate]
-  )
+  const quickActions = [
+    {
+      label: 'View All Licenses',
+      onClick: () => navigate({ to: '/license-management/licenses' }),
+      variant: 'default' as const,
+      icon: List,
+    },
+    {
+      label: 'Review Expiring',
+      onClick: () =>
+        navigate({ to: '/license-management/licenses' }),
+      variant: 'secondary' as const,
+      icon: Clock,
+    },
+  ]
 
-  const renderExpiringItem = (license: License) => {
-    const daysUntilExpiry = differenceInDays(new Date(license.dateOfExpiry), new Date())
+  const renderExpiringItem = (item: LicenseDashboardStats['expiring_licenses'][0]) => {
+    const daysUntilExpiry = differenceInDays(dayjs(item.date_of_expiry, 'YYYY-MM-DD').toDate(), new Date())
 
     return (
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
           <p className="font-medium text-gray-900 truncate">
-            {license.owner}
+            {item.owner}
           </p>
           <p className="text-sm text-gray-600 truncate">
-            License #{license.licenseNumber} • {license.facilityType}
+            License #{item.license_number} • {item.facility_type}
           </p>
           <p className="text-xs text-red-600 font-medium mt-1">
             Expires in {daysUntilExpiry} day{daysUntilExpiry !== 1 ? 's' : ''}
@@ -154,7 +78,7 @@ export function FacilityLicensesDashboard() {
           <Button
             size="sm"
             variant="default"
-            onClick={() => navigate({ to: `/license-management/${license.licenseNumber}` })}
+            onClick={() => navigate({ to: `/license-management/${item.license_number}` })}
           >
             View Details
           </Button>
@@ -163,7 +87,7 @@ export function FacilityLicensesDashboard() {
     )
   }
 
-  if (licensesLoading && licenses.length === 0) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
         <div className="text-center">
@@ -180,7 +104,7 @@ export function FacilityLicensesDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <MetricCard
           title="Expiring Soon (30 days)"
-          value={metrics.expiringSoon}
+          value={dashboardData?.metrics.expiring_soon || 0}
           variant="warning"
           icon={AlertTriangle}
           onClick={() =>
@@ -189,7 +113,7 @@ export function FacilityLicensesDashboard() {
         />
         <MetricCard
           title="Active Licenses"
-          value={metrics.active}
+          value={dashboardData?.metrics.active || 0}
           variant="success"
           icon={CheckCircle}
           onClick={() =>
@@ -198,13 +122,13 @@ export function FacilityLicensesDashboard() {
         />
         <MetricCard
           title="Suspended/Denied"
-          value={metrics.suspended}
+          value={dashboardData?.metrics.suspended_denied || 0}
           variant="danger"
           icon={XCircle}
         />
         <MetricCard
           title="Pending Renewals"
-          value={metrics.pendingRenewals}
+          value={dashboardData?.metrics.pending_renewals || 0}
           variant="info"
           icon={Clock}
         />
@@ -213,7 +137,7 @@ export function FacilityLicensesDashboard() {
       {/* Status Distribution and Priority Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <StatusDistribution
-          data={statusDistribution}
+          data={dashboardData?.status_distribution || []}
           title="License Status Distribution"
           type="bar"
           onSegmentClick={(status) =>
@@ -222,7 +146,7 @@ export function FacilityLicensesDashboard() {
         />
         <PrioritySection
           title="Licenses Expiring Soon"
-          items={expiringLicenses}
+          items={dashboardData?.expiring_licenses || []}
           renderItem={renderExpiringItem}
           onViewAll={() =>
             navigate({ to: '/license-management/licenses', search: { status: 'Expiring' } })
@@ -230,9 +154,6 @@ export function FacilityLicensesDashboard() {
           emptyMessage="No licenses expiring in the next 30 days"
         />
       </div>
-
-      {/* Recent Activity */}
-      <RecentActivity activities={recentActivity} title="Recent License Actions" />
 
       {/* Quick Actions */}
       <QuickActions actions={quickActions} title="Quick Actions" />

@@ -190,7 +190,7 @@ export default function AppLayout({
             )}
           >
             <div className="flex items-center gap-3">
-              <Icon className="w-4 h-4 flex-shrink-0" />
+              <Icon className="w-4 h-4 shrink-0" />
               {!collapsed && <span>{item.label}</span>}
             </div>
             {!collapsed && (
@@ -218,7 +218,7 @@ export default function AppLayout({
             : "hover:bg-accent hover:text-accent-foreground"
         )}
       >
-        <Icon className="w-4 h-4 flex-shrink-0" />
+        <Icon className="w-4 h-4 shrink-0" />
         {!collapsed && <span>{item.label}</span>}
       </button>
     )

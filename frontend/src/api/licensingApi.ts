@@ -39,10 +39,26 @@ export function transformLicenseApplication(backendApp: any): LicenseApplication
     licenseApplicationId: backendApp.license_application_id,
     facilityName: backendApp.facility_name,
     facilityCode: backendApp.facility_code,
+    hieFacilityId: backendApp.hie_facility_id,
     registrationNumber: backendApp.registration_number,
     facilityCategory: backendApp.facility_category,
     owner: backendApp.owner,
     facilityType: backendApp.facility_type,
+    kephLevel: backendApp.keph_level,
+    licenseStatus: backendApp.license_status,
+    county: backendApp.county,
+    subCounty: backendApp.sub_county,
+    ward: backendApp.ward,
+    constituency: backendApp.constituency,
+    telephoneNumber: backendApp.telephone_number,
+    officialEmail: backendApp.official_email,
+    physicalAddress: backendApp.physical_address,
+    numberOfBeds: backendApp.number_of_beds,
+    industry: backendApp.industry,
+    openLateNight: !!backendApp.open_late_night,
+    openWholeDay: !!backendApp.open_whole_day,
+    openWeekends: !!backendApp.open_weekends,
+    openPublicHoliday: !!backendApp.open_public_holiday,
     licenseTypeName: backendApp.license_type_name,
     applicationStatus: backendApp.status || backendApp.application_status,
     applicationType: backendApp.application_type,
@@ -222,6 +238,7 @@ export async function listLicenseApplications(
   pageSize: number = 20,
   filters?: {
     search?: string
+    applicationId?: string
     applicationType?: 'New' | 'Renewal'
     applicationStatus?: string
     regulatoryBody?: string
@@ -234,6 +251,7 @@ export async function listLicenseApplications(
     debug_mode: '1',
   })
 
+  if (filters?.applicationId) params.append('license_application_id', filters.applicationId)
   if (filters?.applicationType) params.append('application_type', filters.applicationType)
   if (filters?.applicationStatus) params.append('application_status', filters.applicationStatus)
   if (filters?.regulatoryBody) params.append('regulatory_body', filters.regulatoryBody)
@@ -364,13 +382,23 @@ export function transformProfessionalLicenseApplication(backend: any): Professio
     licenseApplicationId: backend.license_application_id,
     fullName: backend.full_name || '',
     registrationNumber: backend.registration_number || '',
+    identificationType: backend.identification_type,
+    identificationNumber: backend.identification_number,
+    country: backend.country,
+    nationality: backend.nationality,
     categoryOfPractice: backend.category_of_practice || '',
     placeOfPractice: backend.place_of_practice || '',
     county: backend.county || '',
+    instituteOfGraduation: backend.institute_of_graduation,
+    degree: backend.degree,
+    address: backend.address,
+    email: backend.email,
+    phone: backend.phone,
     licenseTypeName: backend.license_type || backend.license_type_name || '',
     applicationStatus: backend.status || backend.application_status || 'Pending',
     applicationType: backend.application_type || 'New',
     applicationDate: formatDateForFrontend(backend.application_date),
+    regulatoryBody: backend.regulatory_body,
     licenseFee: backend.license_fee || 0,
     remarks: backend.remarks,
     complianceDocuments: backend.compliance_documents,
@@ -382,6 +410,7 @@ export async function listProfessionalLicenseApplications(
   pageSize: number = 20,
   filters?: {
     search?: string
+    applicationId?: string
     applicationType?: 'New' | 'Renewal'
     applicationStatus?: string
     regulatoryBody?: string
@@ -393,6 +422,7 @@ export async function listProfessionalLicenseApplications(
     minimize: '0',
   })
 
+  if (filters?.applicationId) params.append('license_application_id', filters.applicationId)
   if (filters?.applicationType) params.append('application_type', filters.applicationType)
   if (filters?.applicationStatus) params.append('application_status', filters.applicationStatus)
   if (filters?.regulatoryBody) params.append('regulatory_body', filters.regulatoryBody)
@@ -433,6 +463,64 @@ export async function listProfessionalLicenseApplications(
     data: transformedData,
     pagination: paginationMeta,
   }
+}
+
+export async function getFacilityApplication(applicationId: string): Promise<LicenseApplication> {
+  const response = await listLicenseApplications(1, 1, { applicationId })
+  const app = response.data.find((a) => a.licenseApplicationId === applicationId)
+  if (!app) throw new Error(`Facility application ${applicationId} not found`)
+  return app
+}
+
+export async function getProfessionalApplication(applicationId: string): Promise<ProfessionalLicenseApplication> {
+  const response = await listProfessionalLicenseApplications(1, 1, { applicationId })
+  const app = response.data.find((a) => a.licenseApplicationId === applicationId)
+  if (!app) throw new Error(`Professional application ${applicationId} not found`)
+  return app
+}
+
+export async function updateFacilityApplicationStatus(
+  applicationId: string,
+  status: 'Issued' | 'Denied',
+  remarks: string
+): Promise<any> {
+  const payload: Record<string, any> = {
+    license_application_id: applicationId,
+    application_status: status,
+  }
+  if (status === 'Denied') payload.denial_comment = remarks
+  else payload.remarks = remarks
+
+  const response = await apiRequest<any>(
+    `/api/method/compliance_360.api.license_management.applications.update_license_application_status`,
+    {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    }
+  )
+  return response
+}
+
+export async function updateProfessionalApplicationStatus(
+  applicationId: string,
+  status: 'Issued' | 'Denied',
+  remarks: string
+): Promise<any> {
+  const payload: Record<string, any> = {
+    license_application_id: applicationId,
+    application_status: status,
+  }
+  if (status === 'Denied') payload.denial_comment = remarks
+  else payload.remarks = remarks
+
+  const response = await apiRequest<any>(
+    `/api/method/compliance_360.api.license_management.professional_applications.update_professional_license_application_status`,
+    {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    }
+  )
+  return response
 }
 
 export async function createLicenseAppeal(

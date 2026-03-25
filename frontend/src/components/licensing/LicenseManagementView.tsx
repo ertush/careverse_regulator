@@ -9,7 +9,6 @@ import { ArrowLeft, Building2, UserRound } from 'lucide-react'
 import ApplicationsTable from './ApplicationsTable'
 import ApplicationCard from './ApplicationCard'
 import ApplicationsFilters from './ApplicationsFilters'
-import ApplicationDetailModal from './ApplicationDetailModal'
 import ProfessionalApplicationsTable from './ProfessionalApplicationsTable'
 import PaginationControls from './PaginationControls'
 import ExportButton from '@/components/shared/ExportButton'
@@ -52,8 +51,6 @@ export default function LicenseManagementView({ company }: LicenseManagementView
   const { isMobile, isTablet } = useResponsive()
 
   const [activeTab, setActiveTab] = useState<TabValue>('facility-applications')
-  const [selectedApplication, setSelectedApplication] = useState<LicenseApplication | null>(null)
-  const [showApplicationModal, setShowApplicationModal] = useState(false)
 
   // Selection state for tables without store-level selection
   const [selectedFacilityAppIds, setSelectedFacilityAppIds] = useState<Set<string>>(new Set())
@@ -131,17 +128,13 @@ export default function LicenseManagementView({ company }: LicenseManagementView
     setFn(next)
   }
 
-  // Row click handlers
+  // Row click handlers (navigation now handled in tables directly)
   const handleFacilityAppRowClick = (applicationId: string) => {
-    const app = applications.find((a) => a.licenseApplicationId === applicationId)
-    if (app) {
-      setSelectedApplication(app)
-      setShowApplicationModal(true)
-    }
+    navigate({ to: '/license-management/facility-application/$applicationId', params: { applicationId } } as any)
   }
 
-  const handleProfAppRowClick = (_applicationId: string) => {
-    // Could open a modal similar to facility applications
+  const handleProfAppRowClick = (applicationId: string) => {
+    navigate({ to: '/license-management/professional-application/$applicationId', params: { applicationId } } as any)
   }
 
   // Active filter counts
@@ -347,14 +340,6 @@ export default function LicenseManagementView({ company }: LicenseManagementView
 
         </TabsContent>
       </Tabs>
-
-      {/* Facility Application Detail Modal */}
-      <ApplicationDetailModal
-        isOpen={showApplicationModal}
-        onClose={() => { setShowApplicationModal(false); setSelectedApplication(null) }}
-        application={selectedApplication}
-        loading={false}
-      />
 
     </div>
   )

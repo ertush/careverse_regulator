@@ -75,10 +75,26 @@ export interface LicenseApplication {
   licenseApplicationId: string
   facilityName: string
   facilityCode?: string
+  hieFacilityId?: string
   registrationNumber: string
-  facilityCategory: string
-  owner: string
-  facilityType: string
+  facilityCategory?: string
+  owner?: string
+  facilityType?: string
+  kephLevel?: string
+  licenseStatus?: string
+  county?: string
+  subCounty?: string
+  ward?: string
+  constituency?: string
+  telephoneNumber?: string
+  officialEmail?: string
+  physicalAddress?: string
+  numberOfBeds?: number
+  industry?: string
+  openLateNight?: boolean
+  openWholeDay?: boolean
+  openWeekends?: boolean
+  openPublicHoliday?: boolean
   licenseTypeName: string
   applicationStatus: 'Pending' | 'Issued' | 'Info Requested' | 'Denied'
   applicationType: 'New' | 'Renewal'
@@ -146,13 +162,23 @@ export interface ProfessionalLicenseApplication {
   licenseApplicationId: string
   fullName: string
   registrationNumber: string
+  identificationType?: string
+  identificationNumber?: string
+  country?: string
+  nationality?: string
   categoryOfPractice: string
   placeOfPractice: string
   county: string
+  instituteOfGraduation?: string
+  degree?: string
+  address?: string
+  email?: string
+  phone?: string
   licenseTypeName: string
   applicationStatus: 'Pending' | 'Issued' | 'Info Requested' | 'Denied'
   applicationType: 'New' | 'Renewal'
   applicationDate: string
+  regulatoryBody?: string
   licenseFee: number
   remarks?: string
   complianceDocuments?: any[]

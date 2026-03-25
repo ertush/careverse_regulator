@@ -17,6 +17,9 @@ import {
   FileQuestion,
 } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
+import dayjs from 'dayjs'
+import customParseFormat from 'dayjs/plugin/customParseFormat'
+dayjs.extend(customParseFormat)
 import { Button } from '@/components/ui/button'
 import type { LicenseApplication, ProfessionalLicenseApplication } from '@/types/license'
 
@@ -168,7 +171,9 @@ export function ApplicationsDashboard() {
           </p>
           <p className="text-xs text-muted-foreground mt-1">
             Submitted{' '}
-            {formatDistanceToNow(new Date(app.applicationDate), { addSuffix: true })}
+            {app.applicationDate
+              ? formatDistanceToNow(dayjs(app.applicationDate, 'DD/MM/YYYY').toDate(), { addSuffix: true })
+              : '—'}
           </p>
         </div>
         <div className="flex gap-2">

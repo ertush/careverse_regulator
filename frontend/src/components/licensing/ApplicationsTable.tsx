@@ -1,3 +1,4 @@
+import { useNavigate } from '@tanstack/react-router'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Card } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -5,7 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import type { LicenseApplication } from '@/types/license'
 import StatusBadge from './StatusBadge'
 import { Button } from '@/components/ui/button'
-import { Eye } from 'lucide-react'
+import { Pencil } from 'lucide-react'
 
 interface ApplicationsTableProps {
   applications: LicenseApplication[]
@@ -28,6 +29,7 @@ export default function ApplicationsTable({
   onDeselectAll,
   emptyState,
 }: ApplicationsTableProps) {
+  const navigate = useNavigate()
   const selectionEnabled = selectedIds !== undefined && onToggleSelection !== undefined
   const allSelected = selectionEnabled && applications.length > 0 && applications.every(a => selectedIds.has(a.licenseApplicationId))
   const someSelected = selectionEnabled && applications.some(a => selectedIds.has(a.licenseApplicationId)) && !allSelected
@@ -41,9 +43,15 @@ export default function ApplicationsTable({
   }
 
   const totalColumns = selectionEnabled ? 9 : 8
+  const stickyOffset = selectionEnabled ? 1 : 0
+  const stickyClass = (idx: number) => {
+    const col = idx - stickyOffset
+    if (col === 0) return 'sticky left-0 z-10 bg-card border-r border-border/70'
+    return undefined
+  }
 
   return (
-    <Card>
+    <Card className="overflow-x-auto">
       <Table>
         <TableHeader>
           <TableRow>
@@ -55,7 +63,7 @@ export default function ApplicationsTable({
                 />
               </TableHead>
             )}
-            <TableHead>Application ID</TableHead>
+            <TableHead className={stickyClass(stickyOffset)}>Application ID</TableHead>
             <TableHead>Facility Name</TableHead>
             <TableHead>Type</TableHead>
             <TableHead>License Type</TableHead>
@@ -86,8 +94,7 @@ export default function ApplicationsTable({
               return (
                 <TableRow
                   key={app.id}
-                  className="cursor-pointer hover:bg-muted/50 transition-colors"
-                  onClick={() => onRowClick(app.licenseApplicationId)}
+                  className="hover:bg-muted/50 transition-colors"
                 >
                   {selectionEnabled && (
                     <TableCell onClick={(e) => e.stopPropagation()}>
@@ -97,7 +104,15 @@ export default function ApplicationsTable({
                       />
                     </TableCell>
                   )}
-                  <TableCell className="font-mono text-sm font-medium">{app.licenseApplicationId}</TableCell>
+                  <TableCell className={`font-mono text-sm font-medium ${stickyClass(stickyOffset) || ''}`}>
+                    <button
+                      type="button"
+                      className="text-primary hover:underline"
+                      onClick={(e) => { e.stopPropagation(); navigate({ to: '/license-management/facility-application/$applicationId', params: { applicationId: app.licenseApplicationId } }) }}
+                    >
+                      {app.licenseApplicationId}
+                    </button>
+                  </TableCell>
                   <TableCell>
                     {app.facilityName}
                     {app.facilityCode && (
@@ -116,9 +131,9 @@ export default function ApplicationsTable({
                     <StatusBadge status={app.applicationStatus} />
                   </TableCell>
                   <TableCell>
-                    <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground hover:text-foreground" onClick={() => onRowClick(app.licenseApplicationId)}>
-                      <Eye className="h-4 w-4" />
-                      View
+                    <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground hover:text-foreground" onClick={(e) => { e.stopPropagation(); navigate({ to: '/license-management/facility-application/$applicationId', params: { applicationId: app.licenseApplicationId } }) }}>
+                      <Pencil className="h-4 w-4" />
+                      Edit
                     </Button>
                   </TableCell>
                 </TableRow>

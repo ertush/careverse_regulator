@@ -1,6 +1,5 @@
 import { useState, useRef, useCallback } from 'react'
 import { useNavigate } from '@tanstack/react-router'
-import { useAffiliationStore } from '@/stores/affiliationStore'
 import {
   MetricCard,
   StatusDistribution,
@@ -11,7 +10,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import {
-  CheckCircle,
   Clock,
   XCircle,
   Users,
@@ -21,6 +19,7 @@ import {
   ShieldCheck,
   UserCheck,
   AlertTriangle,
+  CheckCircle,
 } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import dayjs from 'dayjs'
@@ -31,7 +30,6 @@ const routeApi = getRouteApi('/affiliations/')
 
 export function AffiliationsDashboard() {
   const navigate = useNavigate()
-  const { approveAffiliation, rejectAffiliation } = useAffiliationStore()
   const dashboardData = routeApi.useLoaderData() as AffiliationDashboardStats
 
   const quickActions = [
@@ -42,7 +40,7 @@ export function AffiliationsDashboard() {
       icon: Users,
     },
     {
-      label: 'Review Pending',
+      label: 'View Pending',
       onClick: () => navigate({ to: '/affiliations/list', search: { status: 'Pending' } }),
       variant: 'secondary' as const,
       icon: Clock,
@@ -70,17 +68,9 @@ export function AffiliationsDashboard() {
           Submitted {formatDistanceToNow(dayjs(item.start_date, 'YYYY-MM-DD').toDate(), { addSuffix: true })}
         </p>
       </div>
-      <div className="flex gap-2">
-        <Button size="sm" variant="default" onClick={(e) => { e.stopPropagation(); approveAffiliation(item.id) }}>
-          <CheckCircle className="h-4 w-4 mr-1" />Approve
-        </Button>
-        <Button size="sm" variant="destructive" onClick={(e) => { e.stopPropagation(); rejectAffiliation(item.id) }}>
-          <XCircle className="h-4 w-4 mr-1" />Reject
-        </Button>
-        <Button size="sm" variant="ghost" onClick={() => navigate({ to: `/affiliations/${item.id}` })}>
-          Details
-        </Button>
-      </div>
+      <Button size="sm" variant="ghost" onClick={() => navigate({ to: `/affiliations/${item.id}` })}>
+        View
+      </Button>
     </div>
   )
 
@@ -184,7 +174,7 @@ export function AffiliationsDashboard() {
       {/* Pending Review + Multi-Affiliated */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <PrioritySection
-          title="Pending Affiliations Requiring Review"
+          title="Pending Affiliations"
           items={dashboardData?.pending_affiliations || []}
           renderItem={renderPendingItem}
           onViewAll={() => navigate({ to: '/affiliations/list', search: { status: 'Pending' } })}

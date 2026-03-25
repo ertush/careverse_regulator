@@ -4,7 +4,7 @@ import { FacilityLicensesDashboard } from './FacilityLicensesDashboard'
 import { ApplicationsDashboard } from './ApplicationsDashboard'
 
 export function LicensesDashboard() {
-  const [activeTab, setActiveTab] = useState('facility-licenses')
+  const [activeTab, setActiveTab] = useState('licenses')
 
   return (
     <div className="space-y-6 p-6">
@@ -12,18 +12,18 @@ export function LicensesDashboard() {
       <div>
         <h1 className="text-3xl font-bold text-foreground">License Management</h1>
         <p className="text-muted-foreground mt-1">
-          Monitor and manage health facility licenses and applications
+          Monitor and manage health facility and professional licenses and applications
         </p>
       </div>
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
-          <TabsTrigger value="facility-licenses">Facility Licenses</TabsTrigger>
+          <TabsTrigger value="licenses">Licenses</TabsTrigger>
           <TabsTrigger value="applications">Applications</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="facility-licenses" className="mt-6">
+        <TabsContent value="licenses" className="mt-6">
           <FacilityLicensesDashboard />
         </TabsContent>
 

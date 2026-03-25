@@ -14,6 +14,8 @@ import {
   Users,
   ListFilter,
   FileText,
+  Building2,
+  UserRound,
 } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import dayjs from 'dayjs'
@@ -42,6 +44,18 @@ export function AffiliationsDashboard() {
         navigate({ to: '/affiliations/list', search: { status: 'Pending' } }),
       variant: 'secondary' as const,
       icon: Clock,
+    },
+    {
+      label: 'Health Facilities',
+      onClick: () => navigate({ to: '/affiliations/facilities' }),
+      variant: 'outline' as const,
+      icon: Building2,
+    },
+    {
+      label: 'Health Professionals',
+      onClick: () => navigate({ to: '/affiliations/professionals' }),
+      variant: 'outline' as const,
+      icon: UserRound,
     },
   ]
 

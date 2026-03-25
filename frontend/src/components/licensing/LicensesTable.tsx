@@ -4,6 +4,8 @@ import { Checkbox } from '@/components/ui/checkbox'
 import type { License } from '@/types/license'
 import StatusBadge from './StatusBadge'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Eye } from 'lucide-react'
 import { EntityLink } from '@/components/entities'
 
 interface LicensesTableProps {
@@ -14,6 +16,7 @@ interface LicensesTableProps {
   onToggleSelection?: (licenseNumber: string) => void
   onSelectAll?: () => void
   onDeselectAll?: () => void
+  emptyState?: React.ReactNode
 }
 
 export default function LicensesTable({
@@ -24,6 +27,7 @@ export default function LicensesTable({
   onToggleSelection,
   onSelectAll,
   onDeselectAll,
+  emptyState,
 }: LicensesTableProps) {
   const selectionEnabled = selectedIds !== undefined && onToggleSelection !== undefined
   const allSelected = selectionEnabled && licenses.length > 0 && licenses.every(l => selectedIds.has(l.licenseNumber))
@@ -37,7 +41,7 @@ export default function LicensesTable({
     }
   }
 
-  const totalColumns = selectionEnabled ? 9 : 8
+  const totalColumns = selectionEnabled ? 10 : 9
 
   return (
     <Card>
@@ -60,6 +64,7 @@ export default function LicensesTable({
             <TableHead>Expiry Date</TableHead>
             <TableHead>Payment</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead>Action</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -74,7 +79,7 @@ export default function LicensesTable({
           ) : licenses.length === 0 ? (
             <TableRow>
               <TableCell colSpan={totalColumns} className="text-center py-8 text-muted-foreground">
-                No licenses found
+                {emptyState || 'No licenses found'}
               </TableCell>
             </TableRow>
           ) : (
@@ -121,6 +126,12 @@ export default function LicensesTable({
                 </TableCell>
                 <TableCell>
                   <StatusBadge status={license.status} />
+                </TableCell>
+                <TableCell>
+                  <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground hover:text-foreground" onClick={() => onRowClick(license.licenseNumber)}>
+                    <Eye className="h-4 w-4" />
+                    View
+                  </Button>
                 </TableCell>
               </TableRow>
               )

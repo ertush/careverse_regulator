@@ -9,6 +9,9 @@ import type {
   LicenseAction,
   LicenseApplication,
   BackendLicenseApplication,
+  ProfessionalLicenseRecord,
+  BackendProfessionalLicense,
+  ProfessionalLicenseApplication,
   CreateLicenseAppealPayload,
   FacilityOption,
 } from '@/types/license'
@@ -48,6 +51,27 @@ export function transformLicenseApplication(backendApp: any): LicenseApplication
     licenseFee: backendApp.license_fee || 0,
     remarks: backendApp.remarks,
     complianceDocuments: backendApp.compliance_documents,
+  }
+}
+
+export function transformProfessionalLicense(backend: BackendProfessionalLicense): ProfessionalLicenseRecord {
+  return {
+    id: backend.license_number,
+    licenseNumber: backend.license_number,
+    name: backend.name || '',
+    registrationNumber: backend.registration_number || '',
+    identificationType: backend.identification_type || '',
+    identificationNumber: backend.identification_number || '',
+    category: backend.category || '',
+    licenseType: backend.license_type || '',
+    degree: backend.degree || '',
+    placeOfPractice: backend.place_of_practice || '',
+    county: backend.county || '',
+    dateOfIssuance: formatDateForFrontend(backend.date_of_issuance),
+    dateOfExpiry: formatDateForFrontend(backend.date_of_expiry),
+    paymentStatus: backend.payment_status || '',
+    licenseStatus: backend.license_status,
+    isArchived: backend.is_archived,
   }
 }
 
@@ -229,6 +253,165 @@ export async function listLicenseApplications(
     transformedData = transformedData.filter(
       (app) =>
         app.facilityName.toLowerCase().includes(searchLower) ||
+        app.licenseApplicationId.toLowerCase().includes(searchLower) ||
+        app.registrationNumber.toLowerCase().includes(searchLower)
+    )
+  }
+
+  const totalCount = pagination.count || transformedData.length
+  const totalPages = Math.ceil(totalCount / pageSize)
+
+  const paginationMeta: LicensePaginationMeta = {
+    page: pagination.current_page || page,
+    page_size: pagination.page_size || pageSize,
+    total_count: totalCount,
+    total_pages: totalPages,
+    has_next: (pagination.current_page || page) < totalPages,
+    has_prev: (pagination.current_page || page) > 1,
+  }
+
+  return {
+    data: transformedData,
+    pagination: paginationMeta,
+  }
+}
+
+export async function listProfessionalLicenses(
+  page: number = 1,
+  pageSize: number = 20,
+  filters?: LicenseFilters
+): Promise<{ data: ProfessionalLicenseRecord[]; pagination: LicensePaginationMeta }> {
+  const params = new URLSearchParams({
+    page: page.toString(),
+    page_size: pageSize.toString(),
+    minimize: '0',
+  })
+
+  if (filters?.status) params.append('license_status', filters.status)
+  if (filters?.isArchived !== undefined) params.append('is_archived', filters.isArchived ? '1' : '0')
+  if (filters?.registrationNumber) params.append('registration_number', filters.registrationNumber)
+
+  const response = await apiRequest<any>(
+    `/api/method/compliance_360.api.license_management.professional_license.get_professional_licenses?${params.toString()}`
+  )
+
+  const licenses = response.data || response.message || []
+  const pagination = response.pagination || {}
+
+  let transformedData = licenses.map(transformProfessionalLicense)
+
+  // Client-side search filtering
+  if (filters?.search) {
+    const searchLower = filters.search.toLowerCase()
+    transformedData = transformedData.filter(
+      (l) =>
+        l.licenseNumber.toLowerCase().includes(searchLower) ||
+        l.name.toLowerCase().includes(searchLower) ||
+        l.registrationNumber.toLowerCase().includes(searchLower) ||
+        l.category.toLowerCase().includes(searchLower)
+    )
+  }
+
+  // Client-side sorting
+  if (filters?.sortBy && filters?.sortOrder) {
+    transformedData.sort((a, b) => {
+      let aVal: any
+      let bVal: any
+
+      switch (filters.sortBy) {
+        case 'license_number':
+          aVal = a.licenseNumber
+          bVal = b.licenseNumber
+          break
+        case 'expiry_date':
+          aVal = dayjs(a.dateOfExpiry, 'DD/MM/YYYY').valueOf()
+          bVal = dayjs(b.dateOfExpiry, 'DD/MM/YYYY').valueOf()
+          break
+        case 'status':
+          aVal = a.licenseStatus
+          bVal = b.licenseStatus
+          break
+        default:
+          return 0
+      }
+
+      const comparison = aVal < bVal ? -1 : aVal > bVal ? 1 : 0
+      return filters.sortOrder === 'asc' ? comparison : -comparison
+    })
+  }
+
+  const totalCount = pagination.count || transformedData.length
+  const totalPages = Math.ceil(totalCount / pageSize)
+
+  const paginationMeta: LicensePaginationMeta = {
+    page: pagination.current_page || page,
+    page_size: pagination.page_size || pageSize,
+    total_count: totalCount,
+    total_pages: totalPages,
+    has_next: (pagination.current_page || page) < totalPages,
+    has_prev: (pagination.current_page || page) > 1,
+  }
+
+  return {
+    data: transformedData,
+    pagination: paginationMeta,
+  }
+}
+
+export function transformProfessionalLicenseApplication(backend: any): ProfessionalLicenseApplication {
+  return {
+    id: backend.license_application_id,
+    licenseApplicationId: backend.license_application_id,
+    fullName: backend.full_name || '',
+    registrationNumber: backend.registration_number || '',
+    categoryOfPractice: backend.category_of_practice || '',
+    placeOfPractice: backend.place_of_practice || '',
+    county: backend.county || '',
+    licenseTypeName: backend.license_type || backend.license_type_name || '',
+    applicationStatus: backend.status || backend.application_status || 'Pending',
+    applicationType: backend.application_type || 'New',
+    applicationDate: formatDateForFrontend(backend.application_date),
+    licenseFee: backend.license_fee || 0,
+    remarks: backend.remarks,
+    complianceDocuments: backend.compliance_documents,
+  }
+}
+
+export async function listProfessionalLicenseApplications(
+  page: number = 1,
+  pageSize: number = 20,
+  filters?: {
+    search?: string
+    applicationType?: 'New' | 'Renewal'
+    applicationStatus?: string
+    regulatoryBody?: string
+  }
+): Promise<{ data: ProfessionalLicenseApplication[]; pagination: LicensePaginationMeta }> {
+  const params = new URLSearchParams({
+    page: page.toString(),
+    page_size: pageSize.toString(),
+    minimize: '0',
+  })
+
+  if (filters?.applicationType) params.append('application_type', filters.applicationType)
+  if (filters?.applicationStatus) params.append('application_status', filters.applicationStatus)
+  if (filters?.regulatoryBody) params.append('regulatory_body', filters.regulatoryBody)
+
+  const response = await apiRequest<any>(
+    `/api/method/compliance_360.api.license_management.professional_applications.fetch_professional_license_applications?${params.toString()}`
+  )
+
+  const applications = response.data || response.message || []
+  const pagination = response.pagination || {}
+
+  let transformedData = applications.map(transformProfessionalLicenseApplication)
+
+  // Client-side search
+  if (filters?.search) {
+    const searchLower = filters.search.toLowerCase()
+    transformedData = transformedData.filter(
+      (app) =>
+        app.fullName.toLowerCase().includes(searchLower) ||
         app.licenseApplicationId.toLowerCase().includes(searchLower) ||
         app.registrationNumber.toLowerCase().includes(searchLower)
     )

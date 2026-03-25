@@ -102,6 +102,62 @@ export interface BackendLicenseApplication {
   compliance_documents?: any[]
 }
 
+// Professional License
+export interface ProfessionalLicenseRecord {
+  id: string
+  licenseNumber: string
+  name: string
+  registrationNumber: string
+  identificationType: string
+  identificationNumber: string
+  category: string
+  licenseType: string
+  degree: string
+  placeOfPractice: string
+  county: string
+  dateOfIssuance: string
+  dateOfExpiry: string
+  paymentStatus: string
+  licenseStatus: LicenseStatus
+  isArchived: boolean
+}
+
+export interface BackendProfessionalLicense {
+  license_number: string
+  name: string
+  registration_number: string
+  identification_type: string
+  identification_number: string
+  category: string
+  license_type: string
+  degree: string
+  place_of_practice: string
+  county: string
+  date_of_issuance: string
+  date_of_expiry: string
+  payment_status: string
+  license_status: LicenseStatus
+  is_archived: boolean
+}
+
+// Professional License Application
+export interface ProfessionalLicenseApplication {
+  id: string
+  licenseApplicationId: string
+  fullName: string
+  registrationNumber: string
+  categoryOfPractice: string
+  placeOfPractice: string
+  county: string
+  licenseTypeName: string
+  applicationStatus: 'Pending' | 'Issued' | 'Info Requested' | 'Denied'
+  applicationType: 'New' | 'Renewal'
+  applicationDate: string
+  licenseFee: number
+  remarks?: string
+  complianceDocuments?: any[]
+}
+
 // License Appeal
 export interface LicenseAppeal {
   id: string

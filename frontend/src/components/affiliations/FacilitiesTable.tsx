@@ -9,12 +9,14 @@ import {
   type ColumnDef,
   type SortingState,
   type ColumnFiltersState,
+  type RowSelectionState,
 } from '@tanstack/react-table'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   Select,
   SelectContent,
@@ -23,11 +25,31 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { EntityLink } from '@/components/entities'
+import ExportButton from '@/components/shared/ExportButton'
 import { Search, Building2, ArrowLeft, ArrowUpDown, ArrowUp, ArrowDown, Eye, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, X } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
 import type { FacilityRecord } from '@/api/registryApi'
+import type { ExportConfig } from '@/utils/exportUtils'
+import dayjs from 'dayjs'
 
 const columns: ColumnDef<FacilityRecord>[] = [
+  {
+    id: 'select',
+    header: ({ table }) => (
+      <Checkbox
+        checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        onClick={(e) => e.stopPropagation()}
+      />
+    ),
+    enableSorting: false,
+  },
   {
     accessorKey: 'facility_name',
     header: ({ column }) => <SortableHeader column={column} label="Facility Name" />,
@@ -147,6 +169,21 @@ function getUniqueValues(data: FacilityRecord[], key: keyof FacilityRecord): str
   return Array.from(values).sort()
 }
 
+const facilityExportConfig: ExportConfig<FacilityRecord> = {
+  filename: `health-facilities-${dayjs().format('YYYY-MM-DD')}`,
+  title: 'Health Facilities Report',
+  columns: [
+    { key: 'facility_name', label: 'Facility Name' },
+    { key: 'facility_code', label: 'Code' },
+    { key: 'registration_number', label: 'Registration #' },
+    { key: 'facility_category', label: 'Category' },
+    { key: 'facility_type', label: 'Type' },
+    { key: 'keph_level', label: 'KEPH Level' },
+    { key: 'county', label: 'County' },
+    { key: 'owner', label: 'Owner' },
+  ],
+}
+
 interface FacilitiesTableProps {
   facilities: FacilityRecord[]
 }
@@ -156,14 +193,16 @@ export default function FacilitiesTable({ facilities }: FacilitiesTableProps) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [globalFilter, setGlobalFilter] = useState('')
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
 
   const table = useReactTable({
     data: facilities,
     columns,
-    state: { sorting, columnFilters, globalFilter },
+    state: { sorting, columnFilters, globalFilter, rowSelection },
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onGlobalFilterChange: setGlobalFilter,
+    onRowSelectionChange: setRowSelection,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -177,11 +216,16 @@ export default function FacilitiesTable({ facilities }: FacilitiesTableProps) {
   const kephLevels = getUniqueValues(facilities, 'keph_level')
 
   const activeFilterCount = columnFilters.length + (globalFilter ? 1 : 0)
+  const selectedCount = Object.keys(rowSelection).length
 
   const clearAllFilters = () => {
     setColumnFilters([])
     setGlobalFilter('')
   }
+
+  const exportData = selectedCount > 0
+    ? table.getSelectedRowModel().rows.map((r) => r.original)
+    : table.getFilteredRowModel().rows.map((r) => r.original)
 
   return (
     <div className="space-y-6">
@@ -195,11 +239,15 @@ export default function FacilitiesTable({ facilities }: FacilitiesTableProps) {
         Back to Dashboard
       </Button>
 
-      <div>
-        <h2 className="text-2xl font-bold text-foreground">Health Facilities</h2>
-        <p className="text-muted-foreground mt-1">
-          Registry of {facilities.length} health facilities
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-foreground">Health Facilities</h2>
+          <p className="text-muted-foreground mt-1">
+            Registry of {facilities.length} health facilities
+            {selectedCount > 0 && <span className="ml-1">({selectedCount} selected)</span>}
+          </p>
+        </div>
+        <ExportButton data={exportData} config={facilityExportConfig} size="default" />
       </div>
 
       {/* Filters */}
@@ -248,13 +296,16 @@ export default function FacilitiesTable({ facilities }: FacilitiesTableProps) {
       </div>
 
       {/* Table */}
-      <Card>
+      <Card className="overflow-x-auto">
         <Table>
-          <TableHeader>
+          <TableHeader className="pl-1">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
+                {headerGroup.headers.map((header, idx) => (
+                  <TableHead
+                    key={header.id}
+                    className={idx === 0 ? 'sticky left-0 z-10 bg-card' : idx === 1 ? 'sticky left-0 z-10 bg-card border-r border-border/70' : undefined}
+                  >
                     {header.isPlaceholder
                       ? null
                       : flexRender(header.column.columnDef.header, header.getContext())}
@@ -263,7 +314,7 @@ export default function FacilitiesTable({ facilities }: FacilitiesTableProps) {
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody>
+          <TableBody className="pl-1">
             {table.getRowModel().rows.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={columns.length} className="text-center py-12">
@@ -282,9 +333,12 @@ export default function FacilitiesTable({ facilities }: FacilitiesTableProps) {
               </TableRow>
             ) : (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
+                  {row.getVisibleCells().map((cell, idx) => (
+                    <TableCell
+                      key={cell.id}
+                      className={idx === 0 ? 'sticky left-0 z-10 bg-card' : idx === 1 ? 'sticky left-0 z-10 bg-card border-r border-border/70' : undefined}
+                    >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}

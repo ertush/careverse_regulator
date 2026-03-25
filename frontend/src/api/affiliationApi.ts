@@ -83,12 +83,17 @@ export async function listAffiliations(
   if (filters?.healthFacility) params.append('health_facility', filters.healthFacility)
 
   // Fetch affiliations
-  const response = await apiRequest<{ message: BackendAffiliationsResponse }>(
+  // The API sets frappe.local.response directly (no `message` wrapper),
+  // so the HTTP response is { status, data: { affiliations, pagination } }
+  const response = await apiRequest<{ status: string; data?: BackendAffiliationsResponse | any[] }>(
     `/api/method/compliance_360.api.license_management.fetch_hw_affiliations.fetch_professional_affiliations?${params.toString()}`
   )
 
-  const backendData = response.message
-  const transformedData = backendData.affiliations.map(transformAffiliation)
+  const rawData = response.data
+  const backendData: BackendAffiliationsResponse = Array.isArray(rawData) || !rawData
+    ? { affiliations: [], pagination: { current_page: 1, page_size: pageSize, start: 0, end: 0, count: 0 } }
+    : rawData as BackendAffiliationsResponse
+  const transformedData = (backendData.affiliations || []).map(transformAffiliation)
 
   // Apply client-side filtering for status and search
   let filteredData = transformedData
@@ -221,7 +226,11 @@ export interface AffiliationDashboardStats {
     pending: number
     active: number
     rejected: number
+    confirmed: number
+    inactive: number
     total: number
+    unique_professionals: number
+    unique_facilities: number
   }
   pending_affiliations: Array<{
     id: string
@@ -239,8 +248,31 @@ export interface AffiliationDashboardStats {
   }>
   trend_data: Array<{
     label: string
+    full_label: string
+    new: number
+    active: number
     value: number
+  }>
+  employment_type_distribution: Array<{
+    type: string
+    count: number
     color: string
+  }>
+  role_distribution: Array<{
+    role: string
+    count: number
+  }>
+  facility_staffing: Array<{
+    facility_id: string
+    facility_name: string
+    total: number
+    active: number
+  }>
+  multi_affiliated_professionals: Array<{
+    registration_number: string
+    full_name: string
+    professional_cadre: string | null
+    affiliation_count: number
   }>
 }
 

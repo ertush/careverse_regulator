@@ -363,7 +363,7 @@ export default function LicensesListView({ company }: LicensesListViewProps) {
             ]}
           />
 
-          {licensesPagination && licensesPagination.total_pages > 1 && (
+          {licensesPagination && (
             <PaginationControls currentPage={licensesPagination.page} totalPages={licensesPagination.total_pages} onPageChange={setLicensesPage} totalCount={licensesPagination.total_count} pageSize={licensesPagination.page_size} isMobile={isMobile} />
           )}
 
@@ -412,7 +412,7 @@ export default function LicensesListView({ company }: LicensesListViewProps) {
             emptyState={<EmptyStateInline icon={UserRound} title="No Professional Licenses Found" description={activeProfLicFilters > 0 ? 'No professional licenses match your current filters.' : 'There are currently no health professional licenses in the system.'} onClear={activeProfLicFilters > 0 ? handleClearProfLicFilters : undefined} />}
           />
 
-          {professionalLicensesPagination && professionalLicensesPagination.total_pages > 1 && (
+          {professionalLicensesPagination && (
             <PaginationControls currentPage={professionalLicensesPagination.page} totalPages={professionalLicensesPagination.total_pages} onPageChange={setProfessionalLicensesPage} totalCount={professionalLicensesPagination.total_count} pageSize={professionalLicensesPagination.page_size} isMobile={isMobile} />
           )}
 

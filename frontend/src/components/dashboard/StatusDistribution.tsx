@@ -126,7 +126,7 @@ export function StatusDistribution({
               ) : null
             )}
             {/* Center circle for donut effect */}
-            <circle cx="100" cy="100" r="50" fill="white" />
+            <circle cx="100" cy="100" r="50" className="fill-card" />
             <text
               x="100"
               y="95"

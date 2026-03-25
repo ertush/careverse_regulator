@@ -257,7 +257,7 @@ export default function AppLayout({
           "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
           collapsed ? "justify-center" : "justify-start",
           isSelected
-            ? "bg-primary/20 text-primary dark:bg-primary/40 dark:text-accent-foreground/95"
+            ? "bg-primary/20 text-primary dark:bg-primary/40 dark:text-green-400"
             : "hover:bg-accent hover:text-accent-foreground",
         )}
       >

@@ -9,6 +9,7 @@ import {
   type ColumnDef,
   type SortingState,
   type ColumnFiltersState,
+  type RowSelectionState,
 } from '@tanstack/react-table'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Card } from '@/components/ui/card'
@@ -22,12 +23,33 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Checkbox } from '@/components/ui/checkbox'
 import { EntityLink } from '@/components/entities'
+import ExportButton from '@/components/shared/ExportButton'
 import { Search, UserRound, ArrowLeft, ArrowUpDown, ArrowUp, ArrowDown, Eye, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, X } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
 import type { ProfessionalRecord } from '@/api/registryApi'
+import type { ExportConfig } from '@/utils/exportUtils'
+import dayjs from 'dayjs'
 
 const columns: ColumnDef<ProfessionalRecord>[] = [
+  {
+    id: 'select',
+    header: ({ table }) => (
+      <Checkbox
+        checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        onClick={(e) => e.stopPropagation()}
+      />
+    ),
+    enableSorting: false,
+  },
   {
     accessorKey: 'full_name',
     header: ({ column }) => <SortableHeader column={column} label="Full Name" />,
@@ -151,6 +173,20 @@ function getUniqueValues(data: ProfessionalRecord[], key: keyof ProfessionalReco
   return Array.from(values).sort()
 }
 
+const professionalExportConfig: ExportConfig<ProfessionalRecord> = {
+  filename: `health-professionals-${dayjs().format('YYYY-MM-DD')}`,
+  title: 'Health Professionals Report',
+  columns: [
+    { key: 'full_name', label: 'Full Name' },
+    { key: 'registration_number', label: 'Registration #' },
+    { key: 'license_number', label: 'License #' },
+    { key: 'category_of_practice', label: 'Category of Practice' },
+    { key: 'place_of_practice', label: 'Place of Practice' },
+    { key: 'county', label: 'County' },
+    { key: 'nationality', label: 'Nationality' },
+  ],
+}
+
 interface ProfessionalsTableProps {
   professionals: ProfessionalRecord[]
 }
@@ -160,14 +196,16 @@ export default function ProfessionalsTable({ professionals }: ProfessionalsTable
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [globalFilter, setGlobalFilter] = useState('')
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
 
   const table = useReactTable({
     data: professionals,
     columns,
-    state: { sorting, columnFilters, globalFilter },
+    state: { sorting, columnFilters, globalFilter, rowSelection },
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onGlobalFilterChange: setGlobalFilter,
+    onRowSelectionChange: setRowSelection,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -180,6 +218,7 @@ export default function ProfessionalsTable({ professionals }: ProfessionalsTable
   const nationalities = getUniqueValues(professionals, 'nationality')
 
   const activeFilterCount = columnFilters.length + (globalFilter ? 1 : 0)
+  const selectedCount = Object.keys(rowSelection).length
 
   const clearAllFilters = () => {
     setColumnFilters([])
@@ -198,11 +237,21 @@ export default function ProfessionalsTable({ professionals }: ProfessionalsTable
         Back to Dashboard
       </Button>
 
-      <div>
-        <h2 className="text-2xl font-bold text-foreground">Health Professionals</h2>
-        <p className="text-muted-foreground mt-1">
-          Registry of {professionals.length} health professionals
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-foreground">Health Professionals</h2>
+          <p className="text-muted-foreground mt-1">
+            Registry of {professionals.length} health professionals
+            {selectedCount > 0 && <span className="ml-1">({selectedCount} selected)</span>}
+          </p>
+        </div>
+        <ExportButton
+          data={selectedCount > 0
+            ? table.getSelectedRowModel().rows.map((r) => r.original)
+            : table.getFilteredRowModel().rows.map((r) => r.original)}
+          config={professionalExportConfig}
+          size="default"
+        />
       </div>
 
       {/* Filters */}
@@ -258,13 +307,16 @@ export default function ProfessionalsTable({ professionals }: ProfessionalsTable
       </div>
 
       {/* Table */}
-      <Card>
+      <Card className="overflow-x-auto">
         <Table>
-          <TableHeader>
+          <TableHeader className="pl-1">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
+                {headerGroup.headers.map((header, idx) => (
+                  <TableHead
+                    key={header.id}
+                    className={idx === 0 ? 'sticky left-0 z-10 bg-card' : idx === 1 ? 'sticky left-0 z-10 bg-card border-r border-border/70' : undefined}
+                  >
                     {header.isPlaceholder
                       ? null
                       : flexRender(header.column.columnDef.header, header.getContext())}
@@ -273,7 +325,7 @@ export default function ProfessionalsTable({ professionals }: ProfessionalsTable
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody>
+          <TableBody className="pl-1">
             {table.getRowModel().rows.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={columns.length} className="text-center py-12">
@@ -292,9 +344,12 @@ export default function ProfessionalsTable({ professionals }: ProfessionalsTable
               </TableRow>
             ) : (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
+                  {row.getVisibleCells().map((cell, idx) => (
+                    <TableCell
+                      key={cell.id}
+                      className={idx === 0 ? 'sticky left-0 z-10 bg-card' : idx === 1 ? 'sticky left-0 z-10 bg-card border-r border-border/70' : undefined}
+                    >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}

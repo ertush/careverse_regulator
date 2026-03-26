@@ -21,7 +21,6 @@ import {
   Clock,
   AlertCircle,
   MessageSquare,
-  RefreshCw,
 } from 'lucide-react'
 import dayjs from 'dayjs'
 import SubmitAppealModal from '../licensing/SubmitAppealModal'
@@ -148,16 +147,6 @@ export function LicenseDrawer({ license, loading }: LicenseDrawerProps) {
             Submit Appeal
           </Button>
         )}
-        {(isExpiringSoon || isExpired || license.status === 'Expired') && (
-          <Button
-            variant="default"
-            size="sm"
-            className="flex items-center gap-2"
-          >
-            <RefreshCw className="w-4 h-4" />
-            Renew License
-          </Button>
-        )}
       </div>
 
       {/* Tabbed Content */}
@@ -185,27 +174,27 @@ export function LicenseDrawer({ license, loading }: LicenseDrawerProps) {
             <div
               className={`p-4 rounded-lg border ${
                 isExpired
-                  ? 'bg-red-50 border-red-200'
-                  : 'bg-orange-50 border-orange-200'
+                  ? 'bg-red-50 border-red-200 dark:bg-red-950/30 dark:border-red-800'
+                  : 'bg-orange-50 border-orange-200 dark:bg-orange-950/30 dark:border-orange-800'
               }`}
             >
               <div className="flex items-start gap-3">
                 <AlertCircle
                   className={`w-5 h-5 mt-0.5 ${
-                    isExpired ? 'text-red-600' : 'text-orange-600'
+                    isExpired ? 'text-red-600 dark:text-red-400' : 'text-orange-600 dark:text-orange-400'
                   }`}
                 />
                 <div className="flex-1">
                   <h3
                     className={`text-sm font-semibold mb-1 ${
-                      isExpired ? 'text-red-900' : 'text-orange-900'
+                      isExpired ? 'text-red-900 dark:text-red-300' : 'text-orange-900 dark:text-orange-300'
                     }`}
                   >
                     {isExpired ? 'License Expired' : 'License Expiring Soon'}
                   </h3>
                   <p
                     className={`text-sm ${
-                      isExpired ? 'text-red-700' : 'text-orange-700'
+                      isExpired ? 'text-red-700 dark:text-red-400' : 'text-orange-700 dark:text-orange-400'
                     }`}
                   >
                     {isExpired
@@ -277,11 +266,11 @@ export function LicenseDrawer({ license, loading }: LicenseDrawerProps) {
 
           {/* License Type & Owner/Name */}
           {(license.licenseType || license.owner || license.facilityName) && (
-            <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
+            <div className="p-4 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-100 dark:border-blue-800">
               <div className="space-y-3">
                 {license.licenseType && (
                   <div>
-                    <p className="text-xs font-medium text-muted-foreground mb-1 text-start">
+                    <p className="text-xs font-semibold text-blue-700 dark:text-blue-300 mb-1 text-start">
                       License Type
                     </p>
                     <p className="text-sm text-foreground text-start">{license.licenseType}</p>
@@ -289,7 +278,7 @@ export function LicenseDrawer({ license, loading }: LicenseDrawerProps) {
                 )}
                 {(license.facilityName || license.owner) && (
                   <div>
-                    <p className="text-xs font-medium text-muted-foreground mb-1 text-start">
+                    <p className="text-xs font-semibold text-blue-700 dark:text-blue-300 mb-1 text-start">
                       {license.category === 'Health Professional' ? 'Professional Name' : 'Facility Name'}
                     </p>
                     <p className="text-sm text-foreground text-start">

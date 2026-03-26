@@ -42,7 +42,7 @@ interface ApplicationFiltersState {
   types?: string[]
 }
 
-type TabValue = 'licenses' | 'appeals' | 'facility-applications' | 'professional-applications'
+type TabValue = 'facility-applications' | 'professional-applications'
 
 export default function LicenseManagementView({}: LicenseManagementViewProps) {
   const navigate = useNavigate()
@@ -79,7 +79,7 @@ export default function LicenseManagementView({}: LicenseManagementViewProps) {
 
   const { isMobile, isTablet } = useResponsive()
 
-  const [activeTab, setActiveTab] = useState<TabValue>('licenses')
+  const [activeTab, setActiveTab] = useState<TabValue>('facility-applications')
 
   // Bulk action dialog state
   const [showBulkActionDialog, setShowBulkActionDialog] = useState(false)
@@ -393,14 +393,6 @@ export default function LicenseManagementView({}: LicenseManagementViewProps) {
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TabValue)} className="w-full">
         <div className="mb-6">
           <TabsList>
-            <TabsTrigger value="licenses">
-              <FileText className="h-4 w-4 mr-1.5" />
-              All Licenses
-            </TabsTrigger>
-            <TabsTrigger value="appeals">
-              <Scale className="h-4 w-4 mr-1.5" />
-              License Appeals
-            </TabsTrigger>
             <TabsTrigger value="facility-applications">
               <Building2 className="h-4 w-4 mr-1.5" />
               Facility Applications
@@ -411,115 +403,6 @@ export default function LicenseManagementView({}: LicenseManagementViewProps) {
             </TabsTrigger>
           </TabsList>
         </div>
-
-        {/* ==================== All Licenses ==================== */}
-        <TabsContent value="licenses" className="space-y-6">
-          <div className="flex justify-between items-start gap-4 flex-wrap">
-            <LicensesFilters
-              searchText={licenseSearchText}
-              onSearchChange={setLicenseSearchText}
-              selectedStatuses={selectedLicenseStatuses}
-              onStatusChange={handleLicenseStatusChange}
-              sortOrder={licenseSortOrder}
-              onSortChange={handleLicenseSortChange}
-              activeFiltersCount={activeLicenseFiltersCount}
-              onClearFilters={handleClearLicenseFilters}
-            />
-            <div className="flex gap-2">
-              <SavedFiltersManager
-                storageKey="license-saved-filters"
-                currentFilters={currentLicenseFilters}
-                onApplyFilters={handleApplySavedLicenseFilters}
-                getFilterSummary={getLicenseFilterSummary}
-              />
-              <ExportButton data={licenses} config={licenseExportConfig} size="default" />
-            </div>
-          </div>
-
-          {licensesError && (
-            <Card className="border-destructive">
-              <CardContent className="py-4">
-                <p className="text-sm text-destructive">{licensesError}</p>
-              </CardContent>
-            </Card>
-          )}
-
-          {isMobile || isTablet ? (
-            <div className="space-y-4">
-              {licenses.map((license) => (
-                <LicenseCard
-                  key={license.id}
-                  license={license}
-                  onClick={() => handleLicenseRowClick(license.licenseNumber)}
-                />
-              ))}
-            </div>
-          ) : (
-            <LicensesTable
-              licenses={licenses}
-              loading={licensesLoading}
-              onRowClick={handleLicenseRowClick}
-              selectedIds={selectedLicenseIds}
-              onToggleSelection={toggleLicenseSelection}
-              onSelectAll={selectAllLicenses}
-              onDeselectAll={deselectAllLicenses}
-            />
-          )}
-
-          <BulkActionsBar
-            selectedCount={selectedLicenseIds.size}
-            onClear={deselectAllLicenses}
-            actions={[
-              {
-                label: 'Approve',
-                onClick: () => handleBulkAction('APPROVE'),
-                variant: 'default',
-                icon: <CheckCircle className="w-4 h-4" />,
-                loading: bulkLicenseActionLoading,
-              },
-              {
-                label: 'Deny',
-                onClick: () => handleBulkAction('DENY'),
-                variant: 'destructive',
-                icon: <XCircle className="w-4 h-4" />,
-                loading: bulkLicenseActionLoading,
-              },
-              {
-                label: 'Suspend',
-                onClick: () => handleBulkAction('SUSPEND'),
-                variant: 'secondary',
-                icon: <Ban className="w-4 h-4" />,
-                loading: bulkLicenseActionLoading,
-              },
-            ]}
-          />
-
-          {licensesPagination && licensesPagination.total_pages > 1 && (
-            <PaginationControls
-              currentPage={licensesPagination.page}
-              totalPages={licensesPagination.total_pages}
-              onPageChange={setLicensesPage}
-              totalCount={licensesPagination.total_count}
-              pageSize={licensesPagination.page_size}
-              isMobile={isMobile}
-            />
-          )}
-
-          {!licensesLoading && licenses.length === 0 && (
-            <EmptyStateInline
-              icon={FileText}
-              title={activeLicenseFiltersCount > 0 ? 'No Results Found' : 'No Licenses Found'}
-              description={activeLicenseFiltersCount > 0 ? 'No licenses match your current filters.' : 'There are currently no facility licenses in the system.'}
-              onClear={activeLicenseFiltersCount > 0 ? handleClearLicenseFilters : undefined}
-            />
-          )}
-        </TabsContent>
-
-        {/* ==================== License Appeals ==================== */}
-        <TabsContent value="appeals" className="space-y-6">
-          <LicenseAppealsOverview />
-          <LicenseAppealsView />
-        </TabsContent>
 
         {/* ==================== Facility Applications ==================== */}
         <TabsContent value="facility-applications" className="space-y-6">

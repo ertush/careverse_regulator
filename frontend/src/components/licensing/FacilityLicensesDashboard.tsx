@@ -4,7 +4,6 @@ import {
   StatusDistribution,
   PrioritySection,
   QuickActions,
-  TrendChart,
 } from '@/components/dashboard'
 import {
   CheckCircle,
@@ -13,10 +12,12 @@ import {
   AlertTriangle,
   FileText,
   List,
+  ShieldCheck,
 } from 'lucide-react'
 import { differenceInDays } from 'date-fns'
 import dayjs from 'dayjs'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import type { LicenseDashboardStats } from '@/api/licensingApi'
 
 const routeApi = getRouteApi('/license-management/')
@@ -24,6 +25,10 @@ const routeApi = getRouteApi('/license-management/')
 export function FacilityLicensesDashboard() {
   const navigate = useNavigate()
   const { dashboardStats: dashboardData } = routeApi.useLoaderData() as { dashboardStats: LicenseDashboardStats }
+
+  const totalLicenses = dashboardData?.metrics.total || 0
+  const activeLicenses = dashboardData?.metrics.active || 0
+  const complianceRate = totalLicenses > 0 ? Math.round((activeLicenses / totalLicenses) * 100) : 0
 
   // Quick actions
   const quickActions = [
@@ -40,6 +45,12 @@ export function FacilityLicensesDashboard() {
       variant: 'secondary' as const,
       icon: Clock,
     },
+    {
+      label: 'View Applications',
+      onClick: () => navigate({ to: '/license-management/applications' }),
+      variant: 'outline' as const,
+      icon: FileText,
+    },
   ]
 
   const renderExpiringItem = (item: LicenseDashboardStats['expiring_licenses'][0]) => {
@@ -54,7 +65,7 @@ export function FacilityLicensesDashboard() {
           <p className="text-sm text-muted-foreground truncate">
             License #{item.license_number} • {item.facility_type}
           </p>
-          <p className="text-xs text-red-600 font-medium mt-1">
+          <p className="text-xs text-red-600 dark:text-red-400 font-medium mt-1">
             Expires in {daysUntilExpiry} day{daysUntilExpiry !== 1 ? 's' : ''}
           </p>
         </div>
@@ -76,6 +87,26 @@ export function FacilityLicensesDashboard() {
       {/* Quick Actions */}
       <QuickActions actions={quickActions} title="Quick Actions" />
 
+      {/* Overview Card */}
+      <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 shadow-md dark:from-green-950/40 dark:to-emerald-950/30 dark:border-green-800 dark:shadow-none">
+        <CardContent className="p-6">
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-sm font-medium text-green-900 dark:text-green-300 mb-1">
+                Total Licensed Facilities
+              </p>
+              <p className="text-4xl font-bold text-green-900 dark:text-green-200">
+                {totalLicenses}
+              </p>
+              <p className="text-sm text-green-700 dark:text-green-400 mt-2">
+                {complianceRate}% compliance rate • {activeLicenses} active
+              </p>
+            </div>
+            <ShieldCheck className="h-12 w-12 text-green-600 dark:text-green-400" />
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <MetricCard
@@ -89,7 +120,7 @@ export function FacilityLicensesDashboard() {
         />
         <MetricCard
           title="Active Licenses"
-          value={dashboardData?.metrics.active || 0}
+          value={activeLicenses}
           variant="success"
           icon={CheckCircle}
           onClick={() =>

@@ -14,8 +14,13 @@ import {
   Users,
   FileText,
   Calendar,
+  ShieldCheck,
+  TrendingUp,
+  Activity,
+  ArrowRight,
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 import { differenceInDays, isBefore } from 'date-fns'
 
 interface MainDashboardProps {
@@ -60,10 +65,15 @@ export default function MainDashboard({}: MainDashboardProps) {
     }).length
 
     const activeLicenses = licenses.filter((l) => l.status === 'Active').length
+    const suspendedLicenses = licenses.filter((l) => l.status === 'Suspended').length
+    const deniedLicenses = licenses.filter((l) => l.status === 'Denied').length
 
     // Applications metrics
     const pendingApplications = applications.filter(
       (a) => a.applicationStatus === 'Pending'
+    ).length
+    const inReviewApplications = applications.filter(
+      (a) => a.applicationStatus === 'In Review'
     ).length
 
     // Inspections metrics
@@ -82,6 +92,10 @@ export default function MainDashboard({}: MainDashboardProps) {
       (i) => i.status === 'Completed'
     ).length
 
+    const nonCompliantInspections = inspections.filter(
+      (i) => i.status === 'Non Compliant'
+    ).length
+
     // Total items requiring attention
     const totalRequiringAttention =
       pendingAffiliations +
@@ -89,16 +103,25 @@ export default function MainDashboard({}: MainDashboardProps) {
       pendingApplications +
       overdueInspections
 
+    // Compliance rate
+    const totalLicenses = licenses.length
+    const complianceRate = totalLicenses > 0 ? Math.round((activeLicenses / totalLicenses) * 100) : 0
+
     return {
       pendingAffiliations,
       activeAffiliations,
       expiringSoonLicenses,
       activeLicenses,
+      suspendedLicenses,
+      deniedLicenses,
       pendingApplications,
+      inReviewApplications,
       overdueInspections,
       dueSoonInspections,
       completedInspections,
+      nonCompliantInspections,
       totalRequiringAttention,
+      complianceRate,
       totalAffiliations: affiliations.length,
       totalLicenses: licenses.length,
       totalApplications: applications.length,
@@ -175,38 +198,87 @@ export default function MainDashboard({}: MainDashboardProps) {
   return (
     <div className="space-y-6 p-6">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-foreground">Regulator Dashboard</h1>
-        <p className="text-muted-foreground mt-1">
-          Overview of all compliance activities and priority actions
-        </p>
+      <div className="flex items-end justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">Regulator Dashboard</h1>
+          <p className="text-muted-foreground mt-1">
+            Overview of all compliance activities and priority actions
+          </p>
+        </div>
+        <Badge variant="outline" className="text-xs gap-1.5 py-1">
+          <Activity className="h-3 w-3" />
+          {aggregateMetrics.complianceRate}% compliance rate
+        </Badge>
       </div>
 
       {/* Quick Actions */}
       <QuickActions actions={quickActions} title="Navigate to Sections" />
 
-      {/* Primary Metrics - Items Requiring Attention */}
-      <Card className="bg-gradient-to-br from-orange-50 to-yellow-50 border-orange-200 shadow-md dark:from-orange-950/40 dark:to-yellow-950/30 dark:border-orange-800 dark:shadow-none">
-        <CardContent className="p-6">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-sm font-medium text-orange-900 dark:text-orange-300 mb-1">
-                Priority Actions Required
-              </p>
-              <p className="text-4xl font-bold text-orange-900 dark:text-orange-200">
-                {aggregateMetrics.totalRequiringAttention}
-              </p>
-              <p className="text-sm text-orange-700 dark:text-orange-400 mt-2">
-                {aggregateMetrics.pendingAffiliations} affiliations •{' '}
-                {aggregateMetrics.pendingApplications} applications •{' '}
-                {aggregateMetrics.expiringSoonLicenses} expiring •{' '}
-                {aggregateMetrics.overdueInspections} overdue
-              </p>
+      {/* Priority Attention + Key Stats Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {/* Priority Actions Card */}
+        <Card className="bg-gradient-to-br from-orange-50 to-yellow-50 border-orange-200 shadow-md dark:from-orange-950/40 dark:to-yellow-950/30 dark:border-orange-800 dark:shadow-none">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm font-medium text-orange-900 dark:text-orange-300 mb-1">
+                  Priority Actions Required
+                </p>
+                <p className="text-4xl font-bold text-orange-900 dark:text-orange-200">
+                  {aggregateMetrics.totalRequiringAttention}
+                </p>
+                <p className="text-sm text-orange-700 dark:text-orange-400 mt-2">
+                  {aggregateMetrics.pendingAffiliations} affiliations •{' '}
+                  {aggregateMetrics.pendingApplications} applications •{' '}
+                  {aggregateMetrics.expiringSoonLicenses} expiring •{' '}
+                  {aggregateMetrics.overdueInspections} overdue
+                </p>
+              </div>
+              <AlertTriangle className="h-10 w-10 text-orange-600 dark:text-orange-400" />
             </div>
-            <AlertTriangle className="h-12 w-12 text-orange-600 dark:text-orange-400" />
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+
+        {/* Total Entities Card */}
+        <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200 shadow-md dark:from-blue-950/40 dark:to-indigo-950/30 dark:border-blue-800 dark:shadow-none">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm font-medium text-blue-900 dark:text-blue-300 mb-1">
+                  Total Regulated Entities
+                </p>
+                <p className="text-4xl font-bold text-blue-900 dark:text-blue-200">
+                  {aggregateMetrics.totalLicenses + aggregateMetrics.totalAffiliations}
+                </p>
+                <p className="text-sm text-blue-700 dark:text-blue-400 mt-2">
+                  {aggregateMetrics.totalLicenses} licenses • {aggregateMetrics.totalAffiliations} affiliations
+                </p>
+              </div>
+              <ShieldCheck className="h-10 w-10 text-blue-600 dark:text-blue-400" />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Inspections Overview Card */}
+        <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 shadow-md dark:from-green-950/40 dark:to-emerald-950/30 dark:border-green-800 dark:shadow-none">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm font-medium text-green-900 dark:text-green-300 mb-1">
+                  Inspections Overview
+                </p>
+                <p className="text-4xl font-bold text-green-900 dark:text-green-200">
+                  {aggregateMetrics.totalInspections}
+                </p>
+                <p className="text-sm text-green-700 dark:text-green-400 mt-2">
+                  {aggregateMetrics.completedInspections} completed • {aggregateMetrics.dueSoonInspections} due soon
+                </p>
+              </div>
+              <TrendingUp className="h-10 w-10 text-green-600 dark:text-green-400" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Overview Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -244,10 +316,39 @@ export default function MainDashboard({}: MainDashboardProps) {
         />
       </div>
 
+      {/* Additional metrics row */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <MetricCard
+          title="Active Licenses"
+          value={aggregateMetrics.activeLicenses}
+          variant="success"
+          icon={ShieldCheck}
+          onClick={() => navigate({ to: '/license-management/licenses', search: { status: 'Active' } })}
+        />
+        <MetricCard
+          title="Suspended Licenses"
+          value={aggregateMetrics.suspendedLicenses}
+          variant="warning"
+          icon={AlertTriangle}
+        />
+        <MetricCard
+          title="In Review Applications"
+          value={aggregateMetrics.inReviewApplications}
+          variant="info"
+          icon={FileText}
+        />
+        <MetricCard
+          title="Non-Compliant"
+          value={aggregateMetrics.nonCompliantInspections}
+          variant="danger"
+          icon={AlertTriangle}
+        />
+      </div>
+
       {/* Section Summaries */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Affiliations Summary */}
-        <Card>
+        <Card className="shadow-md border-border/60 dark:shadow-none dark:border-foreground/15">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Users className="h-5 w-5" />
@@ -262,13 +363,13 @@ export default function MainDashboard({}: MainDashboardProps) {
             <div className="space-y-2 min-h-[72px]">
               <div className="flex justify-between text-sm">
                 <span>Pending Review</span>
-                <span className="font-medium text-yellow-600">
+                <span className="font-medium text-yellow-600 dark:text-yellow-400">
                   {aggregateMetrics.pendingAffiliations}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
                 <span>Active</span>
-                <span className="font-medium">{aggregateMetrics.activeAffiliations}</span>
+                <span className="font-medium text-green-600 dark:text-green-400">{aggregateMetrics.activeAffiliations}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span>Total Professionals</span>
@@ -277,15 +378,16 @@ export default function MainDashboard({}: MainDashboardProps) {
             </div>
             <button
               onClick={() => navigate({ to: '/affiliations' })}
-              className="w-full mt-4 px-4 py-2 bg-primary text-primary-foreground dark:text-background rounded-md hover:bg-primary/90 transition-colors text-sm font-medium"
+              className="w-full mt-4 px-4 py-2 bg-primary text-primary-foreground dark:text-background rounded-md hover:bg-primary/90 transition-colors text-sm font-medium flex items-center justify-center gap-2"
             >
               View Dashboard
+              <ArrowRight className="h-4 w-4" />
             </button>
           </CardContent>
         </Card>
 
         {/* Licenses Summary */}
-        <Card>
+        <Card className="shadow-md border-border/60 dark:shadow-none dark:border-foreground/15">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileText className="h-5 w-5" />
@@ -300,32 +402,33 @@ export default function MainDashboard({}: MainDashboardProps) {
             <div className="space-y-2 min-h-[72px]">
               <div className="flex justify-between text-sm">
                 <span>Expiring Soon</span>
-                <span className="font-medium text-red-600">
+                <span className="font-medium text-red-600 dark:text-red-400">
                   {aggregateMetrics.expiringSoonLicenses}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
                 <span>Active Licenses</span>
-                <span className="font-medium">{aggregateMetrics.activeLicenses}</span>
+                <span className="font-medium text-green-600 dark:text-green-400">{aggregateMetrics.activeLicenses}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span>Pending Applications</span>
-                <span className="font-medium text-yellow-600">
+                <span className="font-medium text-yellow-600 dark:text-yellow-400">
                   {aggregateMetrics.pendingApplications}
                 </span>
               </div>
             </div>
             <button
               onClick={() => navigate({ to: '/license-management' })}
-              className="w-full mt-4 px-4 py-2 bg-primary text-primary-foreground dark:text-background rounded-md hover:bg-primary/90 transition-colors text-sm font-medium"
+              className="w-full mt-4 px-4 py-2 bg-primary text-primary-foreground dark:text-background rounded-md hover:bg-primary/90 transition-colors text-sm font-medium flex items-center justify-center gap-2"
             >
               View Dashboard
+              <ArrowRight className="h-4 w-4" />
             </button>
           </CardContent>
         </Card>
 
         {/* Inspections Summary */}
-        <Card>
+        <Card className="shadow-md border-border/60 dark:shadow-none dark:border-foreground/15">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Calendar className="h-5 w-5" />
@@ -340,28 +443,29 @@ export default function MainDashboard({}: MainDashboardProps) {
             <div className="space-y-2 min-h-[72px]">
               <div className="flex justify-between text-sm">
                 <span>Overdue</span>
-                <span className="font-medium text-red-600">
+                <span className="font-medium text-red-600 dark:text-red-400">
                   {aggregateMetrics.overdueInspections}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
                 <span>Due This Week</span>
-                <span className="font-medium text-yellow-600">
+                <span className="font-medium text-yellow-600 dark:text-yellow-400">
                   {aggregateMetrics.dueSoonInspections}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
                 <span>Completed</span>
-                <span className="font-medium text-green-600">
+                <span className="font-medium text-green-600 dark:text-green-400">
                   {aggregateMetrics.completedInspections}
                 </span>
               </div>
             </div>
             <button
               onClick={() => navigate({ to: '/inspections' })}
-              className="w-full mt-4 px-4 py-2 bg-primary text-primary-foreground dark:text-background rounded-md hover:bg-primary/90 transition-colors text-sm font-medium"
+              className="w-full mt-4 px-4 py-2 bg-primary text-primary-foreground dark:text-background rounded-md hover:bg-primary/90 transition-colors text-sm font-medium flex items-center justify-center gap-2"
             >
               View Dashboard
+              <ArrowRight className="h-4 w-4" />
             </button>
           </CardContent>
         </Card>

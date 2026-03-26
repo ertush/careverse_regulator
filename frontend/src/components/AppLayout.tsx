@@ -146,16 +146,19 @@ export default function AppLayout({
       key: "analytics",
       icon: BarChart3,
       label: "Analytics",
+      disabled: true,
     },
     {
       key: "documents",
       icon: FileText,
       label: "Documents",
+      disabled: true,
     },
     {
       key: "forms",
       icon: FileEdit,
       label: "Forms",
+      disabled: true,
     },
     {
       key: "modules",
@@ -226,37 +229,58 @@ export default function AppLayout({
     const isSelected = selectedMenuKey === item.key;
     const hasChildren = "children" in item && item.children;
     const isOpen = openGroups.includes(item.key);
+    const isDisabled = "disabled" in item && item.disabled;
 
     if (hasChildren) {
       return (
-        <div key={item.key}>
-          <button
-            onClick={() => toggleGroup(item.key)}
-            className={cn(
-              "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
-              collapsed ? "justify-center" : "justify-between",
-              "hover:bg-accent hover:text-accent-foreground",
-            )}
-          >
-            <div className="flex items-center gap-3">
-              <Icon className="w-4 h-4 shrink-0" />
-              {!collapsed && <span>{item.label}</span>}
-            </div>
-            {!collapsed && (
+        <div key={item.key} className={depth === 0 ? "mt-4" : ""}>
+          {!collapsed && (
+            <button
+              onClick={() => toggleGroup(item.key)}
+              className={cn(
+                "w-full flex items-center justify-between px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground/70 hover:text-muted-foreground transition-colors",
+              )}
+            >
+              <span>{item.label}</span>
               <ChevronRight
                 className={cn(
-                  "w-4 h-4 transition-transform",
+                  "w-3.5 h-3.5 transition-transform duration-200",
                   isOpen && "rotate-90",
                 )}
               />
-            )}
-          </button>
+            </button>
+          )}
+          {collapsed && (
+            <button
+              onClick={() => toggleGroup(item.key)}
+              className="w-full flex items-center justify-center px-3 py-2 hover:bg-accent rounded-md transition-colors"
+            >
+              <Icon className="w-4 h-4 shrink-0 text-muted-foreground" />
+            </button>
+          )}
           {!collapsed && isOpen && (
-            <div className="ml-4 mt-1 space-y-1">
+            <div className="mt-0.5 space-y-0.5">
               {item.children.map((child) => renderNavItem(child, depth + 1))}
             </div>
           )}
         </div>
+      );
+    }
+
+    if (isDisabled) {
+      return (
+        <button
+          key={item.key}
+          disabled
+          className={cn(
+            "w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium cursor-not-allowed",
+            collapsed ? "justify-center" : "justify-start",
+            "text-muted-foreground/40",
+          )}
+        >
+          <Icon className="w-4 h-4 shrink-0" />
+          {!collapsed && <span>{item.label}</span>}
+        </button>
       );
     }
 
@@ -265,11 +289,11 @@ export default function AppLayout({
         key={item.key}
         onClick={() => handleMenuClick(item.key)}
         className={cn(
-          "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+          "w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
           collapsed ? "justify-center" : "justify-start",
           isSelected
-            ? "bg-primary/20 text-primary dark:bg-primary/40 dark:text-green-400"
-            : "hover:bg-accent hover:text-accent-foreground",
+            ? "bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary"
+            : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
         )}
       >
         <Icon className="w-4 h-4 shrink-0" />

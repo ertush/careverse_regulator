@@ -14,7 +14,7 @@ interface AffiliationsViewProps {
   company?: string | null
 }
 
-export default function AffiliationsView({ company }: AffiliationsViewProps) {
+export default function AffiliationsView({}: AffiliationsViewProps) {
   const navigate = useNavigate()
   const {
     affiliations,

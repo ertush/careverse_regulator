@@ -22,7 +22,6 @@ interface ApplicationsTableProps {
 export default function ApplicationsTable({
   applications,
   loading,
-  onRowClick,
   selectedIds,
   onToggleSelection,
   onSelectAll,

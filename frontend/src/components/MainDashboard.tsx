@@ -9,14 +9,11 @@ import {
   QuickActions,
 } from '@/components/dashboard'
 import {
-  CheckCircle,
   Clock,
   AlertTriangle,
   Users,
   FileText,
   Calendar,
-  TrendingUp,
-  Activity,
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { differenceInDays, isBefore } from 'date-fns'
@@ -26,7 +23,7 @@ interface MainDashboardProps {
   company?: string | null
 }
 
-export default function MainDashboard({ onNavigate, company }: MainDashboardProps) {
+export default function MainDashboard({}: MainDashboardProps) {
   const navigate = useNavigate()
 
   // Load data from all stores (fetched by route loader)

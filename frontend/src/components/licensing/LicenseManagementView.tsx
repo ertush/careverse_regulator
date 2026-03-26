@@ -29,7 +29,7 @@ interface ApplicationFiltersState {
 
 type TabValue = 'facility-applications' | 'professional-applications'
 
-export default function LicenseManagementView({ company }: LicenseManagementViewProps) {
+export default function LicenseManagementView({}: LicenseManagementViewProps) {
   const navigate = useNavigate()
   const {
     applications,

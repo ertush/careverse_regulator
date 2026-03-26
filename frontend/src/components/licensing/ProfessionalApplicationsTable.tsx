@@ -23,7 +23,6 @@ interface ProfessionalApplicationsTableProps {
 export default function ProfessionalApplicationsTable({
   applications,
   loading,
-  onRowClick,
   selectedIds,
   onToggleSelection,
   onSelectAll,

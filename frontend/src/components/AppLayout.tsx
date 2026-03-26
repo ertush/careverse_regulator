@@ -24,7 +24,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+
 import NotificationCenter from "@/components/shared/NotificationCenter";
 import {
   DropdownMenu,
@@ -86,7 +86,6 @@ export default function AppLayout({
   pageTitle,
   pageSubtitle,
   onNavigate,
-  onOpenNotifications,
   onLogout,
   onSwitchToDesk,
   user,

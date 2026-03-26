@@ -158,7 +158,7 @@ export default function UserAdministrationView() {
         <TabsContent value="users" className="mt-6 space-y-6">
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Card>
+            <Card className="shadow-md border border-border/60 dark:shadow-none dark:border-foreground/15">
               <CardContent className="p-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
@@ -172,7 +172,7 @@ export default function UserAdministrationView() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="shadow-md border border-border/60 dark:shadow-none dark:border-foreground/15">
               <CardContent className="p-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/50 flex items-center justify-center">
@@ -186,7 +186,7 @@ export default function UserAdministrationView() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="shadow-md border border-border/60 dark:shadow-none dark:border-foreground/15">
               <CardContent className="p-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/50 flex items-center justify-center">
@@ -200,7 +200,7 @@ export default function UserAdministrationView() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="shadow-md border border-border/60 dark:shadow-none dark:border-foreground/15">
               <CardContent className="p-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">

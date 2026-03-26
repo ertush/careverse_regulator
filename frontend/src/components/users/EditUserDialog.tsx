@@ -47,9 +47,15 @@ export default function EditUserDialog({ open, onOpenChange, user, onSuccess }: 
 
   useEffect(() => {
     if (user) {
-      const nameParts = (user.full_name || '').split(' ')
-      setFirstName(user.first_name || nameParts[0] || '')
-      setLastName(user.last_name || nameParts.slice(1).join(' ') || '')
+      // Backend returns full_name only (not first_name / last_name separately).
+      // Split on the first space so multi-part last names stay intact.
+      const fullName = (user.full_name || '').trim()
+      const spaceIdx = fullName.indexOf(' ')
+      const parsedFirst = spaceIdx > 0 ? fullName.slice(0, spaceIdx) : fullName
+      const parsedLast = spaceIdx > 0 ? fullName.slice(spaceIdx + 1) : ''
+
+      setFirstName(parsedFirst)
+      setLastName(parsedLast)
       setIdNumber(user.username || '')
       setPhone(user.mobile_no || '')
       setRole(getPortalRole(user.roles))

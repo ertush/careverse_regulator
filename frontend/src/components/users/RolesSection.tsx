@@ -60,9 +60,9 @@ export default function RolesSection({ roles, users, onRefreshUsers }: RolesSect
   const getUsersForRole = (roleName: string) =>
     users.filter((u) => u.roles.includes(roleName))
 
-  const handleOpenAssignDialog = (roleName: PortalRole) => {
+  const handleOpenAssignDialog = (roleName: PortalRole, userId?: string) => {
     setAssignTargetRole(roleName)
-    setAssignUserId('')
+    setAssignUserId(userId ?? '')
     setAssignError(null)
     setAssignDialogOpen(true)
   }
@@ -171,7 +171,7 @@ export default function RolesSection({ roles, users, onRefreshUsers }: RolesSect
                   </p>
                   {role.capabilities.map((cap) => (
                     <div key={cap} className="flex items-center gap-2 text-sm">
-                      <CheckCircle className="h-3.5 w-3.5 text-green-500 shrink-0" />
+                      <CheckCircle className="h-3.5 w-3.5 text-green-500 dark:text-green-400 shrink-0" />
                       <span>{cap}</span>
                     </div>
                   ))}
@@ -193,7 +193,7 @@ export default function RolesSection({ roles, users, onRefreshUsers }: RolesSect
                         >
                           <div className="flex items-center gap-2 min-w-0">
                             <div
-                              className={`w-2 h-2 rounded-full shrink-0 ${u.enabled === 1 ? 'bg-green-500' : 'bg-muted-foreground/50'}`}
+                              className={`w-2 h-2 rounded-full shrink-0 ${u.enabled === 1 ? 'bg-green-500 dark:bg-green-400' : 'bg-muted-foreground/50'}`}
                             />
                             <span className="text-sm truncate">
                               {u.full_name || u.email}
@@ -237,7 +237,7 @@ export default function RolesSection({ roles, users, onRefreshUsers }: RolesSect
                 <div key={u.name} className="flex items-center justify-between gap-3 py-1.5">
                   <div className="flex items-center gap-2 min-w-0">
                     <div
-                      className={`w-2 h-2 rounded-full shrink-0 ${u.enabled === 1 ? 'bg-green-500' : 'bg-muted-foreground/50'}`}
+                      className={`w-2 h-2 rounded-full shrink-0 ${u.enabled === 1 ? 'bg-green-500 dark:bg-green-400' : 'bg-muted-foreground/50'}`}
                     />
                     <span className="text-sm font-medium truncate">
                       {u.full_name || u.email}
@@ -246,8 +246,7 @@ export default function RolesSection({ roles, users, onRefreshUsers }: RolesSect
                   </div>
                   <Select
                     onValueChange={(role) => {
-                      handleOpenAssignDialog(role as PortalRole)
-                      setAssignUserId(u.name)
+                      handleOpenAssignDialog(role as PortalRole, u.name)
                     }}
                   >
                     <SelectTrigger className="w-[180px] h-8 text-xs">

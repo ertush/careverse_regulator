@@ -401,17 +401,9 @@ export default function AppLayout({
               <div className="h-8 w-px bg-border" />
 
               <div className="flex flex-col">
-                {/*<span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
-                  {pageContext}
-                </span>*/}
                 <h1 className="text-sm font-semibold leading-tight">
                   {pageTitle}
                 </h1>
-                {/*{pageSubtitle && (
-                  <span className="text-xs text-muted-foreground">
-                    {pageSubtitle}
-                  </span>
-                )}*/}
               </div>
             </div>
 

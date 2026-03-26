@@ -123,7 +123,7 @@ export default function UsersTable({
                     <div className="flex items-center gap-2 shrink-0">
                       <div className="flex items-center gap-1.5">
                         <div
-                          className={`w-2 h-2 rounded-full ${isActive ? 'bg-green-500' : 'bg-muted-foreground/50'}`}
+                          className={`w-2 h-2 rounded-full ${isActive ? 'bg-green-500 dark:bg-green-400' : 'bg-muted-foreground/50'}`}
                         />
                         <span className="text-xs text-muted-foreground">
                           {isActive ? 'Active' : 'Disabled'}

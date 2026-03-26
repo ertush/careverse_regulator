@@ -151,9 +151,6 @@ async function makeRequest<T>(
     headers.set('X-Frappe-CSRF-Token', csrfToken)
   }
 
-  // Explicitly set Expect to prevent 417 errors
-  headers.set('Expect', '')
-
   // Create abort controller for timeout
   const controller = new AbortController()
   const timeoutId = setTimeout(() => controller.abort(), timeout)

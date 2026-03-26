@@ -203,6 +203,9 @@ def build_tenant_payload(user: str | None = None) -> dict:
 		set_active_company_in_session(context.active_company)
 	company_branding = get_company_branding(context.active_company)
 
+	# Include user roles so the frontend can enforce role-based guards
+	roles = frappe.get_roles(context.user) if context.user and context.user != "Guest" else []
+
 	return {
 		"user": context.user,
 		"active_company": context.active_company,
@@ -212,6 +215,7 @@ def build_tenant_payload(user: str | None = None) -> dict:
 		"favicon_url": company_branding.get("favicon_url"),
 		"company_branding": company_branding,
 		"allowed_companies": list(context.allowed_companies),
+		"roles": roles,
 		"portal_access": {
 			"allowed": context.access_allowed,
 			"reason": context.reason,

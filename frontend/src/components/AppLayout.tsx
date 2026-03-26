@@ -20,12 +20,14 @@ import {
   FileText,
   FileEdit,
   ScrollText,
+
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import NotificationCenter from "@/components/shared/NotificationCenter";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -94,9 +96,11 @@ export default function AppLayout({
   const [collapsed, setCollapsed] = useState(false);
   const [mobileMenuVisible, setMobileMenuVisible] = useState(false);
 
+
   const mode = useThemeStore((state) => state.mode);
   const toggleMode = useThemeStore((state) => state.toggleMode);
   const isDarkMode = mode === "dark";
+
 
   useEffect(() => {
     setCollapsed(isTablet);
@@ -116,6 +120,21 @@ export default function AppLayout({
   const brandTitle =
     user?.companyDisplayName || user?.company || "Compliance360";
   const brandSubtitle = user?.companyAbbr || "Regulator Portal";
+
+  // Keyboard shortcut: Cmd+K / Ctrl+K to open search
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
+        event.preventDefault()
+        setSearchOpen(prev => true)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [])
 
   const menuItems = [
     {
@@ -373,7 +392,31 @@ export default function AppLayout({
               </div>
             </div>
 
+            {/* Search bar for desktop */}
+            {!isMobile && !isTablet && (
+              <Button
+                variant="outline"
+                className="w-80 justify-start text-muted-foreground font-normal"
+                onClick={() => setSearchOpen(true)}
+              >
+                <Search className="w-4 h-4 mr-2" />
+                <span>Search... (⌘K)</span>
+              </Button>
+            )}
+
             <div className="flex items-center gap-2">
+              {/* Search icon for mobile/tablet */}
+              {(isMobile || isTablet) && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setSearchOpen(true)}
+                  className={cn(isMobile ? "w-9 h-9" : "w-10 h-10")}
+                >
+                  <Search className="w-4 h-4" />
+                </Button>
+              )}
+
               <NotificationCenter />
 
               <Tooltip>
@@ -448,6 +491,7 @@ export default function AppLayout({
 
         <main className="p-4 md:p-6">{children}</main>
       </div>
+      {searchOpen && <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />}
     </div>
   );
 }

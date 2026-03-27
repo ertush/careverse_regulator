@@ -96,13 +96,14 @@ export default function UnauthorizedPage({
       <div className="absolute w-[500px] h-[500px] rounded-full bg-primary/10 dark:bg-primary/20 blur-[80px] -top-24 -left-24 pointer-events-none" />
       <div className="absolute w-[400px] h-[400px] rounded-full bg-green-500/10 dark:bg-green-500/20 blur-[80px] -bottom-12 -right-12 pointer-events-none" />
 
-      <header className="sticky top-0 z-10 bg-background/70 dark:bg-slate-900/70 backdrop-blur-lg border-b border-border px-5 py-4">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
+      <header className="sticky top-0 z-10 bg-background/70 dark:bg-background/70 backdrop-blur-lg border-b border-border px-5 py-4">
+        <div className="max-w-7xl w-full mx-auto flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 dark:bg-primary/20 border border-primary/20 dark:border-primary/30 flex items-center justify-center text-primary font-bold text-lg backdrop-blur-sm">
-              C
-            </div>
-            <h4 className="text-lg font-semibold tracking-tight">Compliance 360</h4>
+            <img
+              src="/assets/careverse_regulator/compliance-360/compliance-logo.svg"
+              alt="Compliance 360"
+              className="h-7 w-auto"
+            />
           </div>
 
           <Button variant="ghost" size="sm" onClick={toggleMode} className="rounded-lg">
@@ -116,7 +117,7 @@ export default function UnauthorizedPage({
         <div className="max-w-7xl w-full">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
             <div>
-              <Card className="bg-card/90 dark:bg-slate-900/90 backdrop-blur-sm shadow-lg">
+              <Card className="bg-card/90 dark:bg-card/90 backdrop-blur-sm shadow-lg">
                 <CardContent className={isMobile ? 'p-6' : 'p-10'}>
                   <div className="flex flex-col gap-6">
                     <div className="w-12 h-12 rounded-xl bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary">
@@ -127,7 +128,7 @@ export default function UnauthorizedPage({
                       <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground block mb-2.5">
                         Organization Portal
                       </span>
-                      <h1 className={`font-semibold tracking-tight leading-tight ${isMobile ? 'text-2xl' : 'text-3xl'}`}>
+                      <h1 className={`font-medium tracking-tight leading-tight ${isMobile ? 'text-2xl' : 'text-3xl'}`}>
                         {pageTitle}
                       </h1>
                       <p className="text-sm leading-relaxed text-muted-foreground mt-3">
@@ -138,7 +139,7 @@ export default function UnauthorizedPage({
                     <Button
                       size="lg"
                       onClick={handlePrimaryAction}
-                      className="w-full h-12 text-sm font-semibold bg-gradient-to-r from-primary to-green-600 hover:from-primary/90 hover:to-green-600/90 shadow-lg shadow-primary/25"
+                      className="w-full h-12 text-sm font-medium bg-gradient-to-r from-primary to-green-600 hover:from-primary/90 hover:to-green-600/90 shadow-lg shadow-primary/25"
                     >
                       <LogIn className="w-4 h-4 mr-2" />
                       {primaryLabel}
@@ -151,7 +152,7 @@ export default function UnauthorizedPage({
                           <Button
                             variant="outline"
                             onClick={onSwitchToDesk}
-                            className="h-10 font-semibold"
+                            className="h-10 font-medium"
                           >
                             <Monitor className="w-4 h-4 mr-2" />
                             Open Desk
@@ -161,7 +162,7 @@ export default function UnauthorizedPage({
                           <Button
                             variant="destructive"
                             onClick={onLogout}
-                            className="h-10 font-semibold"
+                            className="h-10 font-medium"
                           >
                             <LogOut className="w-4 h-4 mr-2" />
                             Log Out
@@ -170,7 +171,7 @@ export default function UnauthorizedPage({
                       </div>
                     )}
 
-                    <div className="p-4 rounded-xl bg-muted/50 dark:bg-slate-800/50 border border-border">
+                    <div className="p-4 rounded-xl bg-muted/50 dark:bg-muted/50 border border-border">
                       <h5 className="text-sm font-medium text-primary mb-3">
                         {isGuest ? 'After You Sign In' : 'Current Account'}
                       </h5>
@@ -179,7 +180,7 @@ export default function UnauthorizedPage({
                       </p>
                     </div>
 
-                    <div className="p-4 rounded-xl bg-muted/50 dark:bg-slate-800/50 border border-border">
+                    <div className="p-4 rounded-xl bg-muted/50 dark:bg-muted/50 border border-border">
                       <h5 className="text-sm font-medium mb-2">
                         Need Help?
                       </h5>
@@ -197,7 +198,7 @@ export default function UnauthorizedPage({
                 <span className="text-xs font-medium uppercase tracking-wider text-primary dark:text-green-400 block mb-3">
                   Executive Platform
                 </span>
-                <h2 className="text-3xl font-semibold mb-2.5">
+                <h2 className="text-3xl font-medium mb-2.5">
                   Smarter Organization Management
                 </h2>
                 <p className="text-sm text-muted-foreground">
@@ -209,21 +210,21 @@ export default function UnauthorizedPage({
                 {features.map((feature, index) => {
                   const Icon = feature.icon
                   return (
-                    <Card key={index} className="bg-card/90 dark:bg-slate-900/90 backdrop-blur-sm shadow-md transition-all hover:shadow-lg">
+                    <Card key={index} className="bg-card/90 dark:bg-card/90 backdrop-blur-sm shadow-md transition-all hover:shadow-lg">
                       <CardContent className="p-4.5">
                         <div className="flex gap-4 items-start">
                           <div className="w-10 h-10 rounded-lg bg-primary/10 dark:bg-primary/20 flex items-center justify-center shrink-0 text-primary">
                             <Icon className="w-5 h-5" />
                           </div>
                           <div className="flex-1">
-                            <h5 className="font-semibold mb-1">
+                            <h5 className="font-medium mb-1">
                               {feature.title}
                             </h5>
                             <p className="text-sm text-muted-foreground">
                               {feature.description}
                             </p>
                           </div>
-                          <CheckCircle className="w-5 h-5 text-green-500 ml-auto self-center shrink-0" />
+                          <CheckCircle className="w-5 h-5 text-green-500 dark:text-green-400 ml-auto self-center shrink-0" />
                         </div>
                       </CardContent>
                     </Card>

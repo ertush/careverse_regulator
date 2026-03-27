@@ -1,687 +1,396 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title }}</title>
-    <meta name="description" content="Healthcare regulator platform for compliance tracking and operational excellence.">
 
-    <link rel="icon" type="image/svg+xml" href="/assets/careverse_regulator/compliance-360/favicon.svg?v=20260313b">
-    <link rel="alternate icon" href="/assets/careverse_regulator/compliance-360/favicon.svg?v=20260313b" type="image/svg+xml">
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700&display=swap" rel="stylesheet">
-
-    <style>
-        :root {
-            --primary: #0f766e;
-            --primary-dark: #0d9488;
-            --text-main: #1e293b;
-            --text-body: #334155;
-            --text-muted: #64748b;
-            --text-light: #94a3b8;
-            --text-faint: #cbd5e1;
-            --glass-bg: linear-gradient(145deg, rgba(255,255,255,0.72), rgba(255,255,255,0.44));
-            --glass-border: 1px solid rgba(255,255,255,0.50);
-            --glass-shadow: 0 12px 36px rgba(15, 23, 42, 0.11);
-            --glass-shadow-lg: 0 20px 56px rgba(15, 23, 42, 0.14);
-            --r: 16px;
-            --r-lg: 20px;
-            --font: 'Public Sans', 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+<html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>{{ title }}</title>
+<link rel="icon" type="image/svg+xml" href="/assets/careverse_regulator/compliance-360/favicon.svg?v=20260313b">
+<link rel="alternate icon" href="/assets/careverse_regulator/compliance-360/favicon.svg?v=20260313b" type="image/svg+xml">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#006b5c",
+                        "on-tertiary-fixed": "#3c0800",
+                        "surface-container-high": "#e3eae6",
+                        "background": "#f4fbf7",
+                        "on-secondary": "#ffffff",
+                        "primary-container": "#00bfa5",
+                        "surface-tint": "#006b5c",
+                        "surface-container-lowest": "#ffffff",
+                        "outline": "#6c7a76",
+                        "tertiary-fixed": "#ffdbd2",
+                        "tertiary-container": "#fe896a",
+                        "surface-container-low": "#eef5f1",
+                        "secondary-fixed": "#e0e0ff",
+                        "on-secondary-container": "#27308a",
+                        "surface-container-highest": "#dde4e0",
+                        "outline-variant": "#bbcac4",
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed-dim": "#ffb4a1",
+                        "on-tertiary": "#ffffff",
+                        "tertiary": "#9f4128",
+                        "on-tertiary-container": "#74220b",
+                        "primary-fixed-dim": "#44ddc1",
+                        "on-background": "#161d1b",
+                        "on-surface": "#161d1b",
+                        "on-secondary-fixed": "#000767",
+                        "on-primary-container": "#00473c",
+                        "error-container": "#ffdad6",
+                        "error": "#ba1a1a",
+                        "on-surface-variant": "#3c4a46",
+                        "inverse-primary": "#44ddc1",
+                        "surface-variant": "#dde4e0",
+                        "surface": "#f4fbf7",
+                        "secondary": "#4c56af",
+                        "on-primary": "#ffffff",
+                        "inverse-surface": "#2b3230",
+                        "on-secondary-fixed-variant": "#343d96",
+                        "surface-bright": "#f4fbf7",
+                        "secondary-container": "#959efd",
+                        "surface-dim": "#d4dcd8",
+                        "on-primary-fixed": "#00201a",
+                        "on-primary-fixed-variant": "#005145",
+                        "primary-fixed": "#68fadd",
+                        "on-tertiary-fixed-variant": "#7f2a13",
+                        "on-error": "#ffffff",
+                        "inverse-on-surface": "#ebf2ef",
+                        "secondary-fixed-dim": "#bdc2ff",
+                        "surface-container": "#e8efec"
+                    },
+                    fontFamily: {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
         }
-
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-        html, body {
-            font-family: var(--font);
-            color: var(--text-main);
-            background: linear-gradient(168deg, #f3f6fb 0%, #f8f7f5 42%, #f4f6fa 100%);
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            scroll-behavior: smooth;
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
         }
-
+        .glass-header {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+        }
+        .signature-gradient {
+            background: linear-gradient(135deg, #006b5c 0%, #00bfa5 100%);
+        }
+        .asymmetric-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 1.5rem;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            color: #161d1b;
+            background-color: #f4fbf7;
+        }
         #page-content { padding: 0 !important; max-width: none !important; }
-
-        .wrap { max-width: 1060px; margin: 0 auto; padding: 0 28px; }
-
-        .page { position: relative; overflow: hidden; }
-
-        .page::before,
-        .page::after {
-            content: '';
-            position: fixed;
-            pointer-events: none;
-            border-radius: 999px;
-            filter: blur(34px);
-            z-index: 0;
-        }
-
-        .page::before {
-            width: 360px; height: 360px;
-            top: -110px; right: -90px;
-            background: radial-gradient(circle, rgba(15, 118, 110, 0.22), transparent);
-        }
-
-        .page::after {
-            width: 300px; height: 300px;
-            bottom: -90px; left: -70px;
-            background: radial-gradient(circle, rgba(22, 163, 74, 0.16), transparent);
-        }
-
-        .page > * { position: relative; z-index: 1; }
-
-        .orb-mid {
-            position: fixed;
-            pointer-events: none; z-index: 0;
-            width: 180px; height: 180px;
-            top: 50%; left: -30px;
-            border-radius: 999px;
-            filter: blur(46px);
-            background: radial-gradient(circle, rgba(15, 118, 110, 0.08), transparent);
-        }
-
-        .g {
-            background: var(--glass-bg);
-            border: var(--glass-border);
-            box-shadow: var(--glass-shadow);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            border-radius: var(--r);
-        }
-
-        .navbar {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: linear-gradient(145deg, rgba(255,255,255,0.72), rgba(255,255,255,0.44));
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            border-bottom: 1px solid rgba(226, 232, 240, 0.30);
-            padding: 1rem 2rem;
-        }
-
-        .navbar-content {
-            max-width: 1060px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .navbar-logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .navbar-logo img.nav-icon { width: 36px; height: 36px; }
-        .navbar-logo img.nav-wordmark { height: 24px; width: auto; }
-
-        .navbar-logo span {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: var(--text-main);
-        }
-
-        .navbar-actions { display: flex; gap: 12px; }
-
-        .btn {
-            padding: 12px 20px;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.15s;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-family: inherit;
-            border: none;
-        }
-
-        .btn-outline {
-            background: rgba(255,255,255,0.6);
-            color: var(--text-body);
-            border: 1px solid rgba(226, 232, 240, 0.8);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-        }
-
-        .btn-outline:hover {
-            background: rgba(255,255,255,0.9);
-            transform: translateY(-1px);
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: #fff;
-            box-shadow: 0 4px 14px rgba(15, 118, 110, 0.22), 0 1px 3px rgba(15, 118, 110, 0.10);
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-dark);
-            box-shadow: 0 6px 20px rgba(15, 118, 110, 0.30), 0 2px 4px rgba(15, 118, 110, 0.12);
-            transform: translateY(-1px);
-        }
-
-        .hero { padding: 110px 0 48px; }
-
-        .hero-inner { text-align: center; max-width: 680px; margin: 0 auto; }
-
-        .hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 7px 18px;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-muted);
-            border-radius: 100px;
-            margin-bottom: 28px;
-            letter-spacing: 0.3px;
-            background: linear-gradient(145deg, rgba(255,255,255,0.78), rgba(248,252,255,0.52));
-            box-shadow: var(--glass-shadow);
-        }
-
-        .hero-badge svg { color: var(--primary); width: 13px; height: 13px; }
-
-        .hero-title {
-            font-size: clamp(2.6rem, 5vw, 3.6rem);
-            font-weight: 700;
-            line-height: 1.06;
-            letter-spacing: -0.035em;
-            margin-bottom: 20px;
-        }
-
-        .hero-title .accent {
-            background: linear-gradient(135deg, var(--primary), #16a34a);
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .hero-desc {
-            font-size: 17px;
-            line-height: 1.65;
-            color: var(--text-muted);
-            margin: 0 auto 36px;
-            max-width: 520px;
-            font-weight: 400;
-        }
-
-        .cta-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-
-        .trust-bar {
-            display: flex;
-            justify-content: center;
-            gap: 32px;
-            margin-top: 48px;
-            padding-top: 32px;
-            border-top: 1px solid rgba(226, 232, 240, 0.30);
-            flex-wrap: wrap;
-        }
-
-        .trust-item { text-align: center; }
-        .trust-val { font-size: 22px; font-weight: 700; color: var(--text-main); }
-        .trust-lbl { font-size: 11px; color: var(--text-light); font-weight: 500; letter-spacing: 0.4px; text-transform: uppercase; margin-top: 2px; }
-
-        .showcase { padding: 24px 0 100px; }
-
-        .showcase-panel {
-            border-radius: var(--r-lg);
-            overflow: hidden;
-            position: relative;
-            padding: 48px;
-            min-height: 320px;
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 16px;
-            align-items: start;
-            background: linear-gradient(145deg, rgba(255,255,255,0.68), rgba(255,255,255,0.36));
-            border: 1px solid rgba(255,255,255,0.48);
-            box-shadow: var(--glass-shadow-lg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-        }
-
-        .showcase-panel::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-image:
-                linear-gradient(rgba(22, 163, 74, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(22, 163, 74, 0.03) 1px, transparent 1px);
-            background-size: 32px 32px;
-            z-index: 0;
-        }
-
-        .showcase-panel > * { position: relative; z-index: 1; }
-
-        .sc-card {
-            padding: 20px;
-            border-radius: 12px;
-            background: linear-gradient(145deg, rgba(255,255,255,0.82), rgba(255,255,255,0.52));
-            border: 1px solid rgba(255,255,255,0.55);
-            box-shadow: 0 6px 20px rgba(15, 23, 42, 0.07);
-        }
-
-        .sc-label {
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--text-light);
-            text-transform: uppercase;
-            letter-spacing: 0.4px;
-            margin-bottom: 8px;
-        }
-
-        .sc-value {
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--text-main);
-            line-height: 1;
-            margin-bottom: 6px;
-        }
-
-        .sc-sub { font-size: 12px; color: var(--text-muted); }
-
-        .bento { padding: 100px 0; }
-
-        .bento-header { margin-bottom: 48px; }
-        .bento-header h2 { font-size: 28px; font-weight: 700; letter-spacing: -0.025em; margin-bottom: 10px; }
-        .bento-header p { font-size: 15px; color: var(--text-muted); max-width: 420px; line-height: 1.55; }
-
-        .bento-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: auto auto;
-            gap: 16px;
-        }
-
-        .bento-card {
-            padding: 32px;
-            transition: box-shadow 0.2s ease, transform 0.2s ease;
-        }
-
-        .bento-card:hover {
-            box-shadow: 0 18px 48px rgba(15, 23, 42, 0.15);
-            transform: translateY(-2px);
-        }
-
-        .bento-card.wide { grid-column: span 2; }
-
-        .bento-ic {
-            width: 40px; height: 40px;
-            border-radius: 10px;
-            background: rgba(15, 118, 110, 0.08);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--primary);
-            margin-bottom: 16px;
-        }
-
-        .bento-ic svg { width: 18px; height: 18px; stroke: currentColor; stroke-width: 2; fill: none; }
-
-        .bento-card h3 { font-size: 16px; font-weight: 700; color: var(--text-body); margin-bottom: 8px; }
-        .bento-card p { font-size: 13px; line-height: 1.6; color: var(--text-muted); max-width: 400px; }
-
-        .proof { padding: 100px 0; }
-
-        .proof-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        .proof-quote {
-            padding: 36px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            grid-row: span 2;
-        }
-
-        .proof-quote .pq-mark {
-            font-size: 56px;
-            line-height: 1;
-            font-family: Georgia, serif;
-            color: var(--primary);
-            opacity: 0.15;
-            margin-bottom: 8px;
-        }
-
-        .proof-quote .pq-text {
-            font-size: 17px;
-            line-height: 1.7;
-            color: var(--text-body);
-            font-style: italic;
-            margin-bottom: 24px;
-        }
-
-        .proof-quote .pq-author { display: flex; align-items: center; gap: 12px; }
-
-        .proof-quote .pq-avatar {
-            width: 40px; height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary), #16a34a);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-weight: 700;
-            font-size: 14px;
-        }
-
-        .proof-quote .pq-name { font-size: 14px; font-weight: 600; color: var(--text-body); }
-        .proof-quote .pq-role { font-size: 12px; color: var(--text-muted); }
-
-        .proof-mini {
-            padding: 28px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .proof-mini .pm-text {
-            font-size: 14px;
-            line-height: 1.6;
-            color: var(--text-body);
-            margin-bottom: 16px;
-        }
-
-        .proof-mini .pm-author { display: flex; align-items: center; gap: 10px; }
-
-        .proof-mini .pm-avatar {
-            width: 32px; height: 32px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary), #16a34a);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-weight: 700;
-            font-size: 11px;
-        }
-
-        .proof-mini .pm-name { font-size: 13px; font-weight: 600; color: var(--text-body); }
-        .proof-mini .pm-role { font-size: 11px; color: var(--text-muted); }
-
-        .cta-sec { padding: 60px 0 100px; }
-
-        .cta-box {
-            text-align: center;
-            padding: 64px 40px;
-            max-width: 720px;
-            margin: 0 auto;
-            background: linear-gradient(145deg, rgba(255,255,255,0.84), rgba(255,255,255,0.50));
-            border: 1px solid rgba(255,255,255,0.60);
-            box-shadow: var(--glass-shadow-lg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-radius: var(--r-lg);
-        }
-
-        .cta-box h2 { font-size: 28px; font-weight: 700; margin-bottom: 12px; letter-spacing: -0.025em; }
-        .cta-box > p { font-size: 15px; color: var(--text-muted); margin-bottom: 28px; line-height: 1.55; max-width: 460px; margin-left: auto; margin-right: auto; }
-        .cta-box .cta-row { justify-content: center; }
-
-        .cta-box .trust-note {
-            margin-top: 18px;
-            font-size: 12px;
-            color: var(--text-light);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
-        .cta-box .trust-note svg { color: #10b981; width: 14px; height: 14px; }
-
-        .ft {
-            padding: 48px 0 32px;
-            border-top: 1px solid rgba(226, 232, 240, 0.30);
-        }
-
-        .ft-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr;
-            gap: 32px;
-            margin-bottom: 32px;
-        }
-
-        .ft-brand p { font-size: 13px; line-height: 1.6; color: var(--text-muted); margin-top: 8px; max-width: 260px; }
-        .ft-col h4 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-body); margin-bottom: 14px; }
-        .ft-col a { display: block; color: var(--text-muted); text-decoration: none; font-size: 13px; margin-bottom: 10px; transition: color 0.15s; }
-        .ft-col a:hover { color: var(--primary); }
-
-        .ft-bottom {
-            border-top: 1px solid rgba(226, 232, 240, 0.22);
-            padding-top: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .ft-bottom .cp { color: var(--text-light); font-size: 11px; }
-        .ft-bottom .ft-links { display: flex; gap: 16px; }
-        .ft-bottom .ft-links a { color: var(--text-light); text-decoration: none; font-size: 11px; transition: color 0.15s; }
-        .ft-bottom .ft-links a:hover { color: var(--primary); }
-
-        @media (max-width: 992px) {
-            .hero-title { font-size: 2.4rem; }
-            .showcase-panel { grid-template-columns: 1fr; padding: 32px; }
-            .bento-grid { grid-template-columns: 1fr; }
-            .bento-card.wide { grid-column: span 1; }
-            .proof-grid { grid-template-columns: 1fr; }
-            .proof-quote { grid-row: span 1; }
-            .ft-grid { grid-template-columns: 1fr 1fr; }
-            .trust-bar { gap: 24px; }
-        }
-
-        @media (max-width: 768px) {
-            .hero { padding: 72px 0 36px; }
-            .bento, .proof { padding: 64px 0; }
-            .cta-row { flex-direction: column; width: 100%; }
-            .btn { width: 100%; justify-content: center; }
-            .showcase { padding: 16px 0 64px; }
-            .ft-grid { grid-template-columns: 1fr; }
-            .ft-bottom { justify-content: center; text-align: center; }
-            .trust-bar { flex-wrap: wrap; gap: 20px; }
-            .navbar-logo span { display: none; }
-        }
     </style>
 </head>
-<body>
-    <div class="page">
-        <div class="orb-mid"></div>
-
-        <nav class="navbar">
-            <div class="navbar-content wrap">
-                <div class="navbar-logo">
-                    <img class="nav-wordmark" src="/assets/careverse_regulator/compliance-360/compliance-logo.svg" alt="{{ app_name }}">
-                </div>
-                <div class="navbar-actions">
-                    <a href="{{ cta_secondary_link }}" class="btn btn-outline">{{ cta_secondary_text }}</a>
-                    <a href="{{ cta_link }}" class="btn btn-primary">{{ cta_text }}</a>
-                </div>
-            </div>
-        </nav>
-
-        <section class="hero">
-            <div class="wrap">
-                <div class="hero-inner">
-                    <div class="g hero-badge">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                        Healthcare Management Platform
-                    </div>
-                    <h1 class="hero-title">
-                        <span class="accent">Compliance. Excellence.</span>
-                        Healthcare Management
-                    </h1>
-                    <p class="hero-desc">
-                        One platform for healthcare facility management, license tracking, compliance monitoring, and operational excellence across your organization.
-                    </p>
-                    <div class="cta-row">
-                        <a href="{{ cta_link }}" class="btn btn-primary">{{ cta_text }}</a>
-                        <a href="{{ cta_secondary_link }}" class="btn btn-outline">{{ cta_secondary_text }}</a>
-                    </div>
-                    <div class="trust-bar">
-                        <div class="trust-item"><div class="trust-val">100%</div><div class="trust-lbl">Compliant</div></div>
-                        <div class="trust-item"><div class="trust-val">24/7</div><div class="trust-lbl">Monitoring</div></div>
-                        <div class="trust-item"><div class="trust-val">Multi-Site</div><div class="trust-lbl">Enabled</div></div>
-                        <div class="trust-item"><div class="trust-val">Enterprise</div><div class="trust-lbl">Ready</div></div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="showcase">
-            <div class="wrap">
-                <div class="showcase-panel">
-                    <div class="sc-card">
-                        <div class="sc-label">License Compliance</div>
-                        <div class="sc-value">98.6%</div>
-                        <div class="sc-sub">All checks passing</div>
-                    </div>
-                    <div class="sc-card">
-                        <div class="sc-label">Affiliations Active</div>
-                        <div class="sc-value">247</div>
-                        <div class="sc-sub">Verified this month</div>
-                    </div>
-                    <div class="sc-card">
-                        <div class="sc-label">Facilities Covered</div>
-                        <div class="sc-value">18</div>
-                        <div class="sc-sub">Across network</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="bento">
-            <div class="wrap">
-                <div class="bento-header">
-                    <h2>Everything in One Platform</h2>
-                    <p>Comprehensive healthcare management with built-in compliance, licensing, and operational excellence tracking.</p>
-                </div>
-                <div class="bento-grid">
-                    <div class="g bento-card wide">
-                        <div class="bento-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
-                        <h3>License & Credential Management</h3>
-                        <p>End-to-end license lifecycle management from issuance to renewal. Automated expiry alerts ensure your organization remains fully compliant without manual overhead.</p>
-                    </div>
-                    <div class="g bento-card">
-                        <div class="bento-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></div>
-                        <h3>Analytics & Insights</h3>
-                        <p>Real-time dashboards showing compliance metrics, facility performance, and operational KPIs across all your locations.</p>
-                    </div>
-                    <div class="g bento-card">
-                        <div class="bento-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
-                        <h3>Workforce Management</h3>
-                        <p>Track professional credentials, affiliations, and certifications across your entire healthcare workforce with real-time verification.</p>
-                    </div>
-                    <div class="g bento-card wide">
-                        <div class="bento-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div>
-                        <h3>Compliance & Audit Trails</h3>
-                        <p>Full audit log for every compliance action, regulatory submission, and approval workflow. Built for environments where accountability and traceability are non-negotiable.</p>
-                    </div>
-                    {% for feature in features %}
-                    <div class="g bento-card">
-                        <div class="bento-ic">{{ feature.icon }}</div>
-                        <h3>{{ feature.title }}</h3>
-                        <p>{{ feature.description }}</p>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </section>
-
-        <section class="proof">
-            <div class="wrap">
-                <div class="proof-grid">
-                    <div class="g proof-quote">
-                        <div>
-                            <div class="pq-mark">&ldquo;</div>
-                            <p class="pq-text">The unified platform has fundamentally changed how our compliance team operates. We went from managing multiple disconnected systems to a single source of truth for licenses, affiliations, and regulatory requirements. The automated tracking alone saves us weeks of manual work every quarter.</p>
-                        </div>
-                        <div class="pq-author">
-                            <div class="pq-avatar">RC</div>
-                            <div><div class="pq-name">Dr. Rachel Chen</div><div class="pq-role">Compliance Officer, Regional Health</div></div>
-                        </div>
-                    </div>
-                    <div class="g proof-mini">
-                        <p class="pm-text">License management is now seamless. We have complete visibility into expiring credentials across 50+ facilities, and the renewal notifications keep us compliant without lifting a finger.</p>
-                        <div class="pm-author">
-                            <div class="pm-avatar">MJ</div>
-                            <div><div class="pm-name">Michael Johnson</div><div class="pm-role">Facility Manager</div></div>
-                        </div>
-                    </div>
-                    <div class="g proof-mini">
-                        <p class="pm-text">The workforce affiliation tracking is exactly what healthcare organizations need. Comprehensive, automated, and built specifically for regulatory compliance. Highly recommended.</p>
-                        <div class="pm-author">
-                            <div class="pm-avatar">SK</div>
-                            <div><div class="pm-name">Sarah Kim</div><div class="pm-role">HR Director</div></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="cta-sec">
-            <div class="wrap">
-                <div class="cta-box">
-                    <h2>Ready to transform healthcare management?</h2>
-                    <p>Join healthcare organizations streamlining compliance, licensing, and workforce management across their entire network.</p>
-                    <div class="cta-row">
-                        <a href="{{ cta_link }}" class="btn btn-primary">{{ cta_text }}</a>
-                    </div>
-                    <div class="trust-note">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                        Secure & compliant · Built for healthcare · Enterprise-ready
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <footer class="ft">
-            <div class="wrap">
-                <div class="ft-grid">
-                    <div class="ft-brand">
-                        <img src="/assets/careverse_regulator/compliance-360/compliance-logo.svg" alt="{{ app_name }}" style="height: 22px; width: auto;">
-                        <p>Healthcare Management Platform for compliance tracking and operational excellence.</p>
-                    </div>
-                    <div class="ft-col">
-                        <h4>Product</h4>
-                        <a href="#bento">Features</a>
-                        <a href="{{ cta_link }}">Dashboard</a>
-                        <a href="#">Changelog</a>
-                    </div>
-                    <div class="ft-col">
-                        <h4>Resources</h4>
-                        <a href="#">Documentation</a>
-                        <a href="#">API Reference</a>
-                        <a href="#">Status</a>
-                    </div>
-                    <div class="ft-col">
-                        <h4>Company</h4>
-                        <a href="#">About</a>
-                        <a href="#">Contact</a>
-                        <a href="{{ cta_secondary_link }}">Sign In</a>
-                    </div>
-                </div>
-                <div class="ft-bottom">
-                    <span class="cp">&copy; 2026 {{ app_name }}. All rights reserved.</span>
-                    <div class="ft-links">
-                        <a href="#">Privacy</a>
-                        <a href="#">Terms</a>
-                        <a href="#">Security</a>
-                    </div>
-                </div>
-            </div>
-        </footer>
-    </div>
-</body>
-</html>
+<body class="antialiased">
+<!-- TopNavBar -->
+<header class="w-full sticky top-0 z-50 glass-header">
+<nav class="container mx-auto flex items-center justify-between px-8 py-4">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-2">
+<img alt="{{ app_name }}" class="h-8 w-auto" src="/assets/careverse_regulator/compliance-360/compliance-logo.svg"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<a href="{{ cta_secondary_link }}" class="text-on-surface-variant hover:text-primary px-5 py-2 rounded-lg font-medium text-sm transition-colors">{{ cta_secondary_text }}</a>
+<a href="{{ cta_link }}" class="signature-gradient text-white px-5 py-2 rounded-lg font-medium text-sm shadow-sm active:scale-95 transition-transform">{{ cta_text }}</a>
+</div>
+</nav>
+</header>
+<main>
+<!-- Hero Section: Architectural Asymmetry -->
+<section class="relative flex items-center pt-16 pb-20 overflow-hidden">
+<div class="container mx-auto px-8 relative z-10">
+<div class="asymmetric-grid">
+<div class="col-span-12 lg:col-span-7 flex flex-col justify-center">
+<span class="text-primary font-medium tracking-widest uppercase text-xs mb-6">Healthcare Management Platform</span>
+<h1 class="text-5xl md:text-7xl font-semibold tracking-tighter leading-[0.9] text-on-surface mb-8">
+                            Compliance. <br/> <span class="text-primary-container">Excellence.</span> <br/> Healthcare.
+                        </h1>
+<p class="text-lg text-on-surface-variant max-w-xl mb-10 leading-relaxed">
+                            One platform for healthcare facility management, license tracking, compliance monitoring, and operational excellence across your entire regulatory network.
+                        </p>
+<div class="flex gap-4">
+<a href="{{ cta_link }}" class="signature-gradient text-white px-8 py-4 rounded-xl font-medium text-lg shadow-xl hover:shadow-primary/20 transition-all">{{ cta_text }}</a>
+<a href="{{ cta_secondary_link }}" class="bg-surface-container-high text-on-secondary-container px-8 py-4 rounded-xl font-medium text-lg hover:bg-surface-container-highest transition-all">{{ cta_secondary_text }}</a>
+</div>
+</div>
+<div class="col-span-12 lg:col-span-5 relative mt-12 lg:mt-0">
+<!-- Overlapping Image Elements -->
+<div class="relative w-full aspect-square">
+<div class="absolute top-0 right-0 w-4/5 h-4/5 rounded-xl overflow-hidden shadow-2xl z-20 transform translate-x-4 -translate-y-4">
+<img alt="Modern Healthcare Facility" class="w-full h-full object-cover" data-alt="ultra-modern clean room intensive care unit with advanced monitoring screens and soft clinical blue lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCBYeYFDqbeipCdSd6u1El9kihhD6cnPfhSEa-_LgZo94SGBCChRHubw7tCfhWrGv6fbZgFxARvQrhBzbJa59ArkMOqrsINNmsIdYXmgBmVUtE341hanbDzIq3LhJ4TABE0RjOFpp__qqE-IldGeY8ecaupAhj86UEdWPb6IDvbMDdV0H3D3ulm4Czd5y0WSA5AkieBfmdt2cGmWYkOyIS6P4jxG7TxBfnQ0titNSDUgP9Kkl5ZYymZ9Fb5NqJ_Jb0dY0fbs6kLgxRu"/>
+</div>
+<div class="absolute bottom-0 left-0 w-3/4 h-3/4 rounded-xl overflow-hidden shadow-xl z-10 bg-surface-container-highest">
+<img alt="Healthcare Professional" class="w-full h-full object-cover opacity-80 mix-blend-multiply" data-alt="professional female doctor in a white coat looking at a digital tablet with focused expression in a bright corridor" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAXRKSQWNs7T5xVQQ293LMF9MKneQfv6BHO5siDWEkP8DJw_NmrQ5NzFKO1pM7HBLBNuSqwn74alWjpblNRrBr19RSjitUzQ-VB6VInrnmI0d36H2t_vMbUEJwLX6hKy1ZXLBzPIveFaTohe85AfAAC83BrHLsGtptTvXuM-_UrtetgWabMafpNReFxa7TES4TyTUTW4abjA3uOlm5Q-J4gF1s7kuf0cBjtcP1Pl6LluCoSQ7VUVH_09HJl1s0bH0_susqzh5yPlgxj"/>
+</div>
+<div class="absolute -bottom-10 -right-10 w-48 h-48 signature-gradient rounded-full blur-3xl opacity-20 z-0"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Decorative Background Wash -->
+<div class="absolute inset-0 bg-surface-tint/[0.03] -z-10 pointer-events-none"></div>
+</section>
+<!-- Regulatory Edge Section: Bento Grid Layout -->
+<section class="py-20 bg-surface-container-low">
+<div class="container mx-auto px-8">
+<div class="flex flex-col md:flex-row justify-between items-end mb-10 gap-8">
+<div class="max-w-2xl">
+<h2 class="text-4xl font-medium tracking-tight text-on-surface mb-4">Everything in One Platform</h2>
+<p class="text-on-surface-variant text-lg">Comprehensive healthcare management with built-in compliance, licensing, and operational excellence tracking.</p>
+</div>
+<div class="flex items-center gap-4 bg-surface-container-lowest p-2 rounded-full shadow-sm">
+<span class="px-4 py-2 bg-primary text-white rounded-full text-sm font-medium">Live Status</span>
+<span class="pr-6 text-sm font-medium text-on-surface-variant tracking-tight">System Integrity: 100% Operational</span>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+<!-- Card 1 -->
+<div class="md:col-span-2 bg-surface-container-lowest p-8 rounded-xl shadow-sm hover:translate-y-[-4px] transition-all duration-300">
+<div class="w-12 h-12 rounded-lg signature-gradient flex items-center justify-center text-white mb-6">
+<span class="material-symbols-outlined">verified_user</span>
+</div>
+<h3 class="text-2xl font-medium mb-4">License & Credential Management</h3>
+<p class="text-on-surface-variant mb-6">End-to-end license lifecycle management from issuance to renewal. Automated expiry alerts ensure your organization remains fully compliant without manual overhead.</p>
+<div class="flex gap-2">
+<span class="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium uppercase tracking-wider">Auto Renewal</span>
+<span class="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium uppercase tracking-wider">Real-time Sync</span>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface-container-highest p-8 rounded-xl shadow-sm hover:translate-y-[-4px] transition-all duration-300">
+<div class="w-12 h-12 rounded-lg bg-white flex items-center justify-center text-primary mb-6">
+<span class="material-symbols-outlined">analytics</span>
+</div>
+<h3 class="text-xl font-medium mb-4">Analytics & Insights</h3>
+<p class="text-sm text-on-surface-variant mb-6">Real-time dashboards showing compliance metrics, facility performance, and operational KPIs across all your locations.</p>
+<div class="text-3xl font-semibold text-primary">24/7</div>
+<div class="text-xs font-medium text-on-surface-variant opacity-60">CONTINUOUS MONITORING</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-white p-8 rounded-xl shadow-sm border border-outline-variant/10 hover:translate-y-[-4px] transition-all duration-300">
+<div class="w-12 h-12 rounded-lg bg-surface-container-low flex items-center justify-center text-primary mb-6">
+<span class="material-symbols-outlined">groups</span>
+</div>
+<h3 class="text-xl font-medium mb-4">Workforce Management</h3>
+<p class="text-sm text-on-surface-variant mb-6">Track professional credentials, affiliations, and certifications across your entire healthcare workforce with real-time verification.</p>
+<div class="h-2 w-full bg-surface-container-low rounded-full overflow-hidden">
+<div class="h-full bg-primary-container w-[98%]"></div>
+</div>
+<div class="mt-2 text-xs font-medium text-primary">98.6% Compliance Rate</div>
+</div>
+<!-- Card 4 (Large Bottom) -->
+<div class="md:col-span-4 bg-on-surface text-white p-12 rounded-xl flex flex-col md:flex-row items-center gap-12 overflow-hidden relative">
+<div class="flex-1 relative z-10">
+<h3 class="text-3xl font-medium mb-4 text-primary-container">Compliance & Audit Trails</h3>
+<p class="text-surface-variant text-lg max-w-xl mb-8">Full audit log for every compliance action, regulatory submission, and approval workflow. Built for environments where accountability and traceability are non-negotiable.</p>
+<a href="{{ cta_link }}" class="text-white border-b-2 border-primary-container pb-1 font-medium tracking-tight hover:text-primary-container transition-colors">EXPLORE THE PLATFORM</a>
+</div>
+<div class="w-full md:w-1/3 h-48 rounded-lg overflow-hidden grayscale opacity-50 relative z-10">
+<img alt="Laboratory Infrastructure" class="w-full h-full object-cover" data-alt="modern medical laboratory with stainless steel surfaces and high-precision scientific equipment under bright cool lights" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3-Mct5PDZEoadlPrOKdK3Itw53IJM4aLWnigh6Ra2_g4YDdCjs3CLI7SupoJRVk82mH_0ecDoOmlZ9-0t3yRWuO6PixYSK4W540WHTuxVyzReAGydNd87xKWSTjuLI8N58vtdCgcwwMChnOMaSACikOr7GzWGVbizn7t4l7mnVzWI16hd-OKr5RLHSchbriJ0_tKTwzkDIjzrOKci-SooJCCeEbZyCnhcRQb1m7F4xe3BM2PNNFzXkk6B1X8pWGPb1v9Z8n4uaXcU"/>
+</div>
+<div class="absolute -right-20 -bottom-20 w-96 h-96 bg-primary opacity-10 rounded-full blur-3xl"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Health Worker Lifecycle: High Precision Layout -->
+<section class="py-20 bg-white">
+<div class="container mx-auto px-8">
+<div class="asymmetric-grid items-center">
+<div class="col-span-12 lg:col-span-5 order-2 lg:order-1">
+<div class="relative">
+<div class="bg-surface-container-low p-6 rounded-2xl shadow-inner mb-8">
+<div class="flex justify-between items-center mb-6">
+<h4 class="font-medium text-sm uppercase tracking-widest text-primary">License Compliance</h4>
+<span class="text-xs font-mono text-on-surface-variant">ORG_ID: REG-001</span>
+</div>
+<!-- Mock Visualisation -->
+<div class="flex items-end gap-1 h-32 mb-4">
+<div class="flex-1 bg-outline-variant/30 h-[40%] rounded-t-sm"></div>
+<div class="flex-1 bg-outline-variant/30 h-[45%] rounded-t-sm"></div>
+<div class="flex-1 bg-primary-container h-[60%] rounded-t-sm"></div>
+<div class="flex-1 bg-primary h-[80%] rounded-t-sm"></div>
+<div class="flex-1 bg-primary-container h-[55%] rounded-t-sm"></div>
+<div class="flex-1 bg-outline-variant/30 h-[42%] rounded-t-sm"></div>
+<div class="flex-1 bg-outline-variant/30 h-[38%] rounded-t-sm"></div>
+</div>
+<div class="flex justify-between text-[10px] font-medium text-on-surface-variant">
+<span>Expired</span>
+<span class="text-primary">COMPLIANT: 98.6%</span>
+<span>Pending</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-surface-container-highest p-6 rounded-xl">
+<div class="text-xs font-medium text-on-surface-variant mb-1 uppercase">Facilities Covered</div>
+<div class="text-3xl font-semibold text-on-surface">247</div>
+</div>
+<div class="bg-primary p-6 rounded-xl text-white">
+<div class="text-xs font-medium opacity-80 mb-1 uppercase">Renewals Tracked</div>
+<div class="text-3xl font-semibold">Active</div>
+</div>
+</div>
+</div>
+</div>
+<div class="col-span-12 lg:col-span-6 lg:offset-1 order-1 lg:order-2 mb-16 lg:mb-0">
+<span class="text-primary font-medium tracking-widest uppercase text-xs mb-4 block">Health Worker Lifecycle</span>
+<h2 class="text-5xl font-semibold tracking-tighter text-on-surface mb-8 leading-tight">Complete <br/> Lifecycle Oversight.</h2>
+<p class="text-lg text-on-surface-variant mb-10 leading-relaxed">
+                            Track every stage from indexing and internship licensing through full registration and renewal. Our unified registry gives you a single source of truth for every health worker under your jurisdiction.
+                        </p>
+<ul class="space-y-4">
+<li class="flex items-center gap-3 font-medium text-on-surface">
+<span class="material-symbols-outlined text-primary-container">check_circle</span>
+                                Automated Expiry & Renewal Alerts
+                            </li>
+<li class="flex items-center gap-3 font-medium text-on-surface">
+<span class="material-symbols-outlined text-primary-container">check_circle</span>
+                                Multi-Facility Affiliation Tracking
+                            </li>
+<li class="flex items-center gap-3 font-medium text-on-surface">
+<span class="material-symbols-outlined text-primary-container">check_circle</span>
+                                Credential Verification & Compliance Checks
+                            </li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<!-- Facility Oversight: Technical Details -->
+<section class="py-20 bg-surface-container-low overflow-hidden">
+<div class="container mx-auto px-8">
+<div class="flex flex-col lg:flex-row items-center gap-24">
+<div class="lg:w-1/2">
+<h2 class="text-5xl font-semibold tracking-tighter text-on-surface mb-8">Facility Oversight</h2>
+<div class="space-y-8">
+<div class="border-l-4 border-primary pl-6">
+<h4 class="text-xl font-medium mb-2">Inspection Management</h4>
+<p class="text-on-surface-variant">Schedule, execute, and track multi-facility inspections with automated deficiency detection and resolution workflows.</p>
+</div>
+<div class="border-l-4 border-outline-variant pl-6">
+<h4 class="text-xl font-medium mb-2">Regulatory Reporting</h4>
+<p class="text-on-surface-variant">Operational and regulatory reporting for inspections, renewals, and enforcement status — ready for any audit at any time.</p>
+</div>
+<div class="border-l-4 border-outline-variant pl-6">
+<h4 class="text-xl font-medium mb-2">Company-Scoped Access</h4>
+<p class="text-on-surface-variant">Role-based access with immutable activity history and accountability scoped to each regulator company across your network.</p>
+</div>
+</div>
+</div>
+<div class="lg:w-1/2 relative">
+<div class="relative z-10 rounded-2xl overflow-hidden shadow-2xl rotate-3 translate-x-10">
+<img alt="Hospital Architecture" class="w-full aspect-video object-cover" data-alt="wide angle view of a contemporary glass and steel hospital lobby with natural light and geometric architectural lines" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAqmRuAe9D8eXOMvlUt9Z-jKD9jx9DSGiwgBTdvWDVVPxM4CoyM0QbuLiWOdxcIa5xDafvaK48Pr4jwCNL8THwxZ83lGUTBB54C6RGGp4OryDsSvUXni_BXsRZ6ld5Bz2m1Yn9vbrSnaXG3a3v9tQvHjxQCgosPC9kxjDKwIkk5X382qJ-MrnKibQKw3bo5BAA4MM7KtWcEuasmHsHsDFiNZ9pp2dMw8fXnVvqMpsRuHrNzD8_uDHX0I061ORpikQGOOi3aL7-BdG0B"/>
+</div>
+<div class="absolute top-1/2 left-0 w-full h-full bg-primary-container/20 -z-0 rounded-2xl transform -translate-x-10 -translate-y-1/2 -rotate-3"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Unified Standards Repository: Dark Data-Rich Section -->
+<section class="py-20 bg-on-surface text-white">
+<div class="container mx-auto px-8">
+<div class="text-center max-w-3xl mx-auto mb-12">
+<h2 class="text-4xl font-medium mb-6">Regulatory Intelligence at Scale</h2>
+<p class="text-surface-variant opacity-70">A centralized engine for compliance tracking, license management, and facility oversight — built for healthcare organizations that demand absolute integrity.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
+<div class="p-8 border border-surface-variant/10 rounded-2xl bg-white/5 backdrop-blur-sm">
+<div class="text-6xl font-semibold text-primary-container mb-2">100%</div>
+<div class="text-xs font-medium uppercase tracking-widest text-surface-variant">Compliance Coverage</div>
+</div>
+<div class="p-8 border border-surface-variant/10 rounded-2xl bg-white/5 backdrop-blur-sm">
+<div class="text-6xl font-semibold text-primary-container mb-2">24/7</div>
+<div class="text-xs font-medium uppercase tracking-widest text-surface-variant">Continuous Monitoring</div>
+</div>
+<div class="p-8 border border-surface-variant/10 rounded-2xl bg-white/5 backdrop-blur-sm">
+<div class="text-6xl font-semibold text-primary-container mb-2">Multi‑Site</div>
+<div class="text-xs font-medium uppercase tracking-widest text-surface-variant">Enterprise Ready</div>
+</div>
+</div>
+<div class="mt-12 overflow-hidden rounded-xl bg-surface-variant/5 p-1">
+<table class="w-full text-left text-sm">
+<thead class="bg-surface-variant/10 text-surface-variant uppercase text-[10px] font-medium tracking-widest">
+<tr>
+<th class="px-6 py-4">Module</th>
+<th class="px-6 py-4">Scope</th>
+<th class="px-6 py-4">Status</th>
+<th class="px-6 py-4">Coverage</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-white/5">
+<tr>
+<td class="px-6 py-4 font-medium">License Lifecycle Management</td>
+<td class="px-6 py-4 text-surface-variant">All Facility Types</td>
+<td class="px-6 py-4"><span class="px-2 py-0.5 bg-primary/20 text-primary-container rounded text-[10px] font-medium">ACTIVE</span></td>
+<td class="px-6 py-4 text-surface-variant">Issuance to Renewal</td>
+</tr>
+<tr>
+<td class="px-6 py-4 font-medium">Health Worker Registry</td>
+<td class="px-6 py-4 text-surface-variant">Cross-Organization</td>
+<td class="px-6 py-4"><span class="px-2 py-0.5 bg-primary/20 text-primary-container rounded text-[10px] font-medium">ACTIVE</span></td>
+<td class="px-6 py-4 text-surface-variant">Full Lifecycle</td>
+</tr>
+<tr>
+<td class="px-6 py-4 font-medium">Inspection & Audit Engine</td>
+<td class="px-6 py-4 text-surface-variant">Multi-Facility</td>
+<td class="px-6 py-4"><span class="px-2 py-0.5 bg-primary/20 text-primary-container rounded text-[10px] font-medium">ACTIVE</span></td>
+<td class="px-6 py-4 text-surface-variant">Real-time Tracking</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<!-- CTA Section -->
+<section class="py-20 bg-white relative">
+<div class="container mx-auto px-8 text-center relative z-10">
+<h2 class="text-6xl font-semibold tracking-tighter text-on-surface mb-8">Ready to Transform <br/> Healthcare Management?</h2>
+<p class="text-xl text-on-surface-variant max-w-2xl mx-auto mb-12">
+                    Join healthcare organizations streamlining compliance, licensing, and workforce management across their entire regulatory network.
+                </p>
+<div class="flex flex-col sm:flex-row justify-center gap-6">
+<a href="{{ cta_link }}" class="signature-gradient text-white px-10 py-5 rounded-xl font-medium text-xl shadow-2xl active:scale-95 transition-all">{{ cta_text }}</a>
+<a href="{{ cta_secondary_link }}" class="border-2 border-outline text-on-surface px-10 py-5 rounded-xl font-medium text-xl hover:bg-surface-container-low active:scale-95 transition-all">{{ cta_secondary_text }}</a>
+</div>
+</div>
+<!-- Large Decorative Icon -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[40rem] text-primary/5 pointer-events-none select-none z-0">
+<span class="material-symbols-outlined">verified_user</span>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full border-t border-slate-100 bg-white">
+<div class="container mx-auto flex flex-col md:flex-row justify-between items-center px-8 py-10">
+<div class="mb-8 md:mb-0">
+<div class="flex items-center gap-2 mb-4">
+<img alt="{{ app_name }}" class="h-6 w-auto" src="/assets/careverse_regulator/compliance-360/compliance-logo.svg"/>
+</div>
+<p class="font-['Inter'] text-xs uppercase tracking-widest font-medium text-slate-400">&copy; 2026 {{ app_name }}. All rights reserved.</p>
+</div>
+<div class="flex flex-wrap gap-8 font-['Inter'] text-xs uppercase tracking-widest font-medium">
+<a class="text-slate-400 hover:text-teal-700 transition-colors" href="#">Privacy Policy</a>
+<a class="text-slate-400 hover:text-teal-700 transition-colors" href="#">Terms of Service</a>
+<a class="text-slate-400 hover:text-teal-700 transition-colors" href="#">Security Disclosure</a>
+</div>
+</div>
+</footer>
+</body></html>

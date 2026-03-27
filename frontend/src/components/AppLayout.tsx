@@ -46,7 +46,6 @@ import type { PortalUser } from "@/types/auth";
 import { useThemeStore } from "@/stores/themeStore";
 import { cn } from "@/lib/utils";
 
-
 interface AppLayoutProps {
   children: React.ReactNode;
   currentRoute: string;
@@ -98,11 +97,9 @@ export default function AppLayout({
   const [mobileMenuVisible, setMobileMenuVisible] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
 
-
   const mode = useThemeStore((state) => state.mode);
   const toggleMode = useThemeStore((state) => state.toggleMode);
   const isDarkMode = mode === "dark";
-
 
   useEffect(() => {
     setCollapsed(isTablet);
@@ -126,17 +123,17 @@ export default function AppLayout({
   // Keyboard shortcut: Cmd+K / Ctrl+K to open search
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
-        event.preventDefault()
-        setSearchOpen(prev => true)
+      if ((event.metaKey || event.ctrlKey) && event.key === "k") {
+        event.preventDefault();
+        setSearchOpen((prev) => true);
       }
-    }
+    };
 
-    window.addEventListener('keydown', handleKeyDown)
+    window.addEventListener("keydown", handleKeyDown);
     return () => {
-      window.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [])
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   const menuItems = [
     {
@@ -404,17 +401,9 @@ export default function AppLayout({
               <div className="h-8 w-px bg-border" />
 
               <div className="flex flex-col">
-                <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
-                  {pageContext}
-                </span>
                 <h1 className="text-sm font-semibold leading-tight">
                   {pageTitle}
                 </h1>
-                {pageSubtitle && (
-                  <span className="text-xs text-muted-foreground">
-                    {pageSubtitle}
-                  </span>
-                )}
               </div>
             </div>
 
@@ -522,7 +511,9 @@ export default function AppLayout({
 
         <main className="p-4 md:p-6">{children}</main>
       </div>
-      {searchOpen && <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />}
+      {searchOpen && (
+        <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
+      )}
     </div>
   );
 }

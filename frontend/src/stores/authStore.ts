@@ -40,6 +40,7 @@ interface UserContextResponse {
       message?: string | null
     }
     allowed_companies?: string[]
+    roles?: string[]
   }
 }
 
@@ -175,27 +176,33 @@ export const useAuthStore = create<AuthState>((set) => ({
       }
 
       const context = await fetchUserContext().catch(() => ({}))
+      const userRoles = context.roles || []
+      const roleAllowed = hasRoleAccess(userRoles)
       const activeCompany = context.active_company || context.company_display_name || fallbackUser.company || null
       const branding = context.company_branding || {}
       const companyDisplayName = branding.display_name || context.company_display_name || fallbackUser.companyDisplayName || activeCompany
       const companyAbbr = branding.abbr || context.company_abbr || fallbackUser.companyAbbr || null
       const companyLogo = branding.logo || context.company_logo || fallbackUser.companyLogo || null
       const faviconUrl = branding.favicon_url || context.favicon_url || companyLogo || fallbackUser.faviconUrl || null
-      const accessAllowed = Boolean((context.portal_access?.allowed ?? true) && activeCompany)
+      const accessAllowed = Boolean(roleAllowed && (context.portal_access?.allowed ?? true) && activeCompany)
       const accessIssue = context.portal_access?.reason === 'multiple_company_permissions'
         ? 'multiple_company_permissions'
         : context.portal_access?.reason === 'missing_company_permission'
           ? 'missing_company_permission'
-          : !activeCompany
-            ? 'missing_company_permission'
-            : null
+          : !roleAllowed
+            ? 'role_forbidden'
+            : !activeCompany
+              ? 'missing_company_permission'
+              : null
       const accessMessage = context.portal_access?.message
+        || (!roleAllowed ? 'Your account does not have one of the required portal roles.' : null)
         || (!activeCompany ? 'Assign exactly one Company User Permission to this user account.' : null)
 
       set({
         status: 'authenticated',
         user: {
           ...fallbackUser,
+          roles: userRoles,
           company: activeCompany,
           companyDisplayName,
           companyAbbr,

@@ -13,9 +13,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu'
-import { showSuccess, showError } from '@/utils/toast'
-import type { License, LicenseAction } from '@/types/license'
+} from "@/components/ui/dropdown-menu"
+import { showSuccess, showError } from "@/utils/toast"
+import type { License, LicenseAction } from "@/types/license"
 
 function LicenseDetailPage() {
   const { licenseNumber } = Route.useParams()
@@ -27,7 +27,7 @@ function LicenseDetailPage() {
   const [actionLoading, setActionLoading] = useState(false)
 
   const handleBack = () => {
-    navigate({ to: '/license-management' })
+    navigate({ to: "/license-management" })
   }
 
   const handleAction = async (action: LicenseAction, actionName: string) => {
@@ -40,13 +40,15 @@ function LicenseDetailPage() {
       const updated = await getLicense(licenseNumber)
       setLicense(updated)
     } catch (err) {
-      showError(err instanceof Error ? err.message : `Failed to ${actionName.toLowerCase()} license`)
+      showError(
+        err instanceof Error ? err.message : `Failed to ${actionName.toLowerCase()} license`
+      )
     } finally {
       setActionLoading(false)
     }
   }
 
-  const canPerformActions = license && ['Pending', 'In Review'].includes(license.status)
+  const canPerformActions = license && ["Pending", "In Review"].includes(license.status)
 
   return (
     <div className="hq-page-wrap">
@@ -117,15 +119,21 @@ function LicenseDetailPage() {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground">License Number</label>
+                    <label className="text-sm font-medium text-muted-foreground">
+                      License Number
+                    </label>
                     <p className="mt-1 text-base font-mono">{license.licenseNumber}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground">Registration Number</label>
+                    <label className="text-sm font-medium text-muted-foreground">
+                      Registration Number
+                    </label>
                     <p className="mt-1 text-base font-mono">{license.registrationNumber}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground">License Type</label>
+                    <label className="text-sm font-medium text-muted-foreground">
+                      License Type
+                    </label>
                     <p className="mt-1 text-base">{license.licenseType}</p>
                   </div>
                   <div>
@@ -151,7 +159,9 @@ function LicenseDetailPage() {
                     <p className="mt-1 text-base">{license.owner}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground">Facility Type</label>
+                    <label className="text-sm font-medium text-muted-foreground">
+                      Facility Type
+                    </label>
                     <p className="mt-1 text-base">{license.facilityType}</p>
                   </div>
                 </div>
@@ -160,8 +170,8 @@ function LicenseDetailPage() {
 
             {/* Dates and Payment */}
             {(() => {
-              const expiryDate = dayjs(license.dateOfExpiry, 'DD/MM/YYYY')
-              const daysToExpiry = expiryDate.diff(dayjs(), 'day')
+              const expiryDate = dayjs(license.dateOfExpiry, "DD/MM/YYYY")
+              const daysToExpiry = expiryDate.diff(dayjs(), "day")
               const isExpired = daysToExpiry < 0
               const isExpiringSoon = daysToExpiry >= 0 && daysToExpiry <= 30
 
@@ -175,13 +185,15 @@ function LicenseDetailPage() {
                       </CardTitle>
                       {license.dateOfExpiry && (
                         <Badge
-                          variant={isExpired ? 'destructive' : isExpiringSoon ? 'secondary' : 'outline'}
+                          variant={
+                            isExpired ? "destructive" : isExpiringSoon ? "secondary" : "outline"
+                          }
                           className={`flex items-center gap-1.5 ${
                             isExpired
-                              ? ''
+                              ? ""
                               : isExpiringSoon
-                                ? 'border-orange-500 text-orange-700 dark:text-orange-400'
-                                : 'text-green-700 dark:text-green-400 border-green-500'
+                                ? "border-orange-500 text-orange-700 dark:text-orange-400"
+                                : "text-green-700 dark:text-green-400 border-green-500"
                           }`}
                         >
                           <Clock className="h-3.5 w-3.5" />
@@ -195,15 +207,21 @@ function LicenseDetailPage() {
                   <CardContent className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="text-sm font-medium text-muted-foreground">Date of Issuance</label>
+                        <label className="text-sm font-medium text-muted-foreground">
+                          Date of Issuance
+                        </label>
                         <p className="mt-1 text-base">{license.dateOfIssuance}</p>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-muted-foreground">Date of Expiry</label>
+                        <label className="text-sm font-medium text-muted-foreground">
+                          Date of Expiry
+                        </label>
                         <p className="mt-1 text-base">{license.dateOfExpiry}</p>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-muted-foreground">Payment Status</label>
+                        <label className="text-sm font-medium text-muted-foreground">
+                          Payment Status
+                        </label>
                         <p className="mt-1 text-base flex items-center gap-2">
                           <CreditCard className="h-4 w-4 text-muted-foreground" />
                           <span className="capitalize">{license.paymentStatus}</span>
@@ -211,7 +229,9 @@ function LicenseDetailPage() {
                       </div>
                       {license.isArchived && (
                         <div>
-                          <label className="text-sm font-medium text-muted-foreground">Archived</label>
+                          <label className="text-sm font-medium text-muted-foreground">
+                            Archived
+                          </label>
                           <p className="mt-1 text-base text-orange-600">Yes</p>
                         </div>
                       )}
@@ -227,8 +247,7 @@ function LicenseDetailPage() {
   )
 }
 
-export const Route = createFileRoute('/license-management/$licenseNumber')({
-  loader: async ({ params }) =>
-    useLicensingStore.getState().getLicense(params.licenseNumber),
+export const Route = createFileRoute("/license-management/$licenseNumber")({
+  loader: async ({ params }) => useLicensingStore.getState().getLicense(params.licenseNumber),
   component: LicenseDetailPage,
 })

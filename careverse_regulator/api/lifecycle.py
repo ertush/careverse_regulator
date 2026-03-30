@@ -71,4 +71,3 @@ def get_company_lifecycle_catalog() -> dict:
 		"facility_states": FACILITY_STATES,
 		"tracks": ["health_worker", "facility"],
 	}
-
